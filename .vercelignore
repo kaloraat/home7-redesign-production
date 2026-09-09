@@ -1,0 +1,15 @@
+# Reference-only Laravel export kept for migration lookups (see
+# PROJECT_BRIEF.md) — not part of the Next.js app, and its vendor/ folder
+# alone is 15k+ files, which is what pushed the CLI past Vercel's upload
+# limit in the first place.
+old_laravel_site
+
+# Vercel runs its own install/build — no need to upload local artifacts.
+node_modules
+.next
+.vercel
+*.tsbuildinfo
+
+# Secrets and local-only files.
+.env*
+.DS_Store

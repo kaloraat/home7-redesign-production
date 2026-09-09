@@ -1,0 +1,173 @@
+@import "tailwindcss";
+
+/*
+ * Brand colors pulled directly from the live site's compiled stylesheet
+ * (resources/css/vendor/styles.css in the Laravel export) rather than
+ * guessed — #f4ca74 is the dominant button/accent color (276 uses),
+ * #121B22 is the near-black used for dark sections and body copy,
+ * #081349 is the dark navy used behind the header/footer.
+ */
+:root {
+  /* This site has no dark mode — without this, form controls (and Google
+     Maps web components like the address autocomplete dropdown) fall back
+     to following the OS/browser's dark-mode preference on their own,
+     rendering an unstyled black dropdown regardless of the page's actual
+     (always-light) design. */
+  color-scheme: light;
+  --background: #ffffff;
+  --foreground: #121b22;
+  --brand-gold: #f4ca74;
+  --brand-gold-dark: #c18847;
+  --brand-navy: #081349;
+  /* The teal endpoint of BRAND_GRADIENT (lib/constants.ts) — same "sky
+     blue" already used across the site (nav/agent-hero gradient), reused
+     here as a standalone color for the play-button icon. */
+  --brand-teal: #228599;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-gold-dark: var(--brand-gold-dark);
+  --color-brand-navy: var(--brand-navy);
+  --color-brand-teal: var(--brand-teal);
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+}
+
+/*
+ * Sitewide background texture — plain CSS background-image on body, not
+ * next/image. next/image's contract (an <img> with intrinsic width/height
+ * or `fill` inside a positioned box, responsive srcset, lazy-loading by
+ * default) is built for content images; a decorative, always-visible,
+ * viewport-covering backdrop like this doesn't fit that shape, and it would
+ * need `priority` anyway since it's never below the fold to lazy-load. CSS
+ * background-size:cover is the native, zero-JS way to scale-and-crop a
+ * background to any viewport size, and background-attachment:fixed sizes
+ * `cover` against the viewport rather than the full (possibly much taller)
+ * scrollable page — without it, a long page would stretch this hugely to
+ * cover its whole height. (Older iOS Safari didn't support fixed
+ * attachment; modern versions do — worst case there it just falls back to
+ * scrolling with the page, not to anything broken.)
+ *
+ * The size concern next/image would normally solve (compression, modern
+ * format) is handled up front instead: the source bricks1.jpg (173KB) was
+ * converted to WebP at quality 78, landing at ~15KB — smaller than most of
+ * this site's icons, not a page-weight concern.
+ */
+body {
+  background-color: var(--background);
+  background-image: url("/images/background/bricks1.webp");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: var(--foreground);
+}
+
+/* Subtle contrast helper for text sitting directly on a photo — cheaper on
+   the eye than darkening the whole hero image further to fix legibility. */
+.text-shadow-hero {
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+/*
+ * Bold by default, site-wide — every heading already uses the `font-display`
+ * utility (it's the established pattern throughout the app), so setting the
+ * weight here once standardizes every title's boldness in one place rather
+ * than adding font-bold to each individual heading across every page.
+ * 800 (ExtraBold) — Rethink Sans (the current --font-display font, matching
+ * upmind.com's own heading font) tops out at 800, unlike Lato which needed
+ * 900 to hit its boldest cut.
+ */
+.font-display {
+  font-weight: 800;
+}
+
+/*
+ * Same family (Rethink Sans, via --font-display), light weight instead of
+ * the site-wide bold default — for the one quote-style block (BrandStory)
+ * that wants the display font's letterforms without the boldness. A
+ * Tailwind `font-light` utility can't do this: .font-display above is
+ * unlayered plain CSS, which the cascade always ranks above Tailwind's own
+ * utility layer regardless of class order, so it would silently win over
+ * any `font-light` class placed alongside it.
+ * 400 (Regular), not 300: Rethink Sans's variable range starts at 400 — a
+ * lighter value would just clamp to this anyway.
+ */
+.font-display-light {
+  font-family: var(--font-display);
+  font-weight: 400;
+}
+
+/*
+ * The Google-provided address-autocomplete widget (AddressAutocomplete.tsx)
+ * renders its own internal <input> inside a Shadow DOM, so it doesn't pick
+ * up any of our Tailwind classes and defaulted to its own font — visibly
+ * different from the plain sibling inputs in the same form. `::part(input)`
+ * is a shadow part Google explicitly exposes for exactly this, matching the
+ * sibling inputs' text-xl (1.25rem) size and px-3 py-2.5 padding (the
+ * wrapping div carries no padding of its own, so this is the only padding
+ * source — no doubling up).
+ */
+gmp-place-autocomplete::part(input) {
+  font-family: var(--font-sans), sans-serif;
+  font-size: 1.25rem;
+  padding: 0.625rem 0.75rem;
+}
+
+/*
+ * PropertyAddressFields.tsx (admin Property form) reuses this same widget
+ * but sits alongside text-sm/px-3 py-2 sibling inputs, not the public
+ * form's larger text-xl ones — the rule above alone made its placeholder
+ * text visibly bigger than every other admin field. Scoped to
+ * .admin-address-autocomplete (set on that component's wrapper only) so
+ * this doesn't affect the public AddressAutocomplete.tsx usage above.
+ */
+.admin-address-autocomplete gmp-place-autocomplete::part(input) {
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+}
+/* ::part(input) alone only reaches the widget's internal <input> — the
+   custom element's own HOST box (gmp-place-autocomplete itself) has a
+   default height independent of that padding, which is why the widget
+   still measured ~10px taller than its sibling inputs (38px) even with
+   the input part's own padding already reduced above. Constraining the
+   host directly closes that remaining gap.
+   36px (not 38px) is deliberate: the widget itself carries no border of
+   its own (see AddressAutocomplete.tsx's comment — the WRAPPING div
+   supplies that instead), so its own 2px border-box height stacks on top
+   of this; 36px + that 2px border = 38px total, matching the sibling
+   plain inputs' own already-bordered 38px box exactly. */
+.admin-address-autocomplete gmp-place-autocomplete {
+  height: 2.25rem;
+}
+
+/*
+ * Slower, smoother ripple than Tailwind's built-in animate-ping (1s, and its
+ * cubic-bezier holds the ring at full size before an abrupt jump-and-fade —
+ * reads as fast/jerky at this larger 56px size). ease-out here gives a
+ * continuous outward drift that decelerates smoothly, at roughly a third
+ * the speed.
+ */
+@keyframes ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+/* Longhand properties, not the `animation` shorthand — the shorthand
+   implicitly resets animation-delay to 0s, which (depending on stylesheet
+   order) can clobber the separate `[animation-delay:...]` utility used to
+   stagger the two rings. */
+.animate-ripple {
+  animation-name: ripple;
+  animation-duration: 2.8s;
+  animation-timing-function: ease-out;
+  animation-iteration-count: infinite;
+}
