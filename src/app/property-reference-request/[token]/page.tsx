@@ -43,6 +43,10 @@ export default async function TenancyReferencePage({
             tenantName={reference.tenantName}
             tenantAddress={reference.tenantAddress}
             requestedAt={new Date(reference.createdAt).toLocaleDateString("en-AU")}
+            agentName={reference.agentName}
+            jobPosition={reference.jobPosition}
+            agencyName={reference.agencyName}
+            agentEmail={reference.agentEmail}
           />
         ) : (
           <div className="rounded-lg border border-slate-200 bg-white p-8 text-center">

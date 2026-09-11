@@ -12,6 +12,15 @@ interface Props {
   tenantName: string;
   tenantAddress: string;
   requestedAt: string;
+  // Captured up front by Home7 staff when the request was created (same
+  // fields the old Laravel admin form collected) — pre-filled here so the
+  // previous agent filling this out isn't re-typing their own details,
+  // matching propertyReferenceAgentForm.blade.php's `old('agent_name',
+  // $reference->agent_name ?? '')` pattern.
+  agentName: string;
+  jobPosition?: string;
+  agencyName: string;
+  agentEmail: string;
 }
 
 const YES_NO_NA_OPTIONS = ["Yes", "No", "Not Applicable"] as const;
@@ -52,7 +61,16 @@ function YesNoPills({
 const inputClass = "w-full border border-slate-300 rounded px-3 py-2 text-sm bg-white";
 const labelClass = "block text-sm font-medium text-brand-navy mb-1.5";
 
-export function TenancyReferenceForm({ token, tenantName, tenantAddress, requestedAt }: Props) {
+export function TenancyReferenceForm({
+  token,
+  tenantName,
+  tenantAddress,
+  requestedAt,
+  agentName,
+  jobPosition,
+  agencyName,
+  agentEmail,
+}: Props) {
   const router = useRouter();
   const [screen, setScreen] = useState<"intro" | "form" | "declined">("intro");
   const [status, setStatus] = useState<"idle" | "submitting" | "error">("idle");
@@ -218,11 +236,11 @@ export function TenancyReferenceForm({ token, tenantName, tenantAddress, request
 
         <div>
           <label className={labelClass}>What is your name? *</label>
-          <input name="agentName" required className={inputClass} />
+          <input name="agentName" defaultValue={agentName} required className={inputClass} />
         </div>
         <div>
           <label className={labelClass}>What is your job position? *</label>
-          <input name="jobPosition" required className={inputClass} />
+          <input name="jobPosition" defaultValue={jobPosition} required className={inputClass} />
         </div>
         <div>
           <label className={labelClass}>
@@ -234,11 +252,11 @@ export function TenancyReferenceForm({ token, tenantName, tenantAddress, request
         </div>
         <div>
           <label className={labelClass}>Name of Real Estate Agency *</label>
-          <input name="agencyName" required className={inputClass} />
+          <input name="agencyName" defaultValue={agencyName} required className={inputClass} />
         </div>
         <div>
           <label className={labelClass}>Email of Agent *</label>
-          <input name="agentEmail" type="email" required className={inputClass} />
+          <input name="agentEmail" type="email" defaultValue={agentEmail} required className={inputClass} />
         </div>
         <div>
           <label className={labelClass}>
