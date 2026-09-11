@@ -5,7 +5,6 @@ import { SITE_URL } from "@/lib/constants";
 import { pageMetadata } from "@/lib/pageMetadata";
 import { getPropertiesByType } from "@/lib/queries";
 import PropertyCard from "@/components/PropertyCard";
-import ResponsiveCardGrid from "@/components/ResponsiveCardGrid";
 
 const TITLE = "Best Properties for Rent in Liverpool, NSW";
 const DESCRIPTION = "Discover the best properties for rent in Liverpool, NSW and Western Sydney.";
@@ -56,7 +55,7 @@ export default async function Page() {
         </div>
       </section>
 
-      <div className="mx-auto max-w-6xl 2xl:max-w-384 px-4 py-16 sm:py-20">
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:py-20">
         <p className="text-lg text-slate-600 leading-relaxed max-w-2xl">
           Discover the best properties for rent in Liverpool, NSW and Western Sydney.
         </p>
@@ -66,12 +65,14 @@ export default async function Page() {
             No listings yet — connect MONGODB_URI and add properties from the admin dashboard.
           </p>
         ) : (
-          <div className="mt-8">
-            <ResponsiveCardGrid
-              items={properties}
-              renderItem={(p) => <PropertyCard key={String(p._id)} property={p} />}
-              wide4up
-            />
+          // Plain grid, not ResponsiveCardGrid — see sold-properties/page.tsx
+          // for the full writeup: that component hides trailing items so a
+          // wide-screen row never ends up partial, right for a homepage
+          // preview but not for this page, which IS the full list.
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {properties.map((p) => (
+              <PropertyCard key={String(p._id)} property={p} />
+            ))}
           </div>
         )}
 

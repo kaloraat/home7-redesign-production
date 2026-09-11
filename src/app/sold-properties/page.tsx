@@ -5,7 +5,6 @@ import { SITE_URL } from "@/lib/constants";
 import { pageMetadata } from "@/lib/pageMetadata";
 import { getPropertiesByType } from "@/lib/queries";
 import PropertyCard from "@/components/PropertyCard";
-import ResponsiveCardGrid from "@/components/ResponsiveCardGrid";
 
 const TITLE = "Sold Properties in Liverpool, NSW";
 const DESCRIPTION = "See recently sold properties across Liverpool and Western Sydney.";
@@ -56,7 +55,7 @@ export default async function Page() {
         </div>
       </section>
 
-      <div className="mx-auto max-w-6xl 2xl:max-w-384 px-4 py-16 sm:py-20">
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:py-20">
         <p className="text-lg text-slate-600 leading-relaxed max-w-2xl">
           See recently sold properties across Liverpool and Western Sydney.
         </p>
@@ -66,12 +65,21 @@ export default async function Page() {
             No listings yet — connect MONGODB_URI and add properties from the admin dashboard.
           </p>
         ) : (
-          <div className="mt-8">
-            <ResponsiveCardGrid
-              items={properties}
-              renderItem={(p) => <PropertyCard key={String(p._id)} property={p} />}
-              wide4up
-            />
+          // Plain grid, not ResponsiveCardGrid — that component deliberately
+          // hides trailing items so a wide-screen 4-column row never ends up
+          // orphaned/partial (right for a "latest 4" homepage preview), but
+          // this page IS the full list, not a preview — with 11 real sold
+          // listings it was silently hiding 2-3 of them depending on
+          // viewport width (found live: Math.floor(11/4)*4 = 8 shown on a
+          // wide screen, real listings just missing with no way to see them
+          // — a genuine SEO/trust-signal loss on a "sold properties" archive
+          // page, not a cosmetic issue). Matches the same plain grid
+          // /properties, /leased-properties, and /other-properties already
+          // correctly use for exactly this reason.
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {properties.map((p) => (
+              <PropertyCard key={String(p._id)} property={p} />
+            ))}
           </div>
         )}
       </div>

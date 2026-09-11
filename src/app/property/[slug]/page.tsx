@@ -480,6 +480,15 @@ export default async function Page({
             submit button is always reachable independent of how long the
             article is. */}
         <aside className="lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto space-y-6">
+          {property.listingType === "rent" && (
+            <Link
+              href={`/property-tenant-application-download?property=${property.slug}`}
+              className="block text-center bg-brand-navy text-white rounded px-5 py-3 font-semibold hover:brightness-110 transition"
+            >
+              Apply for This Property
+            </Link>
+          )}
+
           <div className="rounded-lg border border-slate-200 bg-white p-6">
             <h2 className="font-display text-xl text-brand-navy pb-3 border-b border-slate-200">
               Agent Information
@@ -565,15 +574,6 @@ export default async function Page({
               />
             </div>
           </div>
-
-          {property.listingType === "rent" && (
-            <Link
-              href={`/property-tenant-application-download?property=${property.slug}`}
-              className="block text-center bg-brand-navy text-white rounded px-5 py-3 font-semibold hover:brightness-110 transition"
-            >
-              Apply for This Property
-            </Link>
-          )}
         </aside>
       </div>
       </div>
