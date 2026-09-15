@@ -1,7 +1,9 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import dbConnect from "@/lib/db";
 import PropertyReference from "@/models/PropertyReference";
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
+import CreatedToast from "@/components/admin/CreatedToast";
 
 async function getAll() {
   try {
@@ -29,6 +31,9 @@ export default async function AdminTenancyChecksPage() {
 
   return (
     <div>
+      <Suspense fallback={null}>
+        <CreatedToast message="Reference request sent." />
+      </Suspense>
       <AdminPageHeader
         title="Tenancy Reference Checks"
         description="Rental reference requests sent to applicants' previous agents."

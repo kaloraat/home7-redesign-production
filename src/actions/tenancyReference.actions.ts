@@ -48,5 +48,5 @@ export async function createReferenceRequest(formData: FormData) {
   await sendReferenceRequestEmail(reference);
 
   revalidatePath("/admin/tenancy-checks");
-  redirect("/admin/tenancy-checks");
+  redirect("/admin/tenancy-checks?created=1");
 }
