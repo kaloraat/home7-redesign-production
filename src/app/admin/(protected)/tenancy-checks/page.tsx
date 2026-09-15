@@ -28,6 +28,15 @@ const STATUS_LABELS: Record<string, string> = {
   declined: "Declined",
 };
 
+// The old live site recorded both "Call Me Instead" and "I don't know this
+// tenant" indistinguishably as just "completed" — this rebuild keeps them
+// apart in the DB (see PropertyReference.declineReason) but until now had
+// nowhere in the admin UI that actually showed which one it was.
+const DECLINE_REASON_LABELS: Record<string, string> = {
+  call_me_instead: "Asked to be called instead",
+  unknown_contact: "Doesn't know this tenant",
+};
+
 export default async function AdminTenancyChecksPage() {
   const references = await getAll();
 
@@ -79,6 +88,11 @@ export default async function AdminTenancyChecksPage() {
                     <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[r.status]}`}>
                       {STATUS_LABELS[r.status]}
                     </span>
+                    {r.status === "declined" && r.declineReason && (
+                      <p className="mt-1 text-xs text-slate-400">
+                        {DECLINE_REASON_LABELS[r.declineReason]}
+                      </p>
+                    )}
                   </td>
                   <td className="py-3 px-4 text-right space-x-3 whitespace-nowrap">
                     <Link href={`/admin/tenancy-checks/${r._id}`} className="text-brand-gold-dark hover:underline">
