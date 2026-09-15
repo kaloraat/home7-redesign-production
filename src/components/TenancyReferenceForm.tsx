@@ -61,6 +61,37 @@ function YesNoPills({
 const inputClass = "w-full border border-slate-300 rounded px-3 py-2 text-sm bg-white";
 const labelClass = "block text-sm font-medium text-brand-navy mb-1.5";
 
+function humanizeFieldName(key: string) {
+  return key.replace(/([a-z0-9])([A-Z])/g, "$1 $2").replace(/^./, (c) => c.toUpperCase());
+}
+
+/** The submit route returns `{ error: "some string" }` for most failures,
+ * but `{ error: zodError.flatten() }` — an object, not a string — when the
+ * form data fails Zod validation. The old logic only handled the string
+ * case, so a validation failure (the actual, useful reason a submission
+ * was rejected) silently collapsed into a bare "Submission failed" with no
+ * way to tell what was wrong — found live when a real test submission
+ * failed with zero indication of which field. This surfaces the first
+ * real field error instead. */
+function extractErrorMessage(body: unknown): string {
+  if (body && typeof body === "object") {
+    const b = body as { error?: unknown };
+    if (typeof b.error === "string") return b.error;
+    if (b.error && typeof b.error === "object") {
+      const flat = b.error as { fieldErrors?: Record<string, string[]>; formErrors?: string[] };
+      const firstField = flat.fieldErrors
+        ? Object.entries(flat.fieldErrors).find(([, msgs]) => msgs?.length)
+        : undefined;
+      if (firstField) {
+        const [field, msgs] = firstField;
+        return `${humanizeFieldName(field)}: ${msgs[0]}`;
+      }
+      if (flat.formErrors?.length) return flat.formErrors[0];
+    }
+  }
+  return "Submission failed — please check the form and try again.";
+}
+
 export function TenancyReferenceForm({
   token,
   tenantName,
@@ -75,6 +106,16 @@ export function TenancyReferenceForm({
   const [screen, setScreen] = useState<"intro" | "form" | "declined">("intro");
   const [status, setStatus] = useState<"idle" | "submitting" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  // Which required Yes/No/N-A question (by its FormData field name) failed
+  // the pre-submit check below, if any — drives the red ring around that
+  // specific question so it's actually findable in a form this long, not
+  // just named in a message at the bottom. Cleared at the top of every
+  // submit attempt and only set again if that attempt still finds a gap.
+  const [invalidField, setInvalidField] = useState<string | null>(null);
+
+  function fieldHighlightClass(name: string) {
+    return invalidField === name ? "rounded-lg ring-2 ring-red-400 ring-offset-2 -mx-2 px-2 py-1" : "";
+  }
 
   // Only the fields that drive a conditional section need to be controlled
   // state — everything else is read straight out of FormData on submit.
@@ -116,8 +157,48 @@ export function TenancyReferenceForm({
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setStatus("submitting");
     setErrorMsg("");
+    setInvalidField(null);
+
+    // Every other required field here is a real (visible) input, so the
+    // browser's own constraint validation already blocked submission
+    // before this handler could even run if one of those were empty. The
+    // one gap: the HTML spec explicitly exempts type="hidden" inputs from
+    // `required` validation — and every one of these 16 Yes/No/Not
+    // Applicable questions is backed by exactly that (a hidden input
+    // carries the pill's value into FormData, since a <button> has no
+    // native form value). So it's entirely possible to click through the
+    // form skipping one of these with nothing visibly stopping you — found
+    // live, where it silently reached the server and came back as a bare
+    // "Submission failed" with no indication which question. This check
+    // catches it here instead, names the exact question, and highlights it.
+    const requiredPills: Array<{ name: string; value: YesNoNA; label: string }> = [
+      { name: "leaseholderOrApprovedOccupant", value: leaseholder, label: "Can you confirm that this tenant is/was a leaseholder or an approved occupant at the mentioned property?" },
+      { name: "tenancyTerminatedByOffice", value: terminatedByOffice, label: "Did your office terminate the tenancy?" },
+      { name: "rentPaidOnTime", value: rentPaidOnTime, label: "Was rent paid on time?" },
+      { name: "rentDefaultNoticeIssued", value: rentDefaultNoticeIssued, label: "During their tenancy was a Rent Default Notice issued?" },
+      { name: "noticesIssuedByOffice", value: noticesIssuedByOffice, label: "Were any Notices ever issued by your office?" },
+      { name: "tenantServedNotices", value: tenantServedNotices, label: "Has the tenant served any Notices on the landlord?" },
+      { name: "routineInspectionsConducted", value: routineInspectionsConducted, label: "Did you carry out periodic/routine inspections?" },
+      { name: "tenantCaredForProperty", value: tenantCared, label: "Did they care for the property?" },
+      { name: "gardensKeptNeat", value: gardensNeat, label: "Were the gardens kept neat and tidy?" },
+      { name: "complaintsReceived", value: complaintsReceived, label: "Did you receive any complaints during the tenancy?" },
+      { name: "tenantKeptPets", value: tenantKeptPets, label: "Did the tenant keep any pets on the property?" },
+      { name: "fullBondRefundReceived", value: fullBondRefundReceived, label: "Did they/will they receive a full bond refund?" },
+      { name: "vacateInspectionDone", value: vacateInspectionDone, label: "Has the Vacate Inspection been done?" },
+      { name: "tenantCooperative", value: tenantCooperative, label: "Was/is the tenant co-operative and pleasant to deal with?" },
+      { name: "wouldRentAgain", value: wouldRentAgain, label: "Would you rent a property to the tenant again?" },
+      { name: "socialMediaNegativePosts", value: socialMediaNegativePosts, label: "Have the tenants been known to post comments on social media that could damage the landlord or agent's reputation?" },
+    ];
+    const unanswered = requiredPills.find((f) => !f.value);
+    if (unanswered) {
+      setInvalidField(unanswered.name);
+      setErrorMsg(`Please answer: "${unanswered.label}"`);
+      document.getElementById(`field-${unanswered.name}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
+    setStatus("submitting");
     const formData = new FormData(e.currentTarget);
 
     try {
@@ -127,7 +208,7 @@ export function TenancyReferenceForm({
       });
       if (!res.ok) {
         const body = await res.json().catch(() => null);
-        throw new Error(typeof body?.error === "string" ? body.error : "Submission failed");
+        throw new Error(extractErrorMessage(body));
       }
       router.push("/");
     } catch (err) {
@@ -309,7 +390,7 @@ export function TenancyReferenceForm({
           <label className={labelClass}>What is your job position? <span className="text-red-600">*</span></label>
           <input name="jobPosition" defaultValue={jobPosition} required className={inputClass} />
         </div>
-        <div>
+        <div id="field-leaseholderOrApprovedOccupant" className={fieldHighlightClass("leaseholderOrApprovedOccupant")}>
           <label className={labelClass}>
             Can you confirm that this tenant is/was a leaseholder or an approved occupant at the
             mentioned property? <span className="text-red-600">*</span>
@@ -350,7 +431,7 @@ export function TenancyReferenceForm({
             <DateInput name="tenancyAgreementExpiresDate" required />
           </div>
         </div>
-        <div>
+        <div id="field-tenancyTerminatedByOffice" className={fieldHighlightClass("tenancyTerminatedByOffice")}>
           <label className={labelClass}>Did your office terminate the tenancy? <span className="text-red-600">*</span></label>
           <YesNoPills value={terminatedByOffice} onChange={setTerminatedByOffice} />
           <input type="hidden" name="tenancyTerminatedByOffice" value={terminatedByOffice} required />
@@ -366,7 +447,7 @@ export function TenancyReferenceForm({
           <label className={labelClass}>When is their rent paid to? <span className="text-red-600">*</span></label>
           <DateInput name="rentPaidTo" required />
         </div>
-        <div>
+        <div id="field-rentPaidOnTime" className={fieldHighlightClass("rentPaidOnTime")}>
           <label className={labelClass}>Was rent paid on time? <span className="text-red-600">*</span></label>
           <YesNoPills value={rentPaidOnTime} onChange={setRentPaidOnTime} />
           <input type="hidden" name="rentPaidOnTime" value={rentPaidOnTime} required />
@@ -383,7 +464,7 @@ export function TenancyReferenceForm({
             </div>
           )}
         </div>
-        <div>
+        <div id="field-rentDefaultNoticeIssued" className={fieldHighlightClass("rentDefaultNoticeIssued")}>
           <label className={labelClass}>During their tenancy was a Rent Default Notice issued? <span className="text-red-600">*</span></label>
           <YesNoPills value={rentDefaultNoticeIssued} onChange={setRentDefaultNoticeIssued} />
           <input type="hidden" name="rentDefaultNoticeIssued" value={rentDefaultNoticeIssued} required />
@@ -397,7 +478,7 @@ export function TenancyReferenceForm({
       </section>
 
       <section className="space-y-4 pt-6 border-t border-slate-100">
-        <div>
+        <div id="field-noticesIssuedByOffice" className={fieldHighlightClass("noticesIssuedByOffice")}>
           <label className={labelClass}>Were any Notices ever issued by your office? <span className="text-red-600">*</span></label>
           <YesNoPills value={noticesIssuedByOffice} onChange={setNoticesIssuedByOffice} />
           <input type="hidden" name="noticesIssuedByOffice" value={noticesIssuedByOffice} required />
@@ -408,7 +489,7 @@ export function TenancyReferenceForm({
             </div>
           )}
         </div>
-        <div>
+        <div id="field-tenantServedNotices" className={fieldHighlightClass("tenantServedNotices")}>
           <label className={labelClass}>Has the tenant served any Notices on the landlord? <span className="text-red-600">*</span></label>
           <YesNoPills value={tenantServedNotices} onChange={setTenantServedNotices} />
           <input type="hidden" name="tenantServedNotices" value={tenantServedNotices} required />
@@ -419,7 +500,7 @@ export function TenancyReferenceForm({
             </div>
           )}
         </div>
-        <div>
+        <div id="field-routineInspectionsConducted" className={fieldHighlightClass("routineInspectionsConducted")}>
           <label className={labelClass}>Did you carry out periodic/routine inspections? <span className="text-red-600">*</span></label>
           <YesNoPills value={routineInspectionsConducted} onChange={setRoutineInspectionsConducted} />
           <input type="hidden" name="routineInspectionsConducted" value={routineInspectionsConducted} required />
@@ -452,7 +533,7 @@ export function TenancyReferenceForm({
       </section>
 
       <section className="space-y-4 pt-6 border-t border-slate-100">
-        <div>
+        <div id="field-tenantCaredForProperty" className={fieldHighlightClass("tenantCaredForProperty")}>
           <label className={labelClass}>Did they care for the property? <span className="text-red-600">*</span></label>
           <YesNoPills value={tenantCared} onChange={setTenantCared} />
           <input type="hidden" name="tenantCaredForProperty" value={tenantCared} required />
@@ -461,12 +542,12 @@ export function TenancyReferenceForm({
             <input name="tenantCaredForPropertyComments" className={inputClass} />
           </div>
         </div>
-        <div>
+        <div id="field-gardensKeptNeat" className={fieldHighlightClass("gardensKeptNeat")}>
           <label className={labelClass}>Were the gardens kept neat and tidy? <span className="text-red-600">*</span></label>
           <YesNoPills value={gardensNeat} onChange={setGardensNeat} />
           <input type="hidden" name="gardensKeptNeat" value={gardensNeat} required />
         </div>
-        <div>
+        <div id="field-complaintsReceived" className={fieldHighlightClass("complaintsReceived")}>
           <label className={labelClass}>Did you receive any complaints during the tenancy? <span className="text-red-600">*</span></label>
           <YesNoPills value={complaintsReceived} onChange={setComplaintsReceived} />
           <input type="hidden" name="complaintsReceived" value={complaintsReceived} required />
@@ -477,7 +558,7 @@ export function TenancyReferenceForm({
             </div>
           )}
         </div>
-        <div>
+        <div id="field-tenantKeptPets" className={fieldHighlightClass("tenantKeptPets")}>
           <label className={labelClass}>Did the tenant keep any pets on the property? <span className="text-red-600">*</span></label>
           <YesNoPills value={tenantKeptPets} onChange={setTenantKeptPets} />
           <input type="hidden" name="tenantKeptPets" value={tenantKeptPets} required />
@@ -502,7 +583,7 @@ export function TenancyReferenceForm({
       </section>
 
       <section className="space-y-4 pt-6 border-t border-slate-100">
-        <div>
+        <div id="field-fullBondRefundReceived" className={fieldHighlightClass("fullBondRefundReceived")}>
           <label className={labelClass}>Did they/will they receive a full bond refund? <span className="text-red-600">*</span></label>
           <YesNoPills value={fullBondRefundReceived} onChange={setFullBondRefundReceived} />
           <input type="hidden" name="fullBondRefundReceived" value={fullBondRefundReceived} required />
@@ -513,7 +594,7 @@ export function TenancyReferenceForm({
             </div>
           )}
         </div>
-        <div>
+        <div id="field-vacateInspectionDone" className={fieldHighlightClass("vacateInspectionDone")}>
           <label className={labelClass}>Has the Vacate Inspection been done? <span className="text-red-600">*</span></label>
           <YesNoPills value={vacateInspectionDone} onChange={setVacateInspectionDone} />
           <input type="hidden" name="vacateInspectionDone" value={vacateInspectionDone} required />
@@ -524,7 +605,7 @@ export function TenancyReferenceForm({
             </div>
           )}
         </div>
-        <div>
+        <div id="field-tenantCooperative" className={fieldHighlightClass("tenantCooperative")}>
           <label className={labelClass}>Was/is the tenant co-operative and pleasant to deal with? <span className="text-red-600">*</span></label>
           <YesNoPills value={tenantCooperative} onChange={setTenantCooperative} />
           <input type="hidden" name="tenantCooperative" value={tenantCooperative} required />
@@ -540,7 +621,7 @@ export function TenancyReferenceForm({
           <label className={labelClass}>How would you rate this tenant? 1 (Poor) – 5 (Great) <span className="text-red-600">*</span></label>
           <input name="tenantRating" type="number" min={1} max={5} required className={inputClass} />
         </div>
-        <div>
+        <div id="field-wouldRentAgain" className={fieldHighlightClass("wouldRentAgain")}>
           <label className={labelClass}>Would you rent a property to the tenant again? <span className="text-red-600">*</span></label>
           <YesNoPills value={wouldRentAgain} onChange={setWouldRentAgain} />
           <input type="hidden" name="wouldRentAgain" value={wouldRentAgain} required />
@@ -559,7 +640,7 @@ export function TenancyReferenceForm({
           <label className={labelClass}>Do you have plans to list or have you listed this person as a defaulter? <span className="text-red-600">*</span></label>
           <input name="listedAsDefaulter" required className={inputClass} />
         </div>
-        <div>
+        <div id="field-socialMediaNegativePosts" className={fieldHighlightClass("socialMediaNegativePosts")}>
           <label className={labelClass}>
             Have the tenants been known to post comments on social media that could damage the
             landlord or agent&apos;s reputation? <span className="text-red-600">*</span>
