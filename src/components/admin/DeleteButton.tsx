@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 
 interface Props {
@@ -79,55 +80,67 @@ export function DeleteButton({
         Delete
       </button>
 
-      {open && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-          onClick={close}
-        >
+      {open &&
+        createPortal(
+          // Rendered via a portal straight into <body> — this button lives
+          // inside all sorts of ancestors across the admin (most commonly a
+          // table wrapped in overflow-x-auto/overflow-hidden, for the
+          // horizontal-scroll-on-mobile pattern used everywhere lists are).
+          // A plain `fixed` child gets clipped to the nearest overflow:hidden
+          // ancestor's box in every browser — the backdrop only dimmed that
+          // table's own rectangle, so a row's own text right at the boundary
+          // showed through un-dimmed instead of the overlay covering the
+          // whole viewport. Escaping the DOM tree via the portal sidesteps
+          // that entirely, regardless of where this button is used.
           <div
-            className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+            onClick={close}
           >
-            <p className="font-display text-lg text-brand-navy">Delete {itemLabel}?</p>
-            <p className="mt-2 text-sm text-slate-500">This can&apos;t be undone.</p>
+            <div
+              className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <p className="font-display text-lg text-brand-navy">Delete {itemLabel}?</p>
+              <p className="mt-2 text-sm text-slate-500">This can&apos;t be undone.</p>
 
-            {requireTypedConfirmation && (
-              <div className="mt-4">
-                <label className="block text-sm text-slate-600 mb-1">
-                  Type <span className="font-mono font-semibold text-slate-900">{requireTypedConfirmation}</span> to confirm
-                </label>
-                <input
-                  value={typed}
-                  onChange={(e) => setTyped(e.target.value)}
-                  autoFocus
-                  className="w-full border border-slate-300 rounded px-3 py-2 text-sm bg-white"
-                />
+              {requireTypedConfirmation && (
+                <div className="mt-4">
+                  <label className="block text-sm text-slate-600 mb-1">
+                    Type <span className="font-mono font-semibold text-slate-900">{requireTypedConfirmation}</span> to confirm
+                  </label>
+                  <input
+                    value={typed}
+                    onChange={(e) => setTyped(e.target.value)}
+                    autoFocus
+                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm bg-white"
+                  />
+                </div>
+              )}
+
+              {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+
+              <div className="mt-6 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={close}
+                  disabled={pending}
+                  className="rounded px-4 py-2 text-sm font-medium text-slate-600 border border-slate-300 hover:bg-slate-50 transition cursor-pointer disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirm}
+                  disabled={!canConfirm || pending}
+                  className="rounded px-4 py-2 text-sm font-semibold bg-red-600 text-white hover:bg-red-700 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {pending ? "Deleting..." : "Delete"}
+                </button>
               </div>
-            )}
-
-            {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
-
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={close}
-                disabled={pending}
-                className="rounded px-4 py-2 text-sm font-medium text-slate-600 border border-slate-300 hover:bg-slate-50 transition cursor-pointer disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirm}
-                disabled={!canConfirm || pending}
-                className="rounded px-4 py-2 text-sm font-semibold bg-red-600 text-white hover:bg-red-700 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {pending ? "Deleting..." : "Delete"}
-              </button>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </>
   );
 }
