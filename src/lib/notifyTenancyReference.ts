@@ -77,6 +77,8 @@ export async function sendReferenceRequestEmail(reference: IPropertyReference) {
       <p style="margin:3px 0;"><strong>P:&nbsp;</strong>${COMPANY.phone}</p>
       <p style="margin:3px 0;"><strong>E:&nbsp;</strong><a href="mailto:${COMPANY.email}">${COMPANY.email}</a></p>
       <p style="margin:3px 0;"><strong>W:&nbsp;</strong><a href="${SITE_URL}" target="_blank">${SITE_URL}/</a></p>
+      <p style="margin:3px 0;">&nbsp;</p>
+      <p style="margin:3px 0;font-size:12px;color:#888888;">All rights reserved by ${SITE_NAME}.</p>
     </div>
   </body>
 </html>`;
@@ -101,6 +103,8 @@ export async function sendReferenceRequestEmail(reference: IPropertyReference) {
     `P: ${COMPANY.phone}`,
     `E: ${COMPANY.email}`,
     `W: ${SITE_URL}/`,
+    "",
+    `All rights reserved by ${SITE_NAME}.`,
   ].join("\n");
 
   try {

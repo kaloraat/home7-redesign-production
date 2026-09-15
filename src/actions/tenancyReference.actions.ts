@@ -50,3 +50,10 @@ export async function createReferenceRequest(formData: FormData) {
   revalidatePath("/admin/tenancy-checks");
   redirect("/admin/tenancy-checks?created=1");
 }
+
+export async function deleteReferenceRequest(id: string) {
+  await requireAdmin();
+  await dbConnect();
+  await PropertyReference.findByIdAndDelete(id);
+  revalidatePath("/admin/tenancy-checks");
+}

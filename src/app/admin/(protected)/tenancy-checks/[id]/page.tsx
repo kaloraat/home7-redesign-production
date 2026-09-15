@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import dbConnect from "@/lib/db";
 import PropertyReference from "@/models/PropertyReference";
+import { deleteReferenceRequest } from "@/actions/tenancyReference.actions";
+import DeleteButton from "@/components/admin/DeleteButton";
 
 async function getReference(id: string) {
   await dbConnect();
@@ -175,6 +177,15 @@ export default async function TenancyCheckDetailPage({
           </div>
         </>
       )}
+
+      <div className="mt-6">
+        <DeleteButton
+          onConfirm={deleteReferenceRequest.bind(null, id)}
+          itemLabel={`the reference check for ${reference.tenantName}`}
+          after={{ mode: "redirect", to: "/admin/tenancy-checks" }}
+          className="text-sm text-red-600 hover:underline cursor-pointer"
+        />
+      </div>
     </div>
   );
 }

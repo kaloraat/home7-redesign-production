@@ -2,8 +2,10 @@ import { Suspense } from "react";
 import Link from "next/link";
 import dbConnect from "@/lib/db";
 import PropertyReference from "@/models/PropertyReference";
+import { deleteReferenceRequest } from "@/actions/tenancyReference.actions";
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
 import CreatedToast from "@/components/admin/CreatedToast";
+import DeleteButton from "@/components/admin/DeleteButton";
 
 async function getAll() {
   try {
@@ -78,10 +80,14 @@ export default async function AdminTenancyChecksPage() {
                       {STATUS_LABELS[r.status]}
                     </span>
                   </td>
-                  <td className="py-3 px-4 text-right">
+                  <td className="py-3 px-4 text-right space-x-3 whitespace-nowrap">
                     <Link href={`/admin/tenancy-checks/${r._id}`} className="text-brand-gold-dark hover:underline">
                       View
                     </Link>
+                    <DeleteButton
+                      onConfirm={deleteReferenceRequest.bind(null, String(r._id))}
+                      itemLabel={`the reference check for ${r.tenantName}`}
+                    />
                   </td>
                 </tr>
               ))}
