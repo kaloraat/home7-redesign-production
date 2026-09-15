@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { auth } from "@/auth";
 import dbConnect from "@/lib/db";
 import TenancyApplication from "@/models/TenancyApplication";
 import { updateApplicationStatus, deleteApplication } from "@/actions/rentalApplication.actions";
@@ -34,8 +35,10 @@ export default async function RentalApplicationDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const a = await getApplication(id);
+  const [session, a] = await Promise.all([auth(), getApplication(id)]);
   if (!a) notFound();
+  // Deleting is owner-only — see lib/authz.ts.
+  const isOwner = session?.user.role === "owner";
 
   return (
     <div className="max-w-3xl">
@@ -52,11 +55,13 @@ export default async function RentalApplicationDetailPage({
             {a.propertyAddress} · Submitted {new Date(a.createdAt).toLocaleDateString("en-AU")}
           </p>
         </div>
-        <DeleteButton
-          onConfirm={deleteApplication.bind(null, String(a._id))}
-          itemLabel="this application"
-          requireTypedConfirmation="delete this application"
-        />
+        {isOwner && (
+          <DeleteButton
+            onConfirm={deleteApplication.bind(null, String(a._id))}
+            itemLabel="this application"
+            requireTypedConfirmation="delete this application"
+          />
+        )}
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">

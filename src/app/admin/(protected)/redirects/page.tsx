@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { auth } from "@/auth";
 import dbConnect from "@/lib/db";
 import Redirect from "@/models/Redirect";
 import { deleteRedirect } from "@/actions/redirect.actions";
@@ -15,7 +16,9 @@ async function getAll() {
 }
 
 export default async function AdminRedirectsPage() {
-  const redirects = await getAll();
+  const [session, redirects] = await Promise.all([auth(), getAll()]);
+  // Deleting is owner-only — see lib/authz.ts.
+  const isOwner = session?.user.role === "owner";
 
   return (
     <div>
@@ -56,7 +59,9 @@ export default async function AdminRedirectsPage() {
                     <Link href={`/admin/redirects/${r._id}/edit`} className="text-brand-gold-dark hover:underline">
                       Edit
                     </Link>
-                    <DeleteButton onConfirm={deleteRedirect.bind(null, String(r._id))} itemLabel="this redirect" />
+                    {isOwner && (
+                      <DeleteButton onConfirm={deleteRedirect.bind(null, String(r._id))} itemLabel="this redirect" />
+                    )}
                   </td>
                 </tr>
               ))}

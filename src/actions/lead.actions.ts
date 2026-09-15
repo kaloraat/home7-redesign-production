@@ -3,14 +3,7 @@
 import { revalidatePath } from "next/cache";
 import dbConnect from "@/lib/db";
 import Lead from "@/models/Lead";
-import { auth } from "@/auth";
-
-async function requireAdmin() {
-  const session = await auth();
-  if (!session?.user) {
-    throw new Error("Not authorized");
-  }
-}
+import { requireAdmin, requireOwner } from "@/lib/authz";
 
 export async function updateLeadStatus(id: string, status: "new" | "contacted" | "closed") {
   await requireAdmin();
@@ -21,7 +14,7 @@ export async function updateLeadStatus(id: string, status: "new" | "contacted" |
 }
 
 export async function deleteLead(id: string) {
-  await requireAdmin();
+  await requireOwner();
   await dbConnect();
   await Lead.findByIdAndDelete(id);
   revalidatePath("/admin/leads");

@@ -5,15 +5,8 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import dbConnect from "@/lib/db";
 import PropertyReference from "@/models/PropertyReference";
-import { auth } from "@/auth";
+import { requireAdmin, requireOwner } from "@/lib/authz";
 import { sendReferenceRequestEmail } from "@/lib/notifyTenancyReference";
-
-async function requireAdmin() {
-  const session = await auth();
-  if (!session?.user) {
-    throw new Error("Not authorized");
-  }
-}
 
 export async function createReferenceRequest(formData: FormData) {
   await requireAdmin();
@@ -52,7 +45,7 @@ export async function createReferenceRequest(formData: FormData) {
 }
 
 export async function deleteReferenceRequest(id: string) {
-  await requireAdmin();
+  await requireOwner();
   await dbConnect();
   await PropertyReference.findByIdAndDelete(id);
   revalidatePath("/admin/tenancy-checks");

@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { auth } from "@/auth";
 import dbConnect from "@/lib/db";
 import PropertyReference from "@/models/PropertyReference";
 import { deleteReferenceRequest } from "@/actions/tenancyReference.actions";
@@ -38,7 +39,9 @@ const DECLINE_REASON_LABELS: Record<string, string> = {
 };
 
 export default async function AdminTenancyChecksPage() {
-  const references = await getAll();
+  const [session, references] = await Promise.all([auth(), getAll()]);
+  // Deleting is owner-only — see lib/authz.ts.
+  const isOwner = session?.user.role === "owner";
 
   return (
     <div>
@@ -98,10 +101,12 @@ export default async function AdminTenancyChecksPage() {
                     <Link href={`/admin/tenancy-checks/${r._id}`} className="text-brand-gold-dark hover:underline">
                       View
                     </Link>
-                    <DeleteButton
-                      onConfirm={deleteReferenceRequest.bind(null, String(r._id))}
-                      itemLabel={`the reference check for ${r.tenantName}`}
-                    />
+                    {isOwner && (
+                      <DeleteButton
+                        onConfirm={deleteReferenceRequest.bind(null, String(r._id))}
+                        itemLabel={`the reference check for ${r.tenantName}`}
+                      />
+                    )}
                   </td>
                 </tr>
               ))}

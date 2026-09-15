@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import dbConnect from "@/lib/db";
 import Content from "@/models/Content";
-import { auth } from "@/auth";
+import { requireAdmin, requireOwner } from "@/lib/authz";
 
 function slugify(input: string) {
   return input
@@ -12,13 +12,6 @@ function slugify(input: string) {
     .trim()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
-}
-
-async function requireAdmin() {
-  const session = await auth();
-  if (!session?.user) {
-    throw new Error("Not authorized");
-  }
 }
 
 function publicPath(urlPath: "blog" | "root" | "suburb", slug: string) {
@@ -114,7 +107,7 @@ export async function updateContent(id: string, formData: FormData) {
 }
 
 export async function deleteContent(id: string) {
-  await requireAdmin();
+  await requireOwner();
   await dbConnect();
   const existing = await Content.findById(id);
   if (!existing) return;

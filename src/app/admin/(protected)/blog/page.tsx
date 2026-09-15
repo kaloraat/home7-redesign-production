@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { auth } from "@/auth";
 import dbConnect from "@/lib/db";
 import Content from "@/models/Content";
 import { deleteContent } from "@/actions/content.actions";
@@ -17,7 +18,9 @@ async function getAll() {
 }
 
 export default async function AdminBlogPage() {
-  const posts = await getAll();
+  const [session, posts] = await Promise.all([auth(), getAll()]);
+  // Deleting is owner-only — see lib/authz.ts.
+  const isOwner = session?.user.role === "owner";
 
   return (
     <div>
@@ -77,7 +80,9 @@ export default async function AdminBlogPage() {
                     <Link href={`/admin/blog/${p._id}/edit`} className="text-brand-gold-dark hover:underline">
                       Edit
                     </Link>
-                    <DeleteButton onConfirm={deleteContent.bind(null, String(p._id))} itemLabel="this post" />
+                    {isOwner && (
+                      <DeleteButton onConfirm={deleteContent.bind(null, String(p._id))} itemLabel="this post" />
+                    )}
                   </td>
                 </tr>
               ))}

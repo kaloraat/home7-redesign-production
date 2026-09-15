@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { auth } from "@/auth";
 import dbConnect from "@/lib/db";
 import PropertyReference from "@/models/PropertyReference";
 import { deleteReferenceRequest } from "@/actions/tenancyReference.actions";
@@ -32,8 +33,10 @@ export default async function TenancyCheckDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const reference = await getReference(id);
+  const [session, reference] = await Promise.all([auth(), getReference(id)]);
   if (!reference) notFound();
+  // Deleting is owner-only — see lib/authz.ts.
+  const isOwner = session?.user.role === "owner";
 
   const r = reference.response;
 
@@ -178,14 +181,16 @@ export default async function TenancyCheckDetailPage({
         </>
       )}
 
-      <div className="mt-6">
-        <DeleteButton
-          onConfirm={deleteReferenceRequest.bind(null, id)}
-          itemLabel={`the reference check for ${reference.tenantName}`}
-          after={{ mode: "redirect", to: "/admin/tenancy-checks" }}
-          className="text-sm text-red-600 hover:underline cursor-pointer"
-        />
-      </div>
+      {isOwner && (
+        <div className="mt-6">
+          <DeleteButton
+            onConfirm={deleteReferenceRequest.bind(null, id)}
+            itemLabel={`the reference check for ${reference.tenantName}`}
+            after={{ mode: "redirect", to: "/admin/tenancy-checks" }}
+            className="text-sm text-red-600 hover:underline cursor-pointer"
+          />
+        </div>
+      )}
     </div>
   );
 }

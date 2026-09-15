@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { auth } from "@/auth";
 import dbConnect from "@/lib/db";
 import Property from "@/models/Property";
 import { deleteProperty } from "@/actions/property.actions";
@@ -42,7 +43,9 @@ export default async function AdminPropertiesPage({
   searchParams: Promise<{ type?: string }>;
 }) {
   const { type } = await searchParams;
-  const properties = await getAll(type);
+  const [session, properties] = await Promise.all([auth(), getAll(type)]);
+  // Deleting is owner-only — see lib/authz.ts.
+  const isOwner = session?.user.role === "owner";
 
   return (
     <div>
@@ -128,11 +131,13 @@ export default async function AdminPropertiesPage({
                     <Link href={`/admin/properties/${p._id}/edit`} className="text-brand-gold-dark hover:underline">
                       Edit
                     </Link>
-                    <DeleteButton
-                      onConfirm={deleteProperty.bind(null, String(p._id))}
-                      itemLabel="this listing"
-                      requireTypedConfirmation="delete this post"
-                    />
+                    {isOwner && (
+                      <DeleteButton
+                        onConfirm={deleteProperty.bind(null, String(p._id))}
+                        itemLabel="this listing"
+                        requireTypedConfirmation="delete this post"
+                      />
+                    )}
                   </td>
                 </tr>
               ))}

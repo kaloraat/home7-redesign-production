@@ -3,14 +3,7 @@
 import { revalidatePath } from "next/cache";
 import dbConnect from "@/lib/db";
 import TenancyApplication from "@/models/TenancyApplication";
-import { auth } from "@/auth";
-
-async function requireAdmin() {
-  const session = await auth();
-  if (!session?.user) {
-    throw new Error("Not authorized");
-  }
-}
+import { requireAdmin, requireOwner } from "@/lib/authz";
 
 export async function updateApplicationStatus(
   id: string,
@@ -24,7 +17,7 @@ export async function updateApplicationStatus(
 }
 
 export async function deleteApplication(id: string) {
-  await requireAdmin();
+  await requireOwner();
   await dbConnect();
   await TenancyApplication.findByIdAndDelete(id);
   revalidatePath("/admin/rental-applications");

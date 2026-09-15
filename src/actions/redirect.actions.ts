@@ -4,14 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect as nextRedirect } from "next/navigation";
 import dbConnect from "@/lib/db";
 import Redirect from "@/models/Redirect";
-import { auth } from "@/auth";
-
-async function requireAdmin() {
-  const session = await auth();
-  if (!session?.user) {
-    throw new Error("Not authorized");
-  }
-}
+import { requireAdmin, requireOwner } from "@/lib/authz";
 
 function normalizePath(input: string) {
   const trimmed = input.trim();
@@ -64,7 +57,7 @@ export async function updateRedirect(id: string, formData: FormData) {
 }
 
 export async function deleteRedirect(id: string) {
-  await requireAdmin();
+  await requireOwner();
   await dbConnect();
   await Redirect.findByIdAndDelete(id);
   revalidatePath("/admin/redirects");

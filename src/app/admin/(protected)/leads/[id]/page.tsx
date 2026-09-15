@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { auth } from "@/auth";
 import dbConnect from "@/lib/db";
 import Lead from "@/models/Lead";
 import { updateLeadStatus, deleteLead } from "@/actions/lead.actions";
@@ -27,8 +28,10 @@ export default async function LeadDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const lead = await getLead(id);
+  const [session, lead] = await Promise.all([auth(), getLead(id)]);
   if (!lead) notFound();
+  // Deleting is owner-only — see lib/authz.ts.
+  const isOwner = session?.user.role === "owner";
 
   return (
     <div className="max-w-2xl">
@@ -113,14 +116,16 @@ export default async function LeadDetailPage({
         </div>
       </div>
 
-      <div className="mt-4">
-        <DeleteButton
-          onConfirm={deleteLead.bind(null, id)}
-          itemLabel="this lead"
-          after={{ mode: "redirect", to: "/admin/leads" }}
-          className="text-sm text-red-600 hover:underline cursor-pointer"
-        />
-      </div>
+      {isOwner && (
+        <div className="mt-4">
+          <DeleteButton
+            onConfirm={deleteLead.bind(null, id)}
+            itemLabel="this lead"
+            after={{ mode: "redirect", to: "/admin/leads" }}
+            className="text-sm text-red-600 hover:underline cursor-pointer"
+          />
+        </div>
+      )}
     </div>
   );
 }

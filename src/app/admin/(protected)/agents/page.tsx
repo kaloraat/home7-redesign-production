@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { auth } from "@/auth";
 import dbConnect from "@/lib/db";
 import Agent from "@/models/Agent";
 import { deleteAgent } from "@/actions/agent.actions";
@@ -16,7 +17,11 @@ async function getAll() {
 }
 
 export default async function AdminAgentsPage() {
-  const agents = await getAll();
+  const [session, agents] = await Promise.all([auth(), getAll()]);
+  // Deleting is owner-only — see lib/authz.ts — so an "editor" admin (e.g.
+  // office staff with a login but not full trust) simply doesn't see the
+  // option at all, rather than seeing it fail after clicking through.
+  const isOwner = session?.user.role === "owner";
 
   return (
     <div>
@@ -74,7 +79,9 @@ export default async function AdminAgentsPage() {
                     <Link href={`/admin/agents/${a._id}/edit`} className="text-brand-gold-dark hover:underline">
                       Edit
                     </Link>
-                    <DeleteButton onConfirm={deleteAgent.bind(null, String(a._id))} itemLabel="this agent" />
+                    {isOwner && (
+                      <DeleteButton onConfirm={deleteAgent.bind(null, String(a._id))} itemLabel="this agent" />
+                    )}
                   </td>
                 </tr>
               ))}

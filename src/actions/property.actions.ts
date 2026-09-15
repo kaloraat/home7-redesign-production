@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import dbConnect from "@/lib/db";
 import Property from "@/models/Property";
-import { auth } from "@/auth";
+import { requireAdmin, requireOwner } from "@/lib/authz";
 
 function slugify(input: string) {
   return input
@@ -12,13 +12,6 @@ function slugify(input: string) {
     .trim()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
-}
-
-async function requireAdmin() {
-  const session = await auth();
-  if (!session?.user) {
-    throw new Error("Not authorized");
-  }
 }
 
 function numberOrUndefined(value: FormDataEntryValue | null) {
@@ -158,7 +151,7 @@ export async function updateProperty(id: string, formData: FormData) {
 }
 
 export async function deleteProperty(id: string) {
-  await requireAdmin();
+  await requireOwner();
   await dbConnect();
   await Property.findByIdAndDelete(id);
   revalidatePath("/admin/properties");

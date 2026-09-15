@@ -5,27 +5,15 @@ import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 import dbConnect from "@/lib/db";
 import Admin from "@/models/Admin";
-import { auth } from "@/auth";
+import { requireOwner } from "@/lib/authz";
 
-/**
- * The `role` field ("owner"/"editor") existed on the Admin model from the
- * start but nothing actually used it — every admin action just checked
- * "is there a session at all". This is the first real use of it: only an
- * owner can manage other admin accounts (create/delete/reset password).
- * Everything else in the admin dashboard stays open to any signed-in admin,
- * same as before — this isn't a full permissions rebuild, just the one
- * place where "who can add/remove staff logins" genuinely matters.
- */
-async function requireOwner() {
-  const session = await auth();
-  if (!session?.user) {
-    throw new Error("Not authorized");
-  }
-  if (session.user.role !== "owner") {
-    throw new Error("Only an owner can manage admin users");
-  }
-  return session;
-}
+// The `role` field ("owner"/"editor") existed on the Admin model from the
+// start but originally nothing used it — every admin action just checked
+// "is there a session at all". requireOwner (now centralized in
+// lib/authz.ts, since it's also used by every delete* action across the
+// dashboard) is what enforces it: only an owner can manage other admin
+// accounts (create/delete/reset password) — same reasoning as deletion
+// being owner-only, since handing out/revoking a login is delete-adjacent.
 
 export async function createAdminUser(formData: FormData) {
   await requireOwner();
