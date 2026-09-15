@@ -148,20 +148,26 @@ export function TenancyReferenceForm({
   if (screen === "intro") {
     return (
       <div className="rounded-lg border border-slate-200 bg-white p-6 sm:p-8">
-        {/* "Visible to Agents only" notice — matches the old Laravel site's
-            div-note block exactly (same wording, same folder-lock icon:
-            public/assets/uploads/icon/folder-lock.svg in old_laravel_site,
-            stroke #333333, reproduced inline below rather than as a static
-            asset since it's the only place this icon is used). */}
+        {/* "Visible to Agents only" notice — same icon/meaning as the old
+            Laravel site's div-note block (folder-lock.svg, stroke #333333,
+            reproduced inline below rather than as a static asset since it's
+            the only place this icon is used), but split into a proper
+            label + sentence: the old site's own copy ran "Visible to
+            Agents only" straight into "Please note, ..." with no
+            punctuation between them — a genuine grammar bug there, not
+            something worth reproducing just to match exactly. */}
         <div className="flex items-start gap-4 pb-4">
           <svg width="28" height="28" viewBox="0 0 50 50" fill="none" className="shrink-0 mt-0.5" aria-hidden="true">
             <path d="M41.0715 30.357V17.857C41.0715 16.9098 40.6952 16.0014 40.0254 15.3317C39.3556 14.6619 38.4472 14.2856 37.5 14.2856H21.4286L17.8572 8.92847H8.92861C7.9814 8.92847 7.073 9.30474 6.40322 9.97451C5.73345 10.6443 5.35718 11.5527 5.35718 12.4999V37.4999C5.35718 38.4471 5.73345 39.3555 6.40322 40.0253C7.073 40.6951 7.9814 41.0713 8.92861 41.0713H20.5358" stroke="#333333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             <path d="M26.0205 29.9802V25.3884C26.0191 23.965 26.5466 22.5918 27.5007 21.5355C28.4548 20.4791 29.7673 19.8149 31.1835 19.6719C32.5997 19.5288 34.0185 19.9171 35.1646 20.7613C36.3106 21.6056 37.1021 22.8455 37.3853 24.2404V29.9802M37.3853 29.9802H23.7246C22.4566 29.9802 21.4287 31.0082 21.4287 32.2762V40.3119C21.4287 41.5799 22.4566 42.6078 23.7246 42.6078H39.7961C41.0641 42.6078 42.092 41.5799 42.092 40.3119V32.2762C42.092 31.0082 41.0641 29.9802 39.7961 29.9802H37.3853Z" stroke="#333333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          <p className="text-sm text-slate-700">
-            Visible to Agents only Please note, your reference response is only visible to agents and
-            will <u>not</u> be visible to the applicant
-          </p>
+          <div>
+            <p className="text-sm font-semibold text-[#333333]">Visible to Agents only</p>
+            <p className="text-sm text-slate-700">
+              Please note, your reference response is only visible to agents and will{" "}
+              <u>not</u> be visible to the applicant.
+            </p>
+          </div>
         </div>
 
         {/* Matches the old Laravel site's intro sentence — present there,
