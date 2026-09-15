@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { COMPANY, SITE_URL } from "@/lib/constants";
 import DateInput from "@/components/DateInput";
 
@@ -102,8 +101,7 @@ export function TenancyReferenceForm({
   agencyName,
   agentEmail,
 }: Props) {
-  const router = useRouter();
-  const [screen, setScreen] = useState<"intro" | "form" | "declined">("intro");
+  const [screen, setScreen] = useState<"intro" | "form" | "declined" | "submitted">("intro");
   const [status, setStatus] = useState<"idle" | "submitting" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
   // Which required Yes/No/N-A question (by its FormData field name) failed
@@ -210,7 +208,15 @@ export function TenancyReferenceForm({
         const body = await res.json().catch(() => null);
         throw new Error(extractErrorMessage(body));
       }
-      router.push("/");
+      // Was `router.push("/")` — silently dropping the agent onto Home7's
+      // marketing homepage with no confirmation at all that their
+      // submission actually went through. Showing a confirmation screen
+      // right here (same pattern the decline flow already uses) instead
+      // of a toast-after-redirect: this isn't a Home7 visitor being sent
+      // back to a site they browse, it's a one-off internal form for
+      // someone at a different agency — a real "yes, that's done" message
+      // in place, not a redirect to a page that means nothing to them.
+      setScreen("submitted");
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : "Something went wrong — please try again.");
       setStatus("error");
@@ -222,6 +228,23 @@ export function TenancyReferenceForm({
       <div className="rounded-lg border border-slate-200 bg-white p-8 text-center">
         <p className="font-display text-xl text-brand-navy">Thank you</p>
         <p className="mt-2 text-slate-500">We&apos;ve recorded your response.</p>
+      </div>
+    );
+  }
+
+  if (screen === "submitted") {
+    return (
+      <div className="rounded-lg border border-slate-200 bg-white p-8 text-center">
+        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M20 6 9 17l-5-5" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+        <p className="font-display text-xl text-brand-navy">Reference submitted</p>
+        <p className="mt-2 text-slate-500">
+          Thank you for your assistance — {tenantName}&apos;s reference has been sent to Home7 Real
+          Estate.
+        </p>
       </div>
     );
   }
