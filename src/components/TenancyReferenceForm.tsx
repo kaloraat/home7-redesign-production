@@ -302,37 +302,38 @@ export function TenancyReferenceForm({
         <p className="text-red-600 text-sm font-medium">Mandatory Questions</p>
 
         <div>
-          <label className={labelClass}>What is your name? *</label>
+          <label className={labelClass}>What is your name? <span className="text-red-600">*</span></label>
           <input name="agentName" defaultValue={agentName} required className={inputClass} />
         </div>
         <div>
-          <label className={labelClass}>What is your job position? *</label>
+          <label className={labelClass}>What is your job position? <span className="text-red-600">*</span></label>
           <input name="jobPosition" defaultValue={jobPosition} required className={inputClass} />
         </div>
         <div>
           <label className={labelClass}>
             Can you confirm that this tenant is/was a leaseholder or an approved occupant at the
-            mentioned property? *
+            mentioned property? <span className="text-red-600">*</span>
           </label>
           <YesNoPills value={leaseholder} onChange={setLeaseholder} />
           <input type="hidden" name="leaseholderOrApprovedOccupant" value={leaseholder} required />
         </div>
         <div>
-          <label className={labelClass}>Name of Real Estate Agency *</label>
+          <label className={labelClass}>Name of Real Estate Agency <span className="text-red-600">*</span></label>
           <input name="agencyName" defaultValue={agencyName} required className={inputClass} />
         </div>
         <div>
-          <label className={labelClass}>Email of Agent *</label>
+          <label className={labelClass}>Email of Agent <span className="text-red-600">*</span></label>
           <input name="agentEmail" type="email" defaultValue={agentEmail} required className={inputClass} />
         </div>
         <div>
           <label className={labelClass}>
-            What kind of property were/are they renting? (house/apartment/any gardens/old/new) *
+            What kind of property were/are they renting? (house/apartment/any gardens/old/new){" "}
+            <span className="text-red-600">*</span>
           </label>
           <input name="propertyType" required className={inputClass} />
         </div>
         <div>
-          <label className={labelClass}>Lease Type *</label>
+          <label className={labelClass}>Lease Type <span className="text-red-600">*</span></label>
           <select name="leaseType" required className={inputClass}>
             <option value="">Select…</option>
             <option value="Fixed Term">Fixed Term</option>
@@ -341,16 +342,16 @@ export function TenancyReferenceForm({
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className={labelClass}>Date tenancy agreement commenced *</label>
+            <label className={labelClass}>Date tenancy agreement commenced <span className="text-red-600">*</span></label>
             <DateInput name="tenancyAgreementCommencedDate" required />
           </div>
           <div>
-            <label className={labelClass}>Date tenancy agreement expires *</label>
+            <label className={labelClass}>Date tenancy agreement expires <span className="text-red-600">*</span></label>
             <DateInput name="tenancyAgreementExpiresDate" required />
           </div>
         </div>
         <div>
-          <label className={labelClass}>Did your office terminate the tenancy? *</label>
+          <label className={labelClass}>Did your office terminate the tenancy? <span className="text-red-600">*</span></label>
           <YesNoPills value={terminatedByOffice} onChange={setTerminatedByOffice} />
           <input type="hidden" name="tenancyTerminatedByOffice" value={terminatedByOffice} required />
         </div>
@@ -358,37 +359,37 @@ export function TenancyReferenceForm({
 
       <section className="space-y-4 pt-6 border-t border-slate-100">
         <div>
-          <label className={labelClass}>Can you confirm the weekly rent paid? *</label>
+          <label className={labelClass}>Can you confirm the weekly rent paid? <span className="text-red-600">*</span></label>
           <input name="weeklyRentPaid" required className={inputClass} />
         </div>
         <div>
-          <label className={labelClass}>When is their rent paid to? *</label>
+          <label className={labelClass}>When is their rent paid to? <span className="text-red-600">*</span></label>
           <DateInput name="rentPaidTo" required />
         </div>
         <div>
-          <label className={labelClass}>Was rent paid on time? *</label>
+          <label className={labelClass}>Was rent paid on time? <span className="text-red-600">*</span></label>
           <YesNoPills value={rentPaidOnTime} onChange={setRentPaidOnTime} />
           <input type="hidden" name="rentPaidOnTime" value={rentPaidOnTime} required />
           {rentPaidOnTime === "No" && (
             <div className="mt-3 ml-2 space-y-3">
               <div>
-                <label className={labelClass}>How often was the rent paid late? *</label>
+                <label className={labelClass}>How often was the rent paid late? <span className="text-red-600">*</span></label>
                 <input name="rentPaidLateCount" required className={inputClass} />
               </div>
               <div>
-                <label className={labelClass}>Max. period of arrears in days *</label>
+                <label className={labelClass}>Max. period of arrears in days <span className="text-red-600">*</span></label>
                 <input name="rentLateFrequency" required className={inputClass} />
               </div>
             </div>
           )}
         </div>
         <div>
-          <label className={labelClass}>During their tenancy was a Rent Default Notice issued? *</label>
+          <label className={labelClass}>During their tenancy was a Rent Default Notice issued? <span className="text-red-600">*</span></label>
           <YesNoPills value={rentDefaultNoticeIssued} onChange={setRentDefaultNoticeIssued} />
           <input type="hidden" name="rentDefaultNoticeIssued" value={rentDefaultNoticeIssued} required />
           {rentDefaultNoticeIssued === "Yes" && (
             <div className="mt-3 ml-2">
-              <label className={labelClass}>Reason *</label>
+              <label className={labelClass}>Reason <span className="text-red-600">*</span></label>
               <input name="rentDefaultNoticeIssuedReason" required className={inputClass} />
             </div>
           )}
@@ -397,43 +398,43 @@ export function TenancyReferenceForm({
 
       <section className="space-y-4 pt-6 border-t border-slate-100">
         <div>
-          <label className={labelClass}>Were any Notices ever issued by your office? *</label>
+          <label className={labelClass}>Were any Notices ever issued by your office? <span className="text-red-600">*</span></label>
           <YesNoPills value={noticesIssuedByOffice} onChange={setNoticesIssuedByOffice} />
           <input type="hidden" name="noticesIssuedByOffice" value={noticesIssuedByOffice} required />
           {noticesIssuedByOffice === "Yes" && (
             <div className="mt-3 ml-2">
-              <label className={labelClass}>Reason *</label>
+              <label className={labelClass}>Reason <span className="text-red-600">*</span></label>
               <input name="noticesIssuedByOfficeReason" required className={inputClass} />
             </div>
           )}
         </div>
         <div>
-          <label className={labelClass}>Has the tenant served any Notices on the landlord? *</label>
+          <label className={labelClass}>Has the tenant served any Notices on the landlord? <span className="text-red-600">*</span></label>
           <YesNoPills value={tenantServedNotices} onChange={setTenantServedNotices} />
           <input type="hidden" name="tenantServedNotices" value={tenantServedNotices} required />
           {tenantServedNotices === "Yes" && (
             <div className="mt-3 ml-2">
-              <label className={labelClass}>Reason *</label>
+              <label className={labelClass}>Reason <span className="text-red-600">*</span></label>
               <input name="tenantServedNoticesReason" required className={inputClass} />
             </div>
           )}
         </div>
         <div>
-          <label className={labelClass}>Did you carry out periodic/routine inspections? *</label>
+          <label className={labelClass}>Did you carry out periodic/routine inspections? <span className="text-red-600">*</span></label>
           <YesNoPills value={routineInspectionsConducted} onChange={setRoutineInspectionsConducted} />
           <input type="hidden" name="routineInspectionsConducted" value={routineInspectionsConducted} required />
           {routineInspectionsConducted === "Yes" && (
             <div className="mt-3 ml-2 space-y-3">
               <div>
-                <label className={labelClass}>When was the last routine inspection conducted? *</label>
+                <label className={labelClass}>When was the last routine inspection conducted? <span className="text-red-600">*</span></label>
                 <DateInput name="lastRoutineInspectionDate" required />
               </div>
               <div>
-                <label className={labelClass}>How did you find the routine inspections? *</label>
+                <label className={labelClass}>How did you find the routine inspections? <span className="text-red-600">*</span></label>
                 <input name="routineInspectionFeedback" required className={inputClass} />
               </div>
               <div>
-                <label className={labelClass}>Was the property found to be clean, undamaged and well maintained? *</label>
+                <label className={labelClass}>Was the property found to be clean, undamaged and well maintained? <span className="text-red-600">*</span></label>
                 <select name="propertyCleanAndWellMaintained" required className={inputClass}>
                   <option value="">Select…</option>
                   {YES_NO_NA_OPTIONS.map((o) => (
@@ -452,7 +453,7 @@ export function TenancyReferenceForm({
 
       <section className="space-y-4 pt-6 border-t border-slate-100">
         <div>
-          <label className={labelClass}>Did they care for the property? *</label>
+          <label className={labelClass}>Did they care for the property? <span className="text-red-600">*</span></label>
           <YesNoPills value={tenantCared} onChange={setTenantCared} />
           <input type="hidden" name="tenantCaredForProperty" value={tenantCared} required />
           <div className="mt-3">
@@ -461,12 +462,12 @@ export function TenancyReferenceForm({
           </div>
         </div>
         <div>
-          <label className={labelClass}>Were the gardens kept neat and tidy? *</label>
+          <label className={labelClass}>Were the gardens kept neat and tidy? <span className="text-red-600">*</span></label>
           <YesNoPills value={gardensNeat} onChange={setGardensNeat} />
           <input type="hidden" name="gardensKeptNeat" value={gardensNeat} required />
         </div>
         <div>
-          <label className={labelClass}>Did you receive any complaints during the tenancy? *</label>
+          <label className={labelClass}>Did you receive any complaints during the tenancy? <span className="text-red-600">*</span></label>
           <YesNoPills value={complaintsReceived} onChange={setComplaintsReceived} />
           <input type="hidden" name="complaintsReceived" value={complaintsReceived} required />
           {complaintsReceived === "Yes" && (
@@ -477,13 +478,13 @@ export function TenancyReferenceForm({
           )}
         </div>
         <div>
-          <label className={labelClass}>Did the tenant keep any pets on the property? *</label>
+          <label className={labelClass}>Did the tenant keep any pets on the property? <span className="text-red-600">*</span></label>
           <YesNoPills value={tenantKeptPets} onChange={setTenantKeptPets} />
           <input type="hidden" name="tenantKeptPets" value={tenantKeptPets} required />
           {tenantKeptPets === "Yes" && (
             <div className="mt-3 ml-2 space-y-3">
               <div>
-                <label className={labelClass}>If yes, what kind/breed, how many, and how was/is the behaviour of the pet/s? *</label>
+                <label className={labelClass}>If yes, what kind/breed, how many, and how was/is the behaviour of the pet/s? <span className="text-red-600">*</span></label>
                 <input name="petDetails" required className={inputClass} />
               </div>
               <div>
@@ -502,29 +503,29 @@ export function TenancyReferenceForm({
 
       <section className="space-y-4 pt-6 border-t border-slate-100">
         <div>
-          <label className={labelClass}>Did they/will they receive a full bond refund? *</label>
+          <label className={labelClass}>Did they/will they receive a full bond refund? <span className="text-red-600">*</span></label>
           <YesNoPills value={fullBondRefundReceived} onChange={setFullBondRefundReceived} />
           <input type="hidden" name="fullBondRefundReceived" value={fullBondRefundReceived} required />
           {fullBondRefundReceived === "No" && (
             <div className="mt-3 ml-2">
-              <label className={labelClass}>Why not? List deductions *</label>
+              <label className={labelClass}>Why not? List deductions <span className="text-red-600">*</span></label>
               <input name="whyNotListDeductions" required className={inputClass} />
             </div>
           )}
         </div>
         <div>
-          <label className={labelClass}>Has the Vacate Inspection been done? *</label>
+          <label className={labelClass}>Has the Vacate Inspection been done? <span className="text-red-600">*</span></label>
           <YesNoPills value={vacateInspectionDone} onChange={setVacateInspectionDone} />
           <input type="hidden" name="vacateInspectionDone" value={vacateInspectionDone} required />
           {vacateInspectionDone === "Yes" && (
             <div className="mt-3 ml-2">
-              <label className={labelClass}>What was the condition of the property when they vacated? *</label>
+              <label className={labelClass}>What was the condition of the property when they vacated? <span className="text-red-600">*</span></label>
               <input name="propertyConditionOnVacate" required className={inputClass} />
             </div>
           )}
         </div>
         <div>
-          <label className={labelClass}>Was/is the tenant co-operative and pleasant to deal with? *</label>
+          <label className={labelClass}>Was/is the tenant co-operative and pleasant to deal with? <span className="text-red-600">*</span></label>
           <YesNoPills value={tenantCooperative} onChange={setTenantCooperative} />
           <input type="hidden" name="tenantCooperative" value={tenantCooperative} required />
           <div className="mt-3">
@@ -536,38 +537,38 @@ export function TenancyReferenceForm({
 
       <section className="space-y-4 pt-6 border-t border-slate-100">
         <div>
-          <label className={labelClass}>How would you rate this tenant? 1 (Poor) – 5 (Great) *</label>
+          <label className={labelClass}>How would you rate this tenant? 1 (Poor) – 5 (Great) <span className="text-red-600">*</span></label>
           <input name="tenantRating" type="number" min={1} max={5} required className={inputClass} />
         </div>
         <div>
-          <label className={labelClass}>Would you rent a property to the tenant again? *</label>
+          <label className={labelClass}>Would you rent a property to the tenant again? <span className="text-red-600">*</span></label>
           <YesNoPills value={wouldRentAgain} onChange={setWouldRentAgain} />
           <input type="hidden" name="wouldRentAgain" value={wouldRentAgain} required />
           {wouldRentAgain === "No" && (
             <div className="mt-3 ml-2">
-              <label className={labelClass}>Why not? *</label>
+              <label className={labelClass}>Why not? <span className="text-red-600">*</span></label>
               <input name="wouldRentAgainWhyNot" required className={inputClass} />
             </div>
           )}
         </div>
         <div>
-          <label className={labelClass}>What is/was the reason for the tenant leaving this property? *</label>
+          <label className={labelClass}>What is/was the reason for the tenant leaving this property? <span className="text-red-600">*</span></label>
           <input name="tenantLeavingReason" required className={inputClass} />
         </div>
         <div>
-          <label className={labelClass}>Do you have plans to list or have you listed this person as a defaulter? *</label>
+          <label className={labelClass}>Do you have plans to list or have you listed this person as a defaulter? <span className="text-red-600">*</span></label>
           <input name="listedAsDefaulter" required className={inputClass} />
         </div>
         <div>
           <label className={labelClass}>
             Have the tenants been known to post comments on social media that could damage the
-            landlord or agent&apos;s reputation? *
+            landlord or agent&apos;s reputation? <span className="text-red-600">*</span>
           </label>
           <YesNoPills value={socialMediaNegativePosts} onChange={setSocialMediaNegativePosts} />
           <input type="hidden" name="socialMediaNegativePosts" value={socialMediaNegativePosts} required />
           {socialMediaNegativePosts === "Yes" && (
             <div className="mt-3 ml-2">
-              <label className={labelClass}>Please provide an example *</label>
+              <label className={labelClass}>Please provide an example <span className="text-red-600">*</span></label>
               <input name="socialMediaNegativePostsExample" required className={inputClass} />
             </div>
           )}
@@ -577,7 +578,7 @@ export function TenancyReferenceForm({
       <section className="space-y-4 pt-6 border-t border-slate-100">
         <p className="text-red-600 text-sm font-medium">Please provide the following</p>
         <div>
-          <label className={labelClass}>Tenant Ledger *</label>
+          <label className={labelClass}>Tenant Ledger <span className="text-red-600">*</span></label>
           <input name="tenantLedger" type="file" required accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" className={inputClass} />
         </div>
         <div>
