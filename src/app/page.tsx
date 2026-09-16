@@ -73,10 +73,10 @@ function buildJsonLd() {
 export default async function Home() {
   const [featured, forSale, forRent, sold, leased, posts, agents] = await Promise.all([
     getFeaturedProperties(6),
-    getPropertiesByType("sale", 4),
-    getPropertiesByType("rent", 4),
-    getPropertiesByType("sold", 4),
-    getPropertiesByType("leased", 4),
+    getPropertiesByType("sale", 6),
+    getPropertiesByType("rent", 6),
+    getPropertiesByType("sold", 6),
+    getPropertiesByType("leased", 6),
     getPublishedContent("blog", 4),
     getAgents(),
   ]);
@@ -198,7 +198,7 @@ export default async function Home() {
           pick is genuinely the first listing content a visitor sees, ahead
           of the latest-4-per-type sections. */}
       {featured.length > 0 && (
-        <section className="mx-auto max-w-6xl 2xl:max-w-384 px-4 pt-16 sm:pt-20">
+        <section className="mx-auto max-w-6xl px-4 pt-16 sm:pt-20">
           <div className="border-b border-slate-200 pb-4">
             <h2 className="font-display text-2xl sm:text-3xl text-brand-navy">Featured Properties</h2>
           </div>
@@ -206,17 +206,19 @@ export default async function Home() {
             <ResponsiveCardGrid
               items={featured}
               renderItem={(p) => <PropertyCard key={String(p._id)} property={p} />}
-              wide4up
             />
           </div>
         </section>
       )}
 
-      {/* 2xl:max-w-384 (1536px) grows this container in lockstep with
-          ResponsiveCardGrid's wide4up 2xl:grid-cols-4 tier — see that
-          component's own comment for the exact math (358px/card at 2xl,
-          never narrower than the 357.33px 3-column floor). */}
-      <section className="mx-auto max-w-6xl 2xl:max-w-384 px-4 py-16 sm:py-20 space-y-16">
+      {/* Plain 3-column-max grid (no wide4up) — these sections fetch exactly
+          6 items each. wide4up's 2xl 4th column would trim via
+          floor(6/4)*4 = 4, showing FEWER cards at the widest tier than the
+          3-column tier's floor(6/3)*3 = 6 already shows in full — a visible
+          regression, not an improvement, at ultra-wide widths. Same
+          reasoning ResponsiveCardGrid's own doc comment already gives for
+          not using wide4up on Testimonials' 6 items. */}
+      <section className="mx-auto max-w-6xl px-4 py-16 sm:py-20 space-y-16">
         <ListingsSection
           title="For Sale"
           properties={forSale}

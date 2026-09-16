@@ -27,10 +27,15 @@ export function ListingsSection({
       ) : (
         <>
           <div className="mt-8">
+            {/* No wide4up — these sections always fetch exactly 6 items
+                (page.tsx), and wide4up's 2xl 4th column would trim via
+                floor(6/4)*4 = 4, showing fewer cards at the widest tier
+                than the 3-column tier already shows in full. See
+                page.tsx's own comment alongside this section for the
+                full reasoning. */}
             <ResponsiveCardGrid
               items={properties}
               renderItem={(p) => <PropertyCard key={String(p._id)} property={p} />}
-              wide4up
             />
           </div>
           <div className="mt-10 text-center">
