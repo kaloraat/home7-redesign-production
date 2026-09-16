@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
+import Script from "next/script";
 import { Rethink_Sans, Inter } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
@@ -112,9 +113,36 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const session = await auth();
   const isAdmin = session?.user?.email === "admin@home7.com.au";
 
+  // Google Analytics (GA4) — was live on the old Laravel site (measurement
+  // ID G-44SM0JMX0E) but pasted into a generic "custom header script"
+  // catch-all field there, not the site's own dedicated GA setting field
+  // (which was actually empty/unused — confirmed against the live DB
+  // export). This rebuild had no GA implementation at all until now, found
+  // during the pre-domain-switch audit. Same isCanonicalHost() gate as the
+  // noindex/robots logic above, for the same reason: a preview/staging/IP
+  // hit shouldn't count as real production traffic in Analytics.
+  const host = (await headers()).get("host") ?? "";
+  const gaEnabled = isCanonicalHost(host);
+
   return (
     <html lang="en" className={`${rethinkSans.variable} ${inter.variable}`}>
       <body className="min-h-screen flex flex-col antialiased text-foreground font-sans">
+        {gaEnabled && (
+          <>
+            <Script
+              src="https://www.googletagmanager.com/gtag/js?id=G-44SM0JMX0E"
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-init" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'G-44SM0JMX0E');
+              `}
+            </Script>
+          </>
+        )}
         {/* Top loading progress bar (YouTube-style) — without it, a click
             on a dynamic route gives no feedback until the new page's HTML
             actually arrives, which reads as "did my click even register?"
