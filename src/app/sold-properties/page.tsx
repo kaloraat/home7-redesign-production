@@ -25,7 +25,13 @@ const breadcrumbJsonLd = {
 };
 
 export default async function Page() {
-  const properties = await getPropertiesByType("sold", 100);
+  // limit was 100 — a hard cap silently truncates this archive page once
+  // the category passes 100 real listings rather than erroring (found live
+  // on /other-properties, which had already crossed that line — see the
+  // comment there for the full writeup). 10,000 is a sentinel "no
+  // realistic cap" fix applied to all five getPropertiesByType(..., 100)
+  // callers for the same reason.
+  const properties = await getPropertiesByType("sold", 10000);
 
   return (
     <div>

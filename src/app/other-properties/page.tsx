@@ -27,7 +27,17 @@ const breadcrumbJsonLd = {
 // buckets. Confirmed via FrontendController.php: this is its own dedicated
 // listing category on the live site, not a placeholder.
 export default async function Page() {
-  const properties = await getPropertiesByType("other", 100);
+  // limit was 100 — this is the full archive for the category, not a
+  // preview, and "other" alone passed 100 real listings after importing
+  // the legacy property pages found during the pre-domain-switch URL
+  // audit (105 total), which silently dropped the 5 oldest off this page
+  // entirely (confirmed live: getPropertiesByType sorts createdAt desc,
+  // so a hard cap just truncates the tail rather than erroring). 10,000 is
+  // a sentinel "no realistic cap" rather than swapping one arbitrary
+  // number for another that will eventually run out again too — same fix
+  // needed on /properties-for-sale, /properties-for-rent, /sold-properties
+  // and /leased-properties, all of which share this same latent bug.
+  const properties = await getPropertiesByType("other", 10000);
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
       <script

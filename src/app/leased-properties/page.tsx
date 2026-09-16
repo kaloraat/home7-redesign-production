@@ -26,7 +26,9 @@ const breadcrumbJsonLd = {
 };
 
 export default async function Page() {
-  const properties = await getPropertiesByType("leased", 100);
+  // limit was 100 — see sold-properties/page.tsx's comment for the full
+  // writeup (same latent bug, fixed the same way across all five callers).
+  const properties = await getPropertiesByType("leased", 10000);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
