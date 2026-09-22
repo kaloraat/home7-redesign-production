@@ -33,20 +33,28 @@ export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://home7.com.a
 // gradient ever changes, rather than three copies of the same CSS string.
 export const BRAND_GRADIENT = "linear-gradient(145deg, #071048 0%, #228599 100%)";
 
-// Admin-only — deliberately a distinct, more saturated blue than the public
-// BRAND_GRADIENT above (that one stays as-is for the public site). Colors
+// A distinct, more saturated blue palette than the public BRAND_GRADIENT
+// above (that one stays as-is everywhere it was already used). Colors
 // picked by sampling the REB Dealmakers 2026 promo card the client sent as
-// a design reference. The client's second round of feedback: their card
-// isn't a single clean gradient, it's several soft blurred patches of
-// different blue shades overlapping (a "mesh gradient" look) — so this is a
-// dark navy base plus a handful of blurred glow colors that AdminPageHeader
-// layers as separate blurred blobs, rather than one smooth gradient stop
-// list. Kept as constants (not inlined in the component) so the dashboard
-// and every other admin page reuse the exact same palette.
-export const ADMIN_NAVY_BASE = "#0a0e34";
-export const ADMIN_GLOW_BRIGHT_BLUE = "#3f7de5";
-export const ADMIN_GLOW_LIGHT_BLUE = "#6cc4f2";
-export const ADMIN_GLOW_DEEP_BLUE = "#16227a";
+// a design reference. The client's follow-up feedback: their card isn't a
+// single clean gradient, it's several soft blurred patches of different
+// blue shades overlapping (a "mesh gradient" look) — so this is a dark navy
+// base plus a handful of blurred glow colors that get layered as separate
+// blurred divs (filter: blur), rather than more gradient stops. Started
+// admin-only (AdminPageHeader, AdminSidebar's Home7/Admin pill) and then
+// reused for BrandStory on the public homepage, so named generically
+// ("MESH_", not "ADMIN_") rather than implying it's admin-scoped.
+export const MESH_NAVY_BASE = "#0a0e34";
+export const MESH_GLOW_BRIGHT_BLUE = "#3f7de5";
+export const MESH_GLOW_LIGHT_BLUE = "#6cc4f2";
+export const MESH_GLOW_DEEP_BLUE = "#16227a";
+
+// The reference card also sits on its own near-black backdrop, distinct
+// from the card itself (MESH_NAVY_BASE above) — sampled from the same
+// image. Used behind BrandStory's rounded mesh card on the public
+// homepage, matching that two-layer "dark page, lighter rounded card on
+// top" structure rather than the card filling the full section width.
+export const MESH_SECTION_BACKDROP = "#060a1c";
 
 // Same reference card's pill button — light sky-blue fading to a darker
 // teal-blue, white text (not a light pill with dark text, which is what an
@@ -182,6 +190,14 @@ export const BRAND_STORY = [
   `You might say 'Real Estate is in our blood'. As proudly 100% Australian owned family business, we've been at the forefront of real estate in Australia since 2020. We continue today with the same focus, culture and ethics that has helped build our reputation as an Australian Super brand. We are continually evolving to ensure we remain ahead of the pack and leaders within the market.`,
   `To this day, Home7 brand continues to strengthen, grow and evolve. We are specialist for Sydney Real Estate Market. Property Selling, management, Auction we handle with our highly skilled. Mind it… Our priority is your satisfaction and this will help us to become the best real estate agent in Liverpool NSW.`,
 ] as const;
+
+// Pulled out of BRAND_STORY[0] above (it already appears there, in context)
+// for BrandStory's magazine-style pull-quote treatment — a short line blown
+// up large/bold above the smaller body paragraphs, the way a print
+// magazine spread re-states a line from the body copy as a big pull-quote.
+// An experiment per the client's request; easy to drop if they don't like
+// the repetition of the same line at two sizes.
+export const BRAND_STORY_PULLQUOTE = "Real Estate is in our blood";
 
 /**
  * Rewritten from the live site's generic "Customer Service / Professionalism

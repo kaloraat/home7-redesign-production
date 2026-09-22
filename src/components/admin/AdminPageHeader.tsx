@@ -1,13 +1,14 @@
 import Link from "next/link";
 import {
-  ADMIN_NAVY_BASE,
-  ADMIN_GLOW_BRIGHT_BLUE,
-  ADMIN_GLOW_LIGHT_BLUE,
-  ADMIN_GLOW_DEEP_BLUE,
+  MESH_NAVY_BASE,
+  MESH_GLOW_BRIGHT_BLUE,
+  MESH_GLOW_LIGHT_BLUE,
+  MESH_GLOW_DEEP_BLUE,
   ADMIN_BUTTON_GRADIENT,
   ADMIN_ACCENT_BLUE,
   ADMIN_TEXT_BLUE,
 } from "@/lib/constants";
+import MeshBackground from "@/components/MeshBackground";
 
 /**
  * Shared page-header pattern for every admin list/detail page — title +
@@ -36,30 +37,20 @@ export function AdminPageHeader({
   return (
     <div
       className="relative flex items-start justify-between gap-4 overflow-hidden rounded-2xl p-6 sm:p-8 text-white"
-      style={{ backgroundColor: ADMIN_NAVY_BASE }}
+      style={{ backgroundColor: MESH_NAVY_BASE }}
     >
-      {/* The blurred-patch background. Each blob is deliberately an odd
-          size/opacity and off the edge on at least one side — perfectly
-          centered, evenly-sized blobs read as "gradient" again rather than
-          the organic, uneven patches in the reference. */}
-      <div aria-hidden className="pointer-events-none absolute inset-0">
-        <div
-          className="absolute -left-16 -top-20 h-72 w-80 rounded-full opacity-80 blur-3xl"
-          style={{ backgroundColor: ADMIN_GLOW_BRIGHT_BLUE }}
-        />
-        <div
-          className="absolute -top-10 left-1/3 h-56 w-56 rounded-full opacity-60 blur-3xl"
-          style={{ backgroundColor: ADMIN_GLOW_LIGHT_BLUE }}
-        />
-        <div
-          className="absolute -bottom-24 right-0 h-64 w-72 rounded-full opacity-70 blur-3xl"
-          style={{ backgroundColor: ADMIN_GLOW_DEEP_BLUE }}
-        />
-        <div
-          className="absolute -right-10 top-0 h-40 w-40 rounded-full opacity-40 blur-3xl"
-          style={{ backgroundColor: ADMIN_GLOW_LIGHT_BLUE }}
-        />
-      </div>
+      {/* Each blob is deliberately an odd size/opacity and off the edge on
+          at least one side — perfectly centered, evenly-sized blobs read as
+          "gradient" again rather than the organic, uneven patches in the
+          reference. */}
+      <MeshBackground
+        blobs={[
+          { className: "-left-16 -top-20 h-72 w-80 opacity-80 blur-3xl", color: MESH_GLOW_BRIGHT_BLUE },
+          { className: "-top-10 left-1/3 h-56 w-56 opacity-60 blur-3xl", color: MESH_GLOW_LIGHT_BLUE },
+          { className: "-bottom-24 right-0 h-64 w-72 opacity-70 blur-3xl", color: MESH_GLOW_DEEP_BLUE },
+          { className: "-right-10 top-0 h-40 w-40 opacity-40 blur-3xl", color: MESH_GLOW_LIGHT_BLUE },
+        ]}
+      />
 
       <div className="relative">
         <h1 className="font-display text-2xl uppercase tracking-wide text-white">{title}</h1>

@@ -4,6 +4,14 @@ import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import AdminNav from "@/components/admin/AdminNav";
 import { PanelToggleIcon, SignOutIcon } from "@/components/admin/icons";
+import MeshBackground from "@/components/MeshBackground";
+import {
+  MESH_NAVY_BASE,
+  MESH_GLOW_BRIGHT_BLUE,
+  MESH_GLOW_LIGHT_BLUE,
+  ADMIN_BUTTON_GRADIENT,
+  ADMIN_ACCENT_BLUE,
+} from "@/lib/constants";
 
 // Matches Tailwind's own `lg` breakpoint — "small screen" here means the
 // same place every other responsive choice on this site switches.
@@ -99,22 +107,36 @@ export function AdminSidebar({
           // Two-segment pill (like an iOS/macOS segmented control) instead
           // of a separate icon-badge + text — "Home7" goes to the public
           // homepage, "Admin" stays on /admin and reads as the currently
-          // "selected" segment (light/white background, brand-gold-dark
-          // text) since that's genuinely where the visitor already is.
-          // Still reads as a brand/header name (font-display), just in a
-          // pill rather than plain text next to an icon.
-          <div className="inline-flex items-center rounded-full border border-slate-200 bg-slate-100 p-1 font-display text-base font-semibold">
+          // "selected" segment, now the same blurred-blue-mesh + gradient
+          // pill look as AdminPageHeader/BrandStory (MESH_* constants),
+          // instead of a plain white/slate segmented control. Still reads
+          // as a brand/header name (font-display), just in a pill rather
+          // than plain text next to an icon.
+          <div
+            className="relative inline-flex items-center overflow-hidden rounded-full p-1 font-display text-base font-semibold"
+            style={{ backgroundColor: MESH_NAVY_BASE }}
+          >
+            <MeshBackground
+              blobs={[
+                { className: "-left-3 -top-4 h-10 w-14 opacity-90 blur-md", color: MESH_GLOW_BRIGHT_BLUE },
+                { className: "-right-3 -bottom-4 h-9 w-12 opacity-60 blur-md", color: MESH_GLOW_LIGHT_BLUE },
+              ]}
+            />
             <Link
               href="/"
               title="Visit the Home7 website"
-              className="rounded-full px-3 py-1.5 text-slate-500 transition-colors hover:text-brand-navy cursor-pointer"
+              className="relative rounded-full px-3 py-1.5 text-white/60 transition-colors hover:text-white cursor-pointer"
             >
               Home7
             </Link>
             <Link
               href="/admin"
               title="Admin dashboard"
-              className="rounded-full bg-white px-3 py-1.5 text-brand-gold-dark shadow-sm cursor-pointer"
+              className="relative rounded-full px-3 py-1.5 text-white shadow-sm cursor-pointer"
+              style={{
+                background: ADMIN_BUTTON_GRADIENT,
+                boxShadow: `0 4px 12px -4px ${ADMIN_ACCENT_BLUE}99`,
+              }}
             >
               Admin
             </Link>
