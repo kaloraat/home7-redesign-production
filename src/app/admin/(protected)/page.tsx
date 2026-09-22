@@ -5,7 +5,7 @@ import Lead from "@/models/Lead";
 import Agent from "@/models/Agent";
 import Content from "@/models/Content";
 import PropertyReference from "@/models/PropertyReference";
-import { BRAND_GRADIENT } from "@/lib/constants";
+import AdminPageHeader from "@/components/admin/AdminPageHeader";
 
 async function getCounts() {
   try {
@@ -36,35 +36,11 @@ export default async function AdminDashboard() {
 
   return (
     <div>
-      {/* Gradient hero banner — reuses the site's existing BRAND_GRADIENT
-          (same navy-to-teal used on SiteNav / the agent-profile hero) so
-          admin picks up the brand's own signature look rather than a new
-          one-off style. A soft blurred glow behind the heading and a
-          pill-shaped gradient CTA are the two design-update ideas from the
-          REB Dealmakers reference, prototyped here first since this is the
-          lowest-risk, most-visible screen in admin. */}
-      <section
-        className="relative overflow-hidden rounded-2xl p-8 text-white"
-        style={{ background: BRAND_GRADIENT }}
-      >
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-brand-teal/40 blur-3xl"
-        />
-        <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="font-display text-2xl">Dashboard</h1>
-            <p className="mt-1 text-white/70">A quick overview of what&apos;s happening on the site.</p>
-          </div>
-          <Link
-            href="/admin/properties/new"
-            className="inline-flex w-fit items-center gap-1.5 rounded-full px-5 py-2.5 font-display text-sm font-semibold text-brand-navy shadow-lg transition-transform hover:scale-[1.03]"
-            style={{ background: "linear-gradient(135deg, #7fe0ef 0%, #ffffff 100%)" }}
-          >
-            + Add listing
-          </Link>
-        </div>
-      </section>
+      <AdminPageHeader
+        title="Dashboard"
+        description="A quick overview of what's happening on the site."
+        action={{ label: "+ Add listing", href: "/admin/properties/new" }}
+      />
 
       <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-3xl">
         {TILES.map((tile) => (

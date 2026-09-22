@@ -33,6 +33,27 @@ export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://home7.com.a
 // gradient ever changes, rather than three copies of the same CSS string.
 export const BRAND_GRADIENT = "linear-gradient(145deg, #071048 0%, #228599 100%)";
 
+// Admin-only — deliberately a distinct, more saturated blue than the public
+// BRAND_GRADIENT above (that one stays as-is for the public site). Colors
+// picked by sampling the REB Dealmakers 2026 promo card the client sent as
+// a design reference: a vivid blue glow (~#3f7de5) concentrated toward one
+// corner, fading to near-black navy at the far edges — a radial blend, not
+// a flat diagonal, is what actually reproduces that look. Shared by
+// AdminPageHeader and the dashboard's own hero so every admin page picks up
+// the same look from one definition.
+export const ADMIN_GRADIENT =
+  "radial-gradient(135% 135% at 18% 20%, #3f7de5 0%, #1c3080 42%, #0a0e38 72%, #060818 100%)";
+
+// Same reference card's pill button — light sky-blue fading to a darker
+// teal-blue, white text (not a light pill with dark text, which is what an
+// earlier admin prototype used before the client pointed at this image).
+export const ADMIN_BUTTON_GRADIENT = "linear-gradient(135deg, #5cbff0 0%, #3b7e9e 100%)";
+
+// A flat (non-gradient) mid-tone pulled from the same glow, for spots where
+// a solid blue reads better than a full gradient — e.g. a focus ring or
+// hover glow on the pill button above.
+export const ADMIN_ACCENT_BLUE = "#2f5fc7";
+
 export const COMPANY = {
   // Verified against the live site's actual rendered footer (contact_info_items
   // DB row export used earlier had this slightly wrong — "Suite-7, 209
