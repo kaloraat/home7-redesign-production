@@ -56,6 +56,17 @@ export const MESH_GLOW_DEEP_BLUE = "#16227a";
 // top" structure rather than the card filling the full section width.
 export const MESH_SECTION_BACKDROP = "#060a1c";
 
+// A light tint of the same blue family as MESH_NAVY_BASE/MESH_GLOW_* above,
+// for an experiment on the admin sidebar: same blurred-patch technique, but
+// light enough that the sidebar's existing slate-600 nav text still reads
+// fine on top of it (the dark navy mesh failed for that reason on the
+// Home7/Admin pill — reverted there — but a light version on the larger
+// sidebar surface is a different, untested question).
+export const MESH_LIGHT_BASE = "#eef5fb";
+export const MESH_LIGHT_GLOW_1 = "#bfe0f7";
+export const MESH_LIGHT_GLOW_2 = "#d7ecfa";
+export const MESH_LIGHT_GLOW_3 = "#a9d4ee";
+
 // Same reference card's pill button — light sky-blue fading to a darker
 // teal-blue, white text (not a light pill with dark text, which is what an
 // earlier admin prototype used before the client pointed at this image).

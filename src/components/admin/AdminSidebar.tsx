@@ -6,9 +6,10 @@ import AdminNav from "@/components/admin/AdminNav";
 import { PanelToggleIcon, SignOutIcon } from "@/components/admin/icons";
 import MeshBackground from "@/components/MeshBackground";
 import {
-  MESH_NAVY_BASE,
-  MESH_GLOW_BRIGHT_BLUE,
-  MESH_GLOW_LIGHT_BLUE,
+  MESH_LIGHT_BASE,
+  MESH_LIGHT_GLOW_1,
+  MESH_LIGHT_GLOW_2,
+  MESH_LIGHT_GLOW_3,
   ADMIN_BUTTON_GRADIENT,
   ADMIN_ACCENT_BLUE,
 } from "@/lib/constants";
@@ -96,10 +97,24 @@ export function AdminSidebar({
     <aside
       className={`${
         isCollapsed ? "w-18" : "w-64"
-      } shrink-0 border-r border-slate-200 bg-white flex flex-col transition-[width] duration-200`}
+      } relative shrink-0 overflow-hidden border-r border-slate-200 flex flex-col transition-[width] duration-200`}
+      style={{ backgroundColor: MESH_LIGHT_BASE }}
     >
+      {/* Experiment: a light tint of the same blurred-patch technique used
+          on AdminPageHeader/BrandStory, tried here per the client's request
+          to see how it reads across the whole sidebar (as opposed to the
+          dark navy version, which didn't work on the Home7/Admin pill
+          below and was reverted there). */}
+      <MeshBackground
+        blobs={[
+          { className: "-left-16 -top-10 h-56 w-56 opacity-70 blur-3xl", color: MESH_LIGHT_GLOW_1 },
+          { className: "-right-10 top-1/3 h-48 w-48 opacity-60 blur-3xl", color: MESH_LIGHT_GLOW_2 },
+          { className: "-left-10 bottom-24 h-52 w-52 opacity-70 blur-3xl", color: MESH_LIGHT_GLOW_3 },
+        ]}
+      />
+
       <div
-        className={`flex items-center border-b border-slate-100 py-6 ${
+        className={`relative flex items-center border-b border-slate-100 py-6 ${
           isCollapsed ? "justify-center px-2" : "justify-between px-5"
         }`}
       >
@@ -107,32 +122,22 @@ export function AdminSidebar({
           // Two-segment pill (like an iOS/macOS segmented control) instead
           // of a separate icon-badge + text — "Home7" goes to the public
           // homepage, "Admin" stays on /admin and reads as the currently
-          // "selected" segment, now the same blurred-blue-mesh + gradient
-          // pill look as AdminPageHeader/BrandStory (MESH_* constants),
-          // instead of a plain white/slate segmented control. Still reads
-          // as a brand/header name (font-display), just in a pill rather
-          // than plain text next to an icon.
-          <div
-            className="relative inline-flex items-center overflow-hidden rounded-full p-1 font-display text-base font-semibold"
-            style={{ backgroundColor: MESH_NAVY_BASE }}
-          >
-            <MeshBackground
-              blobs={[
-                { className: "-left-3 -top-4 h-10 w-14 opacity-90 blur-md", color: MESH_GLOW_BRIGHT_BLUE },
-                { className: "-right-3 -bottom-4 h-9 w-12 opacity-60 blur-md", color: MESH_GLOW_LIGHT_BLUE },
-              ]}
-            />
+          // "selected" segment. Reverted to the original plain slate/white
+          // segmented look after the client didn't like the dark mesh
+          // background here specifically — but kept the "Admin" segment's
+          // gradient pill treatment, which they did like.
+          <div className="inline-flex items-center rounded-full border border-slate-200 bg-slate-100 p-1 font-display text-base font-semibold">
             <Link
               href="/"
               title="Visit the Home7 website"
-              className="relative rounded-full px-3 py-1.5 text-white/60 transition-colors hover:text-white cursor-pointer"
+              className="rounded-full px-3 py-1.5 text-slate-500 transition-colors hover:text-brand-navy cursor-pointer"
             >
               Home7
             </Link>
             <Link
               href="/admin"
               title="Admin dashboard"
-              className="relative rounded-full px-3 py-1.5 text-white shadow-sm cursor-pointer"
+              className="rounded-full px-3 py-1.5 text-white shadow-sm cursor-pointer"
               style={{
                 background: ADMIN_BUTTON_GRADIENT,
                 boxShadow: `0 4px 12px -4px ${ADMIN_ACCENT_BLUE}99`,
@@ -153,11 +158,11 @@ export function AdminSidebar({
         </button>
       </div>
 
-      <div className="flex-1 px-3 py-4 overflow-y-auto">
+      <div className="relative flex-1 px-3 py-4 overflow-y-auto">
         <AdminNav collapsed={isCollapsed} />
       </div>
 
-      <div className={`border-t border-slate-100 py-4 ${isCollapsed ? "px-2" : "px-4"}`}>
+      <div className={`relative border-t border-slate-100 py-4 ${isCollapsed ? "px-2" : "px-4"}`}>
         {!isCollapsed && <p className="text-xs text-slate-400 truncate mb-2">{userEmail}</p>}
         <form action={signOutAction}>
           <button
