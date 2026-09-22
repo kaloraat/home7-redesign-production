@@ -36,13 +36,17 @@ export const BRAND_GRADIENT = "linear-gradient(145deg, #071048 0%, #228599 100%)
 // Admin-only — deliberately a distinct, more saturated blue than the public
 // BRAND_GRADIENT above (that one stays as-is for the public site). Colors
 // picked by sampling the REB Dealmakers 2026 promo card the client sent as
-// a design reference: a vivid blue glow (~#3f7de5) concentrated toward one
-// corner, fading to near-black navy at the far edges — a radial blend, not
-// a flat diagonal, is what actually reproduces that look. Shared by
-// AdminPageHeader and the dashboard's own hero so every admin page picks up
-// the same look from one definition.
-export const ADMIN_GRADIENT =
-  "radial-gradient(135% 135% at 18% 20%, #3f7de5 0%, #1c3080 42%, #0a0e38 72%, #060818 100%)";
+// a design reference. The client's second round of feedback: their card
+// isn't a single clean gradient, it's several soft blurred patches of
+// different blue shades overlapping (a "mesh gradient" look) — so this is a
+// dark navy base plus a handful of blurred glow colors that AdminPageHeader
+// layers as separate blurred blobs, rather than one smooth gradient stop
+// list. Kept as constants (not inlined in the component) so the dashboard
+// and every other admin page reuse the exact same palette.
+export const ADMIN_NAVY_BASE = "#0a0e34";
+export const ADMIN_GLOW_BRIGHT_BLUE = "#3f7de5";
+export const ADMIN_GLOW_LIGHT_BLUE = "#6cc4f2";
+export const ADMIN_GLOW_DEEP_BLUE = "#16227a";
 
 // Same reference card's pill button — light sky-blue fading to a darker
 // teal-blue, white text (not a light pill with dark text, which is what an
@@ -53,6 +57,12 @@ export const ADMIN_BUTTON_GRADIENT = "linear-gradient(135deg, #5cbff0 0%, #3b7e9
 // a solid blue reads better than a full gradient — e.g. a focus ring or
 // hover glow on the pill button above.
 export const ADMIN_ACCENT_BLUE = "#2f5fc7";
+
+// Light blue-white for header description text — a step down from the
+// title's pure white per the client's ask ("paragraph text white with that
+// strong blue"), so title and description read as two distinct weights
+// against the busier blurred background.
+export const ADMIN_TEXT_BLUE = "#bcdcfb";
 
 export const COMPANY = {
   // Verified against the live site's actual rendered footer (contact_info_items
