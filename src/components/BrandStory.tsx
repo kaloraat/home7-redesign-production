@@ -51,11 +51,18 @@ export function BrandStory() {
               <path d="M69.8 60.7C82.9 69.1 89.4 80.4 89.4 94.7 89.4 108.9 85.2 120.1 76.8 128.3 68.4 136.4 57.9 140.5 45.3 140.5 32.7 140.5 22.1 136.5 13.5 128.6 4.8 120.7 0.5 110.3 0.5 97.5 0.5 84.6 4.7 72.1 13.1 60L54.4 0.5 97.1 0.5 69.8 60.7ZM176.9 60.7C190 69.1 196.5 80.4 196.5 94.7 196.5 108.9 192.3 120.1 183.9 128.3 175.5 136.4 165 140.5 152.4 140.5 139.8 140.5 129.2 136.5 120.6 128.6 111.9 120.7 107.6 110.3 107.6 97.5 107.6 84.6 111.8 72.1 120.2 60L161.5 0.5 204.2 0.5 176.9 60.7Z" />
             </svg>
 
+            {/* No literal quote marks around the pull-quote text itself —
+                the gold " glyph above already signals "this is a quote";
+                adding ‘ ’ around the text too just duplicates that cue. */}
             <p className="mt-6 font-display text-3xl sm:text-5xl uppercase leading-tight tracking-tight text-white">
-              &lsquo;{BRAND_STORY_PULLQUOTE}&rsquo;
+              {BRAND_STORY_PULLQUOTE}
             </p>
 
-            <div className="mt-8 space-y-4 max-w-3xl mx-auto">
+            {/* Left-aligned, narrower measure — center-aligned multi-line
+                paragraphs are harder to scan than the centered icon/pull-quote
+                above; this is the more typical magazine-spread pattern (big
+                centered statement, left-aligned column of body copy under it). */}
+            <div className="mt-8 space-y-4 max-w-2xl mx-auto text-left">
               {BRAND_STORY.map((paragraph, i) => (
                 <p key={i} className="font-display-light text-base sm:text-lg leading-relaxed text-white">
                   {paragraph}
