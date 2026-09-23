@@ -46,11 +46,22 @@ export default async function TenancyCheckDetailPage({
         ← Back to Tenancy Checks
       </Link>
 
-      <div className="mt-4">
-        <h1 className="font-display text-2xl text-brand-navy">{reference.tenantName}</h1>
-        <p className="mt-1 text-slate-500">
-          {reference.tenantAddress} · Requested {new Date(reference.createdAt).toLocaleDateString("en-AU")}
-        </p>
+      <div className="mt-4 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="font-display text-2xl text-brand-navy">{reference.tenantName}</h1>
+          <p className="mt-1 text-slate-500">
+            {reference.tenantAddress} · Requested {new Date(reference.createdAt).toLocaleDateString("en-AU")}
+          </p>
+        </div>
+        {/* Plain <a> to the Route Handler, not a client-side fetch — the
+            browser's own download handling (Content-Disposition: attachment)
+            already does exactly what's needed here with zero JS. */}
+        <a
+          href={`/api/admin/tenancy-checks/${id}/pdf`}
+          className="shrink-0 rounded border border-brand-navy px-4 py-2 text-sm font-semibold text-brand-navy hover:bg-brand-navy hover:text-white transition-colors"
+        >
+          Download PDF
+        </a>
       </div>
 
       <div className="mt-6 rounded-lg border border-slate-200 bg-white p-6">
