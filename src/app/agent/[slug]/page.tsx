@@ -3,7 +3,16 @@ import Image from "next/image";
 import { notFound, permanentRedirect } from "next/navigation";
 import { getAgentBySlug, getPropertiesByAgent } from "@/lib/queries";
 import { PhoneIcon, MobileIcon, EmailIcon, FacebookIcon, LinkedInIcon } from "@/components/icons";
-import { BRAND_GRADIENT, SITE_URL, BLOG_CONTACT_FORM_INTRO, COMPANY } from "@/lib/constants";
+import {
+  SITE_URL,
+  BLOG_CONTACT_FORM_INTRO,
+  COMPANY,
+  MESH_NAVY_BASE,
+  MESH_GLOW_BRIGHT_BLUE,
+  MESH_GLOW_LIGHT_BLUE,
+  MESH_GLOW_DEEP_BLUE,
+} from "@/lib/constants";
+import MeshBackground from "@/components/MeshBackground";
 import PropertyCard from "@/components/PropertyCard";
 import ResponsiveCardGrid from "@/components/ResponsiveCardGrid";
 import ContactForm from "@/components/ContactForm";
@@ -124,12 +133,21 @@ export default async function Page({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      {/* Same gradient as SiteNav, so an agent's profile reads as an
-          extension of the site chrome rather than a bare content page. */}
+      {/* Same blurred-blue-patches style as the homepage's "Real Estate is
+          in our blood" section, per the client's request — not the plain
+          SiteNav gradient anymore. */}
       <section
         className="relative overflow-hidden text-white"
-        style={{ background: BRAND_GRADIENT }}
+        style={{ backgroundColor: MESH_NAVY_BASE }}
       >
+        <MeshBackground
+          blobs={[
+            { className: "-left-16 -top-20 h-72 w-80 opacity-80 blur-3xl", color: MESH_GLOW_BRIGHT_BLUE },
+            { className: "-top-10 left-1/3 h-56 w-56 opacity-50 blur-3xl", color: MESH_GLOW_LIGHT_BLUE },
+            { className: "-bottom-24 right-0 h-64 w-72 opacity-70 blur-3xl", color: MESH_GLOW_DEEP_BLUE },
+            { className: "-right-10 top-0 h-40 w-40 opacity-40 blur-3xl", color: MESH_GLOW_LIGHT_BLUE },
+          ]}
+        />
         {/* max-w-7xl — matches the content section below (and blog/
             property pages) exactly, so the photo+name block's left edge
             lines up with the page's actual content column instead of
@@ -137,7 +155,7 @@ export default async function Page({
             centered independently of the 7xl one below it, so their left
             edges never lined up even though both individually looked
             "centered"). */}
-        <div className="mx-auto max-w-7xl px-4 py-14 sm:py-16 flex flex-col sm:flex-row items-center sm:items-end gap-6 text-center sm:text-left">
+        <div className="relative mx-auto max-w-7xl px-4 py-14 sm:py-16 flex flex-col sm:flex-row items-center sm:items-end gap-6 text-center sm:text-left">
           {agent.photo && (
             <div className="h-32 w-32 sm:h-40 sm:w-40 shrink-0 rounded-full overflow-hidden ring-4 ring-brand-gold shadow-lg">
               <Image

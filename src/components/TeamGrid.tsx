@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BRAND_GRADIENT } from "@/lib/constants";
+import { MESH_NAVY_BASE, MESH_GLOW_BRIGHT_BLUE, MESH_GLOW_LIGHT_BLUE, MESH_GLOW_DEEP_BLUE } from "@/lib/constants";
+import MeshBackground from "@/components/MeshBackground";
 import type { IAgent } from "@/models/Agent";
 
 /**
@@ -44,10 +45,19 @@ export function TeamGrid({ agents }: { agents: IAgent[] }) {
         <Link
           href={`/agent/${principal.slug}`}
           className="col-span-2 sm:col-span-1 sm:row-span-2 relative overflow-hidden rounded-2xl border-2 border-brand-gold-dark p-6 sm:p-8 flex flex-col items-center justify-center text-center hover:brightness-105 transition"
-          style={{ background: BRAND_GRADIENT }}
+          style={{ backgroundColor: MESH_NAVY_BASE }}
         >
-          <div className="absolute -top-8 -right-8 h-28 w-28 rounded-full bg-brand-gold/20 blur-2xl" aria-hidden="true" />
-          <div className="absolute -bottom-10 -left-10 h-32 w-32 rounded-full bg-brand-gold/10 blur-2xl" aria-hidden="true" />
+          {/* Same blurred-blue-patches technique as the homepage's "Real
+              Estate is in our blood" card — applied to the Principal's
+              featured card specifically, per the client's request, not the
+              other team members' plain cards below. */}
+          <MeshBackground
+            blobs={[
+              { className: "-left-10 -top-10 h-44 w-44 opacity-80 blur-3xl", color: MESH_GLOW_BRIGHT_BLUE },
+              { className: "top-1/3 -right-12 h-40 w-40 opacity-50 blur-3xl", color: MESH_GLOW_LIGHT_BLUE },
+              { className: "-bottom-14 -left-8 h-48 w-48 opacity-70 blur-3xl", color: MESH_GLOW_DEEP_BLUE },
+            ]}
+          />
 
           <div className="relative h-32 w-32 sm:h-36 sm:w-36 rounded-full overflow-hidden ring-4 ring-brand-gold shadow-lg">
             {principal.photo && (

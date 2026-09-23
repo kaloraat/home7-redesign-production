@@ -28,9 +28,9 @@ export function suburbSlug(suburb: string): string {
 export const SITE_NAME = "Home7 Real Estate";
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://home7.com.au";
 
-// Shared across SiteNav, the agent profile hero, and the featured team-grid
-// card — kept as one constant so all three stay in sync if the brand
-// gradient ever changes, rather than three copies of the same CSS string.
+// Was shared across SiteNav, the agent profile hero, and the featured
+// team-grid card; those three moved to the MESH_* palette below per the
+// client's request. Still used by not-found.tsx and error.tsx.
 export const BRAND_GRADIENT = "linear-gradient(145deg, #071048 0%, #228599 100%)";
 
 // A distinct, more saturated blue palette than the public BRAND_GRADIENT

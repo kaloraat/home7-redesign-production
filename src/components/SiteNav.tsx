@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { BRAND_GRADIENT, COMPANY, SITE_NAME } from "@/lib/constants";
+import { MESH_NAVY_BASE, COMPANY, SITE_NAME } from "@/lib/constants";
 import { PhoneIcon, MobileIcon, PinIcon } from "@/components/icons";
 
 type NavItem = {
@@ -153,7 +153,11 @@ export function SiteNav({ isAdmin }: { isAdmin: boolean }) {
     <header className="sticky top-0 z-50 text-white">
       {/* Logo + inline desktop nav + contact details — unchanged from the
           original single-row layout at lg and up. */}
-      <div style={{ background: BRAND_GRADIENT }}>
+      {/* Same dark blue as the homepage's "Real Estate is in our blood"
+          section (MESH_NAVY_BASE) — solid color here, not the blurred-patch
+          version, per the client's request: just the color, applied
+          site-wide since this nav renders on every page. */}
+      <div style={{ background: MESH_NAVY_BASE }}>
         <div className="mx-auto max-w-7xl px-2 sm:px-4 flex items-center justify-between gap-1 sm:gap-3 py-1.25">
           <Link href="/" className="shrink-0">
             <Image
