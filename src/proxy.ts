@@ -49,7 +49,15 @@ async function getRedirectMap(): Promise<Map<string, RedirectEntry>> {
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const map = await getRedirectMap();
-  const match = map.get(pathname);
+  // nextUrl.pathname is percent-encoded ("/agent/William%20Scott") but admins
+  // type fromPath as displayed ("/agent/William Scott"), so try both forms.
+  let decoded = pathname;
+  try {
+    decoded = decodeURIComponent(pathname);
+  } catch {
+    // malformed escape sequence — fall back to the raw pathname
+  }
+  const match = map.get(pathname) ?? map.get(decoded);
 
   if (match) {
     return NextResponse.redirect(new URL(match.toPath, request.url), match.statusCode);
