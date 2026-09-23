@@ -34,26 +34,9 @@ const DEFAULT_TITLE = "The Best Real Estate in Liverpool, New South Wales";
 const DEFAULT_DESCRIPTION =
   "Find the best real estate in Liverpool, NSW. Explore top properties for sale or rent today.";
 
-// Dynamic (not a static `export const metadata`) specifically so this can
-// read the request's Host header — same reasoning and same host-check
-// logic as robots.ts's own `isCanonicalHost` check, applied here too as a
-// second, independent layer: robots.txt's disallow only asks crawlers not
-// to CRAWL a non-canonical host (a Vercel preview URL, a staging deploy),
-// it doesn't guarantee they won't still INDEX a URL they discover some
-// other way (e.g. a link posted somewhere Google can see). A `noindex`
-// meta tag is the actual definitive instruction Google respects for
-// exclusion from the index — this adds it site-wide (via inheritance; no
-// public page sets its own `robots` to override it, confirmed via a
-// repo-wide search first) whenever the request isn't arriving on the real
-// production domain, so a `*.vercel.app` preview used for internal
-// testing can't end up indexed even if robots.txt alone gets bypassed.
 export async function generateMetadata(): Promise<Metadata> {
-  const host = (await headers()).get("host") ?? "";
-  const canonical = isCanonicalHost(host);
-
   return {
     metadataBase: new URL(SITE_URL),
-    ...(!canonical && { robots: { index: false, follow: false } }),
     title: {
       // Matches the live site's indexed title verbatim ("The Best Real
       // Estate in Liverpool, New South Wales") rather than a from-scratch
@@ -118,9 +101,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // catch-all field there, not the site's own dedicated GA setting field
   // (which was actually empty/unused — confirmed against the live DB
   // export). This rebuild had no GA implementation at all until now, found
-  // during the pre-domain-switch audit. Same isCanonicalHost() gate as the
-  // noindex/robots logic above, for the same reason: a preview/staging/IP
-  // hit shouldn't count as real production traffic in Analytics.
+  // during the pre-domain-switch audit. Gated on isCanonicalHost() (same
+  // check robots.ts uses to keep a Vercel preview out of robots.txt) so a
+  // preview/staging/IP hit doesn't count as real production traffic in
+  // Analytics.
   const host = (await headers()).get("host") ?? "";
   const gaEnabled = isCanonicalHost(host);
 
