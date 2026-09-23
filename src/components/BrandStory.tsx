@@ -2,7 +2,6 @@ import {
   BRAND_STORY,
   BRAND_STORY_PULLQUOTE,
   MESH_NAVY_BASE,
-  MESH_SECTION_BACKDROP,
   MESH_GLOW_BRIGHT_BLUE,
   MESH_GLOW_LIGHT_BLUE,
   MESH_GLOW_DEEP_BLUE,
@@ -11,9 +10,13 @@ import MeshBackground from "@/components/MeshBackground";
 
 /**
  * Matches the REB Dealmakers 2026 promo card the client sent as a design
- * reference: a near-black page backdrop (MESH_SECTION_BACKDROP) behind a
- * rounded, blurred-blue-mesh card (same MeshBackground/MESH_* palette as
- * AdminPageHeader), pure white text throughout.
+ * reference: a page backdrop behind a rounded, blurred-blue-mesh card, pure
+ * white text throughout. The backdrop is MESH_NAVY_BASE — the exact same
+ * dark blue the card itself is built on (not a separate near-black sampled
+ * from the reference image) — per the client's correction: their reference
+ * card's outer background was the strongest/darkest part of the SAME blue
+ * as the card, not a different color, so the two layers here now share one
+ * color source instead of two.
  *
  * Typography is a magazine-spread experiment the client asked to try: the
  * "Real Estate is in our blood" line — which already appears in BRAND_STORY
@@ -24,7 +27,7 @@ import MeshBackground from "@/components/MeshBackground";
  */
 export function BrandStory() {
   return (
-    <section style={{ backgroundColor: MESH_SECTION_BACKDROP }}>
+    <section style={{ backgroundColor: MESH_NAVY_BASE }}>
       <div className="mx-auto max-w-5xl px-4 py-16 sm:py-24">
         <div
           className="relative overflow-hidden rounded-3xl px-6 py-14 sm:px-16 sm:py-20 text-center"

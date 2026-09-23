@@ -49,13 +49,6 @@ export const MESH_GLOW_BRIGHT_BLUE = "#3f7de5";
 export const MESH_GLOW_LIGHT_BLUE = "#6cc4f2";
 export const MESH_GLOW_DEEP_BLUE = "#16227a";
 
-// The reference card also sits on its own near-black backdrop, distinct
-// from the card itself (MESH_NAVY_BASE above) — sampled from the same
-// image. Used behind BrandStory's rounded mesh card on the public
-// homepage, matching that two-layer "dark page, lighter rounded card on
-// top" structure rather than the card filling the full section width.
-export const MESH_SECTION_BACKDROP = "#060a1c";
-
 // A light tint of the same blue family as MESH_NAVY_BASE/MESH_GLOW_* above,
 // for an experiment on the admin sidebar: same blurred-patch technique, but
 // light enough that the sidebar's existing slate-600 nav text still reads
