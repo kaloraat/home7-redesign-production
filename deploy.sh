@@ -18,11 +18,74 @@ git pull origin main
 echo "==> Installing dependencies"
 npm ci
 
-echo "==> Building"
-npm run build
+# Build into a throwaway directory (next.config.ts's `distDir` reads this
+# env var), never into the live `.next` directly. `home7` (pm2, still
+# running the OLD code) keeps reading the OLD `.next` untouched for the
+# entire build — previously `npm run build` overwrote `.next` in place
+# while the old process was still live and serving from it, which is what
+# actually took the site down once: the running server hit files mid-write/
+# deleted by the new build, independent of whether the build itself
+# succeeded. Building elsewhere first removes that whole window.
+echo "==> Building into .next-new"
+rm -rf .next-new
+NEXT_DIST_DIR=.next-new npm run build
+
+# Belt-and-suspenders: `npm run build` can print its normal success summary
+# and still exit 0 without every expected file landing (this is the exact
+# failure that took the site down — build-manifest.json missing despite a
+# clean-looking build log). Refuse to go anywhere near `pm2 restart` unless
+# the file the running server actually needs is verifiably there.
+if [ ! -s .next-new/build-manifest.json ]; then
+  echo "==> Build verification FAILED — .next-new/build-manifest.json missing or empty"
+  echo "==> Leaving the currently-running deployment untouched. Fix the build and re-run."
+  rm -rf .next-new
+  exit 1
+fi
+# ^ if you're reading this because it just fired: the currently-running
+# site is untouched and still fine. Check the build output above this line.
+
+# Atomic swap: back up the currently-live .next (for a rollback if the new
+# one turns out broken at runtime, not just at build time), then rename the
+# verified new build into place. `mv` on the same filesystem is a single
+# directory-entry rename, not a file-by-file copy — no window where `.next`
+# is a mix of old and new files for a request to land in.
+echo "==> Swapping in the new build"
+rm -rf .next-old
+[ -d .next ] && mv .next .next-old
+mv .next-new .next
 
 echo "==> Restarting"
 pm2 restart home7
+
+# A build that succeeds and verifies can still be broken at runtime (a
+# missing env var, a bad DB connection, etc. — none of which show up until
+# the process actually starts serving requests). Give it a few seconds and
+# a few tries rather than declaring success the instant `pm2 restart`
+# returns, since the app takes a moment to boot.
+echo "==> Health check"
+healthy=0
+for _ in 1 2 3 4 5; do
+  sleep 2
+  if curl -sf -o /dev/null "http://localhost:3000/"; then
+    healthy=1
+    break
+  fi
+done
+
+if [ "$healthy" -ne 1 ]; then
+  echo "==> Health check FAILED — rolling back to the previous build"
+  rm -rf .next
+  if [ -d .next-old ]; then
+    mv .next-old .next
+  fi
+  pm2 restart home7
+  echo "==> Rolled back. Site should be back on the previous version — check pm2 logs for what broke in the new one before retrying."
+  exit 1
+fi
+
+# Only reachable once the new build is live AND confirmed actually serving
+# requests — safe to drop the rollback copy.
+rm -rf .next-old
 
 echo "==> Done"
 
@@ -45,5 +108,6 @@ echo "==> Done"
 #    *before* the next deploy runs, everything picks it up correctly
 #    regardless of whether that deploy was triggered by hand or by a push.
 #
-# Nothing about the auto-deploy below changes any of this — it only ever
-# automates the "pull code, npm ci, build, restart" part.
+# Nothing about the auto-deploy above changes any of this — it only ever
+# automates the "pull code, npm ci, build, verify, swap, restart, health
+# check" part.

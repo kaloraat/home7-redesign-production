@@ -3,6 +3,12 @@ import type { NextConfig } from "next";
 const cloudfrontDomain = process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN;
 
 const nextConfig: NextConfig = {
+  // Lets deploy.sh build into a throwaway directory (NEXT_DIST_DIR=.next-new)
+  // instead of overwriting the live `.next` in place while the old process
+  // is still serving from it — see deploy.sh's own comment for the full
+  // reasoning. `next start` always runs with this unset, so it always reads
+  // the default `.next` — only the build step ever sets it.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   images: {
     remotePatterns: [
       // Property/agent/blog photos, served through CloudFront in front of
