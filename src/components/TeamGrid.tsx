@@ -16,9 +16,19 @@ import type { IAgent } from "@/models/Agent";
  * featured card, the rest render in the grid, both link to their real
  * /agent/[slug] profile.
  */
+// "Principal (Executive Director)" -> ["Principal", "Executive Director"] so
+// the featured card can put the parenthetical on its own line — a display
+// choice for this one card, not a change to the underlying `role` string
+// (which renders plainly everywhere else: the admin list, the agent page).
+function splitRoleParenthetical(role: string): [string, string | null] {
+  const match = role.match(/^(.*?)\s*\((.+)\)\s*$/);
+  return match ? [match[1], match[2]] : [role, null];
+}
+
 export function TeamGrid({ agents }: { agents: IAgent[] }) {
   if (agents.length === 0) return null;
   const [principal, ...team] = agents;
+  const [principalRoleMain, principalRoleSuffix] = splitRoleParenthetical(principal.role);
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-16 sm:py-20">
@@ -74,7 +84,16 @@ export function TeamGrid({ agents }: { agents: IAgent[] }) {
             Principal
           </span>
           <p className="relative mt-3 font-display text-xl text-white">{principal.name}</p>
-          <p className="relative mt-1 text-lg text-brand-gold-dark">{principal.role}</p>
+          <p className="relative mt-1 text-lg text-brand-gold-dark">
+            {principalRoleSuffix ? (
+              <>
+                <span className="block">{principalRoleMain}</span>
+                <span className="block">({principalRoleSuffix})</span>
+              </>
+            ) : (
+              principalRoleMain
+            )}
+          </p>
         </Link>
 
         {team.map((member) => (
