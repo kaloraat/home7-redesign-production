@@ -157,7 +157,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 sizes="100vw"
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-brand-navy/85" />
+              {/* footer-bg.jpg is the Australian flag itself, not a generic
+                  photo — this overlay is what actually determines the
+                  visible blue (85% opacity over it). Was brand-navy;
+                  switched to MESH_NAVY_BASE to match the nav's new color
+                  per the client's request. */}
+              <div className="absolute inset-0 bg-[#0a0e34]/85" />
 
               {/*
                * Four columns, matching the live site's footer.blade.php exactly
