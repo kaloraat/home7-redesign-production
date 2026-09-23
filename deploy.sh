@@ -51,7 +51,15 @@ fi
 # is a mix of old and new files for a request to land in.
 echo "==> Swapping in the new build"
 rm -rf .next-old
-[ -d .next ] && mv .next .next-old
+# `[ -d .next ] && mv ...` would look equivalent but isn't safe under
+# `set -e`: if `.next` doesn't exist yet (a brand-new server with no prior
+# build), the `[ -d .next ]` test itself "fails" and set -e treats that as
+# a fatal error for the whole line, aborting the script right here even
+# though "no previous build to back up" is a completely normal case, not
+# an error.
+if [ -d .next ]; then
+  mv .next .next-old
+fi
 mv .next-new .next
 
 echo "==> Restarting"
