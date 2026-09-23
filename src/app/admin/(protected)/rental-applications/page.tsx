@@ -47,8 +47,8 @@ export default async function AdminRentalApplicationsPage() {
                   <th className="py-3 px-4 font-medium">Applicant</th>
                   <th className="py-3 px-4 font-medium">Property</th>
                   <th className="py-3 px-4 font-medium">Submitted</th>
+                  <th className="py-3 px-4 font-medium">Actions</th>
                   <th className="py-3 px-4 font-medium">Status</th>
-                  <th className="py-3 px-4"></th>
                 </tr>
               </thead>
               <tbody>
@@ -64,15 +64,15 @@ export default async function AdminRentalApplicationsPage() {
                     <td className="py-3 px-4 text-slate-500">
                       {new Date(a.createdAt).toLocaleDateString("en-AU")}
                     </td>
+                    <td className="py-3 px-4 whitespace-nowrap">
+                      <Link href={`/admin/rental-applications/${a._id}`} className="text-brand-gold-dark hover:underline">
+                        View
+                      </Link>
+                    </td>
                     <td className="py-3 px-4">
                       <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[a.status]}`}>
                         {STATUS_LABELS[a.status]}
                       </span>
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <Link href={`/admin/rental-applications/${a._id}`} className="text-brand-gold-dark hover:underline">
-                        View
-                      </Link>
                     </td>
                   </tr>
                 ))}

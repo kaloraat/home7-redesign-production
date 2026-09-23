@@ -47,8 +47,8 @@ export default async function AdminAgentsPage() {
                 <th className="py-3 px-4 font-medium">Agent</th>
                 <th className="py-3 px-4 font-medium">Role</th>
                 <th className="py-3 px-4 font-medium">Order</th>
+                <th className="py-3 px-4 font-medium">Actions</th>
                 <th className="py-3 px-4 font-medium">Status</th>
-                <th className="py-3 px-4"></th>
               </tr>
             </thead>
             <tbody>
@@ -66,6 +66,14 @@ export default async function AdminAgentsPage() {
                   </td>
                   <td className="py-3 px-4 text-slate-600">{a.role}</td>
                   <td className="py-3 px-4 text-slate-600">{a.order}</td>
+                  <td className="py-3 px-4 space-x-3 whitespace-nowrap">
+                    <Link href={`/admin/agents/${a._id}/edit`} className="text-brand-gold-dark hover:underline">
+                      Edit
+                    </Link>
+                    {isOwner && (
+                      <DeleteButton onConfirm={deleteAgent.bind(null, String(a._id))} itemLabel="this agent" />
+                    )}
+                  </td>
                   <td className="py-3 px-4">
                     <span
                       className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -74,14 +82,6 @@ export default async function AdminAgentsPage() {
                     >
                       {a.active ? "Live" : "Hidden"}
                     </span>
-                  </td>
-                  <td className="py-3 px-4 text-right space-x-3 whitespace-nowrap">
-                    <Link href={`/admin/agents/${a._id}/edit`} className="text-brand-gold-dark hover:underline">
-                      Edit
-                    </Link>
-                    {isOwner && (
-                      <DeleteButton onConfirm={deleteAgent.bind(null, String(a._id))} itemLabel="this agent" />
-                    )}
                   </td>
                 </tr>
               ))}

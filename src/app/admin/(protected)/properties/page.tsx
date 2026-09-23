@@ -101,8 +101,8 @@ export default async function AdminPropertiesPage({
                 <th className="py-3 px-4 font-medium">Address</th>
                 <th className="py-3 px-4 font-medium">Type</th>
                 <th className="py-3 px-4 font-medium">Price</th>
+                <th className="py-3 px-4 font-medium">Actions</th>
                 <th className="py-3 px-4 font-medium">Featured</th>
-                <th className="py-3 px-4"></th>
               </tr>
             </thead>
             <tbody>
@@ -120,14 +120,7 @@ export default async function AdminPropertiesPage({
                   <td className="py-3 px-4 text-slate-600">
                     {p.priceDisplay || (p.rentPerWeek ? `$${p.rentPerWeek} P/W` : "—")}
                   </td>
-                  <td className="py-3 px-4">
-                    {p.featured && (
-                      <span className="inline-block rounded-full bg-brand-gold/30 text-brand-navy px-2 py-0.5 text-xs font-medium">
-                        Featured
-                      </span>
-                    )}
-                  </td>
-                  <td className="py-3 px-4 text-right space-x-3 whitespace-nowrap">
+                  <td className="py-3 px-4 space-x-3 whitespace-nowrap">
                     <Link href={`/admin/properties/${p._id}/edit`} className="text-brand-gold-dark hover:underline">
                       Edit
                     </Link>
@@ -137,6 +130,13 @@ export default async function AdminPropertiesPage({
                         itemLabel="this listing"
                         requireTypedConfirmation="delete this post"
                       />
+                    )}
+                  </td>
+                  <td className="py-3 px-4">
+                    {p.featured && (
+                      <span className="inline-block rounded-full bg-brand-gold/30 text-brand-navy px-2 py-0.5 text-xs font-medium">
+                        Featured
+                      </span>
                     )}
                   </td>
                 </tr>

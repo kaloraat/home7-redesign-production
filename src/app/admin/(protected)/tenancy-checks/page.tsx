@@ -70,8 +70,8 @@ export default async function AdminTenancyChecksPage() {
                 <th className="py-3 px-4 font-medium">Tenant</th>
                 <th className="py-3 px-4 font-medium">Previous Agent</th>
                 <th className="py-3 px-4 font-medium">Requested</th>
+                <th className="py-3 px-4 font-medium">Actions</th>
                 <th className="py-3 px-4 font-medium">Status</th>
-                <th className="py-3 px-4"></th>
               </tr>
             </thead>
             <tbody>
@@ -87,17 +87,7 @@ export default async function AdminTenancyChecksPage() {
                   <td className="py-3 px-4 text-slate-500">
                     {new Date(r.createdAt).toLocaleDateString("en-AU")}
                   </td>
-                  <td className="py-3 px-4">
-                    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[r.status]}`}>
-                      {STATUS_LABELS[r.status]}
-                    </span>
-                    {r.status === "declined" && r.declineReason && (
-                      <p className="mt-1 text-xs text-slate-400">
-                        {DECLINE_REASON_LABELS[r.declineReason]}
-                      </p>
-                    )}
-                  </td>
-                  <td className="py-3 px-4 text-right space-x-3 whitespace-nowrap">
+                  <td className="py-3 px-4 space-x-3 whitespace-nowrap">
                     <Link href={`/admin/tenancy-checks/${r._id}`} className="text-brand-gold-dark hover:underline">
                       View
                     </Link>
@@ -106,6 +96,16 @@ export default async function AdminTenancyChecksPage() {
                         onConfirm={deleteReferenceRequest.bind(null, String(r._id))}
                         itemLabel={`the reference check for ${r.tenantName}`}
                       />
+                    )}
+                  </td>
+                  <td className="py-3 px-4">
+                    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[r.status]}`}>
+                      {STATUS_LABELS[r.status]}
+                    </span>
+                    {r.status === "declined" && r.declineReason && (
+                      <p className="mt-1 text-xs text-slate-400">
+                        {DECLINE_REASON_LABELS[r.declineReason]}
+                      </p>
                     )}
                   </td>
                 </tr>

@@ -100,8 +100,8 @@ export default async function AdminLeadsPage({
                 <th className="py-3 px-4 font-medium">Name</th>
                 <th className="py-3 px-4 font-medium">Type</th>
                 <th className="py-3 px-4 font-medium">Received</th>
+                <th className="py-3 px-4 font-medium">Actions</th>
                 <th className="py-3 px-4 font-medium">Status</th>
-                <th className="py-3 px-4"></th>
               </tr>
             </thead>
             <tbody>
@@ -121,6 +121,11 @@ export default async function AdminLeadsPage({
                       minute: "2-digit",
                     })}
                   </td>
+                  <td className="py-3 px-4 whitespace-nowrap">
+                    <Link href={`/admin/leads/${lead._id}`} className="text-brand-gold-dark hover:underline">
+                      View
+                    </Link>
+                  </td>
                   <td className="py-3 px-4">
                     <span
                       className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -133,11 +138,6 @@ export default async function AdminLeadsPage({
                     >
                       {lead.status === "new" ? "New" : lead.status === "contacted" ? "Contacted" : "Closed"}
                     </span>
-                  </td>
-                  <td className="py-3 px-4 text-right">
-                    <Link href={`/admin/leads/${lead._id}`} className="text-brand-gold-dark hover:underline">
-                      View
-                    </Link>
                   </td>
                 </tr>
               ))}

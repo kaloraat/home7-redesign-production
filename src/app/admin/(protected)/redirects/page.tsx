@@ -44,8 +44,8 @@ export default async function AdminRedirectsPage() {
                 <th className="py-3 px-4 font-medium">From</th>
                 <th className="py-3 px-4 font-medium">To</th>
                 <th className="py-3 px-4 font-medium">Code</th>
+                <th className="py-3 px-4 font-medium">Actions</th>
                 <th className="py-3 px-4 font-medium">Note</th>
-                <th className="py-3 px-4"></th>
               </tr>
             </thead>
             <tbody>
@@ -54,8 +54,7 @@ export default async function AdminRedirectsPage() {
                   <td className="py-3 px-4 font-mono text-xs text-slate-900">{r.fromPath}</td>
                   <td className="py-3 px-4 font-mono text-xs text-slate-600">{r.toPath}</td>
                   <td className="py-3 px-4 text-slate-500">{r.statusCode}</td>
-                  <td className="py-3 px-4 text-slate-500">{r.note || "—"}</td>
-                  <td className="py-3 px-4 text-right space-x-3 whitespace-nowrap">
+                  <td className="py-3 px-4 space-x-3 whitespace-nowrap">
                     <Link href={`/admin/redirects/${r._id}/edit`} className="text-brand-gold-dark hover:underline">
                       Edit
                     </Link>
@@ -63,6 +62,7 @@ export default async function AdminRedirectsPage() {
                       <DeleteButton onConfirm={deleteRedirect.bind(null, String(r._id))} itemLabel="this redirect" />
                     )}
                   </td>
+                  <td className="py-3 px-4 text-slate-500">{r.note || "—"}</td>
                 </tr>
               ))}
             </tbody>

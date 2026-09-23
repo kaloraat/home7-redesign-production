@@ -39,8 +39,8 @@ export default async function AdminUsersPage() {
             <tr className="text-left text-slate-500 border-b border-slate-200 bg-slate-50">
               <th className="py-3 px-4 font-medium">Name</th>
               <th className="py-3 px-4 font-medium">Email</th>
+              {isOwner && <th className="py-3 px-4 font-medium">Actions</th>}
               <th className="py-3 px-4 font-medium">Role</th>
-              {isOwner && <th className="py-3 px-4"></th>}
             </tr>
           </thead>
           <tbody>
@@ -51,6 +51,16 @@ export default async function AdminUsersPage() {
                   {session?.user.email === a.email && <span className="ml-2 text-xs text-slate-400">(you)</span>}
                 </td>
                 <td className="py-3 px-4 text-slate-600">{a.email}</td>
+                {isOwner && (
+                  <td className="py-3 px-4 space-x-3 whitespace-nowrap">
+                    <Link href={`/admin/users/${a._id}/reset-password`} className="text-brand-gold-dark hover:underline">
+                      Reset Password
+                    </Link>
+                    {session?.user.email !== a.email && (
+                      <DeleteButton onConfirm={deleteAdminUser.bind(null, String(a._id))} itemLabel="this admin account" />
+                    )}
+                  </td>
+                )}
                 <td className="py-3 px-4">
                   <span
                     className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium capitalize ${
@@ -60,16 +70,6 @@ export default async function AdminUsersPage() {
                     {a.role}
                   </span>
                 </td>
-                {isOwner && (
-                  <td className="py-3 px-4 text-right space-x-3 whitespace-nowrap">
-                    <Link href={`/admin/users/${a._id}/reset-password`} className="text-brand-gold-dark hover:underline">
-                      Reset Password
-                    </Link>
-                    {session?.user.email !== a.email && (
-                      <DeleteButton onConfirm={deleteAdminUser.bind(null, String(a._id))} itemLabel="this admin account" />
-                    )}
-                  </td>
-                )}
               </tr>
             ))}
           </tbody>

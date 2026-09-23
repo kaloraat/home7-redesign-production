@@ -49,8 +49,8 @@ export default async function AdminBlogPage() {
                 <th className="py-3 px-4 font-medium">Title</th>
                 <th className="py-3 px-4 font-medium">URL</th>
                 <th className="py-3 px-4 font-medium">Status</th>
+                <th className="py-3 px-4 font-medium">Actions</th>
                 <th className="py-3 px-4 font-medium">Updated</th>
-                <th className="py-3 px-4"></th>
               </tr>
             </thead>
             <tbody>
@@ -73,16 +73,16 @@ export default async function AdminBlogPage() {
                       {p.status === "published" ? "Published" : "Draft"}
                     </span>
                   </td>
-                  <td className="py-3 px-4 text-slate-500">
-                    {new Date(p.updatedAt).toLocaleDateString("en-AU")}
-                  </td>
-                  <td className="py-3 px-4 text-right space-x-3 whitespace-nowrap">
+                  <td className="py-3 px-4 space-x-3 whitespace-nowrap">
                     <Link href={`/admin/blog/${p._id}/edit`} className="text-brand-gold-dark hover:underline">
                       Edit
                     </Link>
                     {isOwner && (
                       <DeleteButton onConfirm={deleteContent.bind(null, String(p._id))} itemLabel="this post" />
                     )}
+                  </td>
+                  <td className="py-3 px-4 text-slate-500">
+                    {new Date(p.updatedAt).toLocaleDateString("en-AU")}
                   </td>
                 </tr>
               ))}
