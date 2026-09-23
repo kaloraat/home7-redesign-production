@@ -1,6 +1,8 @@
 #!/bin/bash
-# Runs ON the droplet — either by hand (`./deploy.sh`) or triggered remotely
-# by .github/workflows/deploy.yml on every push to main. Deliberately does
+# Runs ON the droplet, by hand: `./deploy.sh`, whenever you decide to deploy.
+# No longer triggered automatically — GitHub Actions used to run this on
+# every push to main, removed after an incident where an auto-triggered
+# deploy's build hung and nothing was watching for that. Deliberately does
 # NOT touch .env.local: that file is gitignored on purpose (secrets should
 # never live in git, and local/production legitimately need different
 # values) and is edited by hand on the server when it needs to change — see
@@ -28,7 +30,22 @@ npm ci
 # succeeded. Building elsewhere first removes that whole window.
 echo "==> Building into .next-new"
 rm -rf .next-new
-NEXT_DIST_DIR=.next-new npm run build
+# --kill-after=15: what actually caused tonight's outage — a Turbopack
+# PostCSS worker (cmdline contains "turbopack-node") hung and never exited,
+# left running as an orphaned process indefinitely since nothing was ever
+# going to time it out. `timeout` sends SIGTERM at 5 minutes (way more than
+# this build has ever taken) and SIGKILL 15s later if it's still alive.
+# That alone only reaches the direct `npm` process, not grandchild workers
+# turbopack spawns — the explicit pkill below is what actually sweeps up a
+# hung worker like the one from tonight, regardless of which process
+# `timeout` itself managed to kill.
+if ! timeout --kill-after=15 300 env NEXT_DIST_DIR=.next-new npm run build; then
+  echo "==> Build TIMED OUT or FAILED — cleaning up and aborting"
+  pkill -9 -f "turbopack-node" 2>/dev/null || true
+  rm -rf .next-new
+  echo "==> Leaving the currently-running deployment untouched."
+  exit 1
+fi
 
 # Belt-and-suspenders: `npm run build` can print its normal success summary
 # and still exit 0 without every expected file landing (this is the exact
