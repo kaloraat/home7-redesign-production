@@ -220,28 +220,28 @@ export default async function Home() {
           not using wide4up on Testimonials' 6 items. */}
       <section className="mx-auto max-w-6xl px-4 py-16 sm:py-20 space-y-16">
         <ListingsSection
-          title="For Sale"
+          title="Properties For Sale"
           properties={forSale}
           viewAllLabel="View All Properties For Sale"
           viewAllHref="/properties-for-sale"
           emptyMessage="No listings yet — this fills in once the property data migration runs."
         />
         <ListingsSection
-          title="For Rent"
+          title="Properties For Rent"
           properties={forRent}
           viewAllLabel="View All Properties For Rent"
           viewAllHref="/properties-for-rent"
           emptyMessage="No listings yet — this fills in once the property data migration runs."
         />
         <ListingsSection
-          title="Sold"
+          title="Sold Properties"
           properties={sold}
           viewAllLabel="View All Sold Properties"
           viewAllHref="/sold-properties"
           emptyMessage="No sold listings yet — this fills in once the property data migration runs."
         />
         <ListingsSection
-          title="Leased"
+          title="Leased Properties"
           properties={leased}
           viewAllLabel="View All Leased Properties"
           viewAllHref="/leased-properties"
