@@ -217,6 +217,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     <li><Link href="/" className="hover:text-brand-gold">Home</Link></li>
                     <li><Link href="/about-us" className="hover:text-brand-gold">About Home7</Link></li>
                     <li><Link href="/buyers-advisory" className="hover:text-brand-gold">Buyers Advisory</Link></li>
+                    <li><Link href="/blog/real-estate-liverpool" className="hover:text-brand-gold">Real Estate Liverpool</Link></li>
                     <li><Link href="/agents" className="hover:text-brand-gold">Our Team</Link></li>
                     <li><Link href="/privacy-policy" className="hover:text-brand-gold">Privacy Policy</Link></li>
                     <li><Link href="/contact" className="hover:text-brand-gold">Contact</Link></li>
