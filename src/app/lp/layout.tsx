@@ -18,7 +18,10 @@ export const metadata: Metadata = {
 export default async function LpLayout({ children }: { children: React.ReactNode }) {
   const host = (await headers()).get("host") ?? "";
   return (
-    <div className="bg-white pb-16 text-foreground md:pb-0 [scroll-behavior:smooth]">
+    // Tailwind v4's reset leaves <button> with the default arrow cursor, so
+    // every enabled button on /lp gets the pointer hand here in one place.
+    <div
+      className="bg-white pb-16 text-foreground md:pb-0 [scroll-behavior:smooth] [&_button:not(:disabled)]:cursor-pointer">
       <TrackingScripts enabled={isCanonicalHost(host)} />
       <ClickIdCapture />
       {children}
