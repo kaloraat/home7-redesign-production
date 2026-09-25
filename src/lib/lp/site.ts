@@ -15,15 +15,20 @@ export const SITE = {
   googleReviewsUrl: GOOGLE_REVIEWS_URL,
   ratingFallback: { rating: GOOGLE_RATING.value, count: GOOGLE_RATING.count },
   since: 2020,
-  // CONFIRM: real NSW agency licence number. Footer omits the line while empty.
-  licenceNumber: "",
-  // CONFIRM: how fast staff really call back. Kept deliberately non-specific.
-  callbackPromise: "as soon as we can during business hours",
-  fees: {
-    // CONFIRM: leave null until Home7 confirms. While null the pages show the
-    // "ask for our fee sheet" wording, never a made-up number.
-    managementPercent: null as number | null, // e.g. 5.5 (inc GST?)
-    lettingFeeWeeks: null as number | null, // e.g. 1
-    salesCommissionFrom: null as string | null, // e.g. "1.5%"
+  // CONFIRM: licensee name + licence number. Not found anywhere in the project
+  // (the main footer doesn't show one). LpFooter hides the line while empty.
+  licensee: { name: "", licenceNumber: "" },
+  // CONFIRM: no opening hours exist on the site either. Unused until filled.
+  officeHours: "",
+  callbackPromise: "today, usually within minutes",
+  feesLine: "Low fees, and yes, they're negotiable.",
+  principal: {
+    name: "Mohammed R Islam",
+    firstName: "Mohammed",
+    role: "Principal",
+    mobileDisplay: COMPANY.mobileSecondary, // "0430 303 059"
+    mobileHref: "tel:+61430303059",
+    photo: "/images/team/mohammed-r-islam.png",
+    profileUrl: "/agent/mohammed-r-islam",
   },
 };

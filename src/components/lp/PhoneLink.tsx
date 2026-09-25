@@ -7,31 +7,36 @@ import { useLp } from "./LpContext";
 
 /**
  * Every visible phone number on an LP goes through this so the text is
- * always exactly "(02) 8729 7753" in the DOM (Google's call-tracking swap
- * looks for that exact string) and every tap is tracked.
+ * exactly what Google's call-tracking swap expects and every tap is tracked.
+ * The office number "(02) 8729 7753" is the main call button (it's the one
+ * Google swaps); `number="mohammed"` is his personal mobile, a secondary
+ * option tracked as its own phone_click location.
  */
 export function PhoneLink({
   location,
   className,
   icon = false,
   label,
+  number = "office",
 }: {
-  location: "header" | "hero" | "sticky" | "footer" | "thank-you";
+  location: string;
   className?: string;
   icon?: boolean;
   /** Text shown before the number, e.g. "Call". */
   label?: string;
+  number?: "office" | "mohammed";
 }) {
   const { leadType, region } = useLp();
+  const isMo = number === "mohammed";
   return (
     <a
-      href={SITE.phoneHref}
-      onClick={() => trackPhoneClick(location, leadType, region)}
+      href={isMo ? SITE.principal.mobileHref : SITE.phoneHref}
+      onClick={() => trackPhoneClick(isMo ? `${location}-mohammed` : location, leadType, region)}
       className={className}
     >
       {icon && <PhoneIcon size={18} className="shrink-0" />}
       {label && <span>{label}&nbsp;</span>}
-      <span>{SITE.phoneDisplay}</span>
+      <span>{isMo ? SITE.principal.mobileDisplay : SITE.phoneDisplay}</span>
     </a>
   );
 }

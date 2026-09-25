@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { LpCopy } from "@/lib/lp/content";
-import { teamFor } from "@/lib/lp/content";
-import type { LpLeadType } from "@/lib/lp/validation";
+import type { IAgent } from "@/models/Agent";
+import { SwitchButton } from "./SwitchCta";
 import type { RecentProperty } from "@/lib/lp/recent";
 import { SITE } from "@/lib/lp/site";
 import LeadForm from "./LeadForm";
@@ -35,21 +35,27 @@ export function FeesBlock({ copy }: { copy: LpCopy }) {
     <section className="bg-white py-12 md:py-20">
       <div className="mx-auto max-w-3xl px-4 text-center">
         <h2 className={h2}>{copy.feesHeading}</h2>
-        {copy.fees.rows ? (
-          <table className="mx-auto mt-6 w-full max-w-xl text-left text-lg">
-            <tbody>
-              {copy.fees.rows.map((r) => (
-                <tr key={r.label} className="border-b border-slate-200">
-                  <th scope="row" className="py-3 pr-4 font-semibold text-slate-800">{r.label}</th>
-                  <td className="py-3 text-slate-700">{r.value}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="mt-4 text-[1.05rem] leading-relaxed text-slate-700 md:text-lg">{copy.fees.fallback}</p>
-        )}
+        <p className="mt-4 text-[1.05rem] leading-relaxed text-slate-700 md:text-lg">{copy.fees.text}</p>
         <a href="#lp-hero-card" className={`${scrollBtn} mt-6`}>{copy.fees.button}</a>
+      </div>
+    </section>
+  );
+}
+
+export function IncludedChecklist({ copy }: { copy: LpCopy }) {
+  if (!copy.included) return null;
+  return (
+    <section className="bg-white py-12 md:py-16">
+      <div className="mx-auto max-w-4xl px-4">
+        <h2 className={`${h2} text-center`}>{copy.included.heading}</h2>
+        <ul className="mt-8 grid gap-x-8 gap-y-3 sm:grid-cols-2">
+          {copy.included.items.map((item) => (
+            <li key={item} className="flex items-start gap-3 text-[1.05rem] text-slate-800">
+              <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-navy text-sm font-bold text-white" aria-hidden="true">✓</span>
+              {item}
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );
@@ -76,45 +82,80 @@ export function HowItWorks({ copy }: { copy: LpCopy }) {
   );
 }
 
-export function SwitchingBlock({ copy }: { copy: LpCopy }) {
-  if (!copy.switching) return null;
-  const s = copy.switching;
+export function SwitchSection({ type }: { type: "pm" | "sell" }) {
+  if (type !== "pm") return null;
   return (
-    <section className="bg-white py-12 md:py-20">
-      <div className={wrap}>
-        <h2 className={`${h2} text-center`}>{s.heading}</h2>
-        <ol className="mt-8 grid gap-4 md:grid-cols-3 md:gap-6">
-          {s.steps.map((step, i) => (
-            <li key={step.title} className="rounded-xl border border-slate-200 p-6">
-              <p className="font-display text-sm uppercase tracking-widest text-brand-gold-dark">Step {i + 1}</p>
-              <h3 className="mt-1 font-display text-xl text-brand-navy">{step.title}</h3>
-              <p className="mt-2 text-[1.05rem] leading-relaxed text-slate-700">{step.body}</p>
-            </li>
-          ))}
-        </ol>
-        <p className="mt-4 text-center text-xs text-slate-500">{s.footnote}</p>
+    <section className="bg-brand-gold/20 py-12 md:py-20">
+      <div className="mx-auto grid max-w-[1120px] items-center gap-8 px-4 md:grid-cols-[auto_1fr] md:gap-12">
+        <div className="flex flex-col items-center text-center">
+          <Image src={SITE.principal.photo} alt={SITE.principal.name} width={160} height={160} className="h-32 w-32 rounded-full border-4 border-brand-gold object-cover shadow-lg md:h-40 md:w-40" />
+          <p className="mt-3 font-display text-lg text-brand-navy">{SITE.principal.name}</p>
+          <p className="text-base text-slate-600">{SITE.principal.role}</p>
+        </div>
+        <div>
+          <h2 className={h2}>Just say yes. We handle the switch.</h2>
+          <p className="mt-4 text-[1.05rem] leading-relaxed text-slate-800 md:text-lg">
+            Unhappy with your current property manager? You don&apos;t have to chase them, argue, or work out any paperwork. Say yes, and we take care of everything with your current agent: the notice, the keys, the tenant file and the bond details. We also let your tenant know, so your rent keeps coming in as normal.
+          </p>
+          <ul className="mt-5 space-y-2 text-[1.05rem] font-semibold text-brand-navy">
+            {["No awkward conversations with your old agent", "No paperwork to work out yourself", "No break in your rent"].map((t) => (
+              <li key={t}><span aria-hidden="true">✓ </span>{t}</li>
+            ))}
+          </ul>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
+            <SwitchButton className={`${scrollBtn} w-full sm:w-auto`}>Yes, handle my switch</SwitchButton>
+            <PhoneLink location="switch" number="mohammed" label="Or call Mohammed on" className="text-lg font-bold text-brand-navy underline underline-offset-2" />
+          </div>
+          <p className="mt-4 text-xs text-slate-600">Your current agreement&apos;s notice period still applies. We&apos;ll check it for you.</p>
+        </div>
       </div>
     </section>
   );
 }
 
-export function Team({ type }: { type: LpLeadType }) {
-  const members = teamFor(type);
+const PRINCIPAL_SLUG = "mohammed-r-islam";
+
+/**
+ * Same team data as the homepage (getAgents(), passed in) — no copy here.
+ * Cards are deliberately not links: they'd take people off the page.
+ */
+export function Team({ agents }: { agents: IAgent[] }) {
+  const others = agents.filter((a) => a.slug !== PRINCIPAL_SLUG);
+  const principal = agents.find((a) => a.slug === PRINCIPAL_SLUG);
   return (
     <section className="bg-[#f6f7f9] py-12 md:py-20">
       <div className={wrap}>
-        <h2 className={`${h2} text-center`}>The people you&apos;ll deal with</h2>
-        <ul className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
-          {members.map((m) => (
-            <li key={m.slug} className="rounded-xl bg-white p-4 text-center shadow-sm ring-1 ring-slate-200">
-              <Image src={m.photo} alt={m.name} width={96} height={96} className="mx-auto h-24 w-24 rounded-full object-cover" />
-              <p className="mt-3 font-display text-lg leading-tight text-brand-navy">{m.name}</p>
-              <p className="text-base text-slate-600">{m.role}</p>
-            </li>
-          ))}
-        </ul>
+        <h2 className={`${h2} text-center`}>Meet the people you&apos;ll actually deal with</h2>
+
+        <div className="mx-auto mt-8 flex max-w-3xl flex-col items-center gap-6 rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-slate-200 sm:flex-row sm:text-left md:p-8">
+          <Image src={principal?.photo || SITE.principal.photo} alt={SITE.principal.name} width={160} height={160} className="h-36 w-36 shrink-0 rounded-full border-4 border-brand-gold object-cover" />
+          <div>
+            <p className="font-display text-2xl text-brand-navy">{SITE.principal.name}</p>
+            <p className="text-lg text-slate-600">{SITE.principal.role}</p>
+            <p className="mt-3 text-[1.05rem] italic text-slate-800">&ldquo;I&apos;ll look after your property like it&apos;s my own. Call me any time.&rdquo;</p>
+            <PhoneLink
+              location="team"
+              number="mohammed"
+              icon
+              label="Call Mohammed"
+              className="mt-4 inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-brand-gold-dark bg-brand-gold px-5 text-lg font-bold text-brand-navy hover:bg-[#f0bd55]"
+            />
+          </div>
+        </div>
+
+        {others.length > 0 && (
+          <ul className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+            {others.map((m) => (
+              <li key={m.slug} className="rounded-xl bg-white p-4 text-center shadow-sm ring-1 ring-slate-200">
+                {m.photo && <Image src={m.photo} alt={m.name} width={80} height={80} className="mx-auto h-20 w-20 rounded-full object-cover" />}
+                <p className="mt-3 font-display text-lg leading-tight text-brand-navy">{m.name}</p>
+                <p className="text-base text-slate-600">{m.role}</p>
+              </li>
+            ))}
+          </ul>
+        )}
         <p className="mt-6 text-center text-lg text-slate-700">
-          Prefer to talk? Call the office on <PhoneLink location="hero" className="font-bold text-brand-navy underline underline-offset-2" />
+          Prefer the office? Call <PhoneLink location="team" className="font-bold text-brand-navy underline underline-offset-2" />
         </p>
       </div>
     </section>
@@ -196,7 +237,9 @@ export function LpFooter() {
       <div className="mx-auto max-w-[1120px] space-y-1 px-4">
         <p className="font-semibold text-slate-800">{SITE.name}</p>
         <p>{SITE.address}</p>
-        {SITE.licenceNumber && <p>{SITE.licenceNumber}</p>}
+        {SITE.licensee.name && (
+          <p>{SITE.licensee.name}{SITE.licensee.licenceNumber && ` · Licence No. ${SITE.licensee.licenceNumber}`}</p>
+        )}
         <p>
           <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">Privacy Policy</a>
           {" · "}© {new Date().getFullYear()} {SITE.name}

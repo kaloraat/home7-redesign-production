@@ -7,7 +7,7 @@ import { toE164 } from "@/lib/lp/phone";
 import { REGIONS } from "@/lib/lp/regions";
 import { SITE } from "@/lib/lp/site";
 import { getAttribution, trackFormStart, trackLeadConversion } from "@/lib/lp/tracking";
-import type { LpCopy } from "@/lib/lp/content";
+import { SWITCH_CHIP, type LpCopy } from "@/lib/lp/content";
 import { useLp } from "./LpContext";
 import PhoneLink from "./PhoneLink";
 
@@ -93,7 +93,10 @@ export function LeadForm({ copy, instance }: { copy: LpCopy; instance: "hero" | 
         leadType,
         region,
         instance,
-        done: () => router.push(`/lp/thank-you?type=${leadType}&n=${encodeURIComponent(firstName)}`),
+        done: () =>
+          router.push(
+            `/lp/thank-you?type=${leadType}&n=${encodeURIComponent(firstName)}${parsed.data.choice === SWITCH_CHIP ? "&intent=switch" : ""}`
+          ),
       });
       // Stay in the "sending" state: the button must never be clickable twice.
     } catch {
@@ -164,7 +167,7 @@ export function LeadForm({ copy, instance }: { copy: LpCopy; instance: "hero" | 
         <div role="radiogroup" aria-label={copy.form.chipsLabel} className="flex flex-wrap gap-2">
           {copy.form.chips.map((chip, i) => (
             <div key={chip}>
-              <input id={id(`chip-${i}`)} type="radio" name="choice" value={chip} className="peer sr-only" />
+              <input id={id(`chip-${i}`)} type="radio" name="choice" value={chip} defaultChecked={chip === copy.defaultChoice} className="peer sr-only" />
               <label
                 htmlFor={id(`chip-${i}`)}
                 className="inline-flex min-h-11 cursor-pointer items-center rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:border-brand-navy peer-checked:border-brand-navy peer-checked:bg-brand-navy peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-brand-navy/50"
@@ -206,8 +209,10 @@ export function LeadForm({ copy, instance }: { copy: LpCopy; instance: "hero" | 
 
       <p className="text-sm leading-snug text-slate-600">{copy.microcopy}</p>
       <p className="text-base text-slate-700">
-        Rather talk now?{" "}
-        <PhoneLink location={instance === "hero" ? "hero" : "footer"} label="Call" className="font-bold text-brand-navy underline underline-offset-2" />
+        Rather talk now? Call{" "}
+        <PhoneLink location={instance} className="font-bold text-brand-navy underline underline-offset-2" />
+        {" "}or Mohammed directly on{" "}
+        <PhoneLink location={instance} number="mohammed" className="font-bold text-brand-navy underline underline-offset-2" />
       </p>
     </form>
   );

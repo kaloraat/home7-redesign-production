@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
 import { leadSchema, type LeadInput } from "@/lib/lp/validation";
 import { toE164 } from "@/lib/lp/phone";
 import { REGIONS } from "@/lib/lp/regions";
-import { getNotificationRecipients } from "@/lib/emailRecipients";
+import { sendNotificationEmail } from "@/lib/notifyLead";
 
 /**
- * Lead endpoint for the Google Ads landing pages (/lp/*). Email-only for
- * launch: the office gets an instant "call within 5 minutes" email with the
+ * Lead endpoint for the Google Ads landing pages (/lp/*). Sent via the
+ * contact forms' mailer (lib/notifyLead.ts). Email-only for launch: the office gets an instant "call within 5 minutes" email with the
  * tap-to-call number and the Google click ids needed for offline conversion
  * uploads. (Deliberately not written to the Lead collection yet — that model
  * requires an email address, which these 3-field forms don't collect.)
@@ -115,27 +114,15 @@ export async function POST(request: Request) {
   const phoneE164 = toE164(lead.phone);
   const { subject, text, html } = buildEmail(lead, leadId, phoneE164);
 
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    console.error("[lp-lead] RESEND_API_KEY not set. Payload:", JSON.stringify({ leadId, ...lead }));
-    if (process.env.NODE_ENV !== "production") return NextResponse.json({ ok: true, leadId });
-    return NextResponse.json({ ok: false, error: "Email not configured" }, { status: 500 });
-  }
-
-  try {
-    const resend = new Resend(apiKey);
-    const { error } = await resend.emails.send({
-      from: process.env.LEAD_NOTIFICATION_FROM || "Home7 Leads <onboarding@resend.dev>",
-      to: getNotificationRecipients(),
-      subject,
-      text,
-      html,
-    });
-    if (error) throw new Error(JSON.stringify(error));
-  } catch (err) {
+  const sent = await sendNotificationEmail({ subject, text, html });
+  if (!sent) {
     // Keep the lead recoverable from server logs even though the visitor
     // sees the "please call us" message.
-    console.error("[lp-lead] email failed:", err, "Payload:", JSON.stringify({ leadId, ...lead }));
+    console.error("[lp-lead] email not sent. Payload:", JSON.stringify({ leadId, ...lead }));
+    // Dev without RESEND_API_KEY: let the form flow be testable.
+    if (process.env.NODE_ENV !== "production" && !process.env.RESEND_API_KEY) {
+      return NextResponse.json({ ok: true, leadId });
+    }
     return NextResponse.json({ ok: false, error: "Could not send" }, { status: 500 });
   }
 
