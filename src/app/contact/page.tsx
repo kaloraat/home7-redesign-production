@@ -6,6 +6,8 @@ import { pageMetadata } from "@/lib/pageMetadata";
 import { PhoneIcon, MobileIcon, EmailIcon, PinIcon } from "@/components/icons";
 import ContactForm from "@/components/ContactForm";
 import ContactMap from "@/components/ContactMap";
+import MeetTheTeam from "@/components/MeetTheTeam";
+import { getAgents } from "@/lib/queries";
 
 const TITLE = "Contact Us";
 const DESCRIPTION = "Contact Home7 Real Estate — Liverpool, NSW.";
@@ -37,7 +39,8 @@ const CONTACT_ITEMS = [
   { Icon: PinIcon, label: COMPANY.address, href: null, size: "text-lg" },
 ];
 
-export default function Page() {
+export default async function Page() {
+  const agents = await getAgents();
   return (
     <div>
       <script
@@ -110,6 +113,8 @@ export default function Page() {
             <ContactMap />
           </div>
         </div>
+
+        <MeetTheTeam agents={agents} />
       </div>
     </div>
   );
