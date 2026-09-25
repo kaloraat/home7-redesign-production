@@ -148,3 +148,27 @@ export async function notifyNewLead(lead: LeadFields) {
     console.error("notifyNewLead: failed to send lead notification email:", err);
   }
 }
+
+/**
+ * Sends an already-built email through the same Resend config, sender and
+ * recipients as the contact forms (RESEND_API_KEY, LEAD_NOTIFICATION_FROM,
+ * LEAD_NOTIFICATION_EMAIL). Unlike notifyNewLead this REPORTS failure, since
+ * the Google Ads landing-page endpoint must tell the visitor to call instead
+ * of showing success for a lead nobody was emailed about.
+ */
+export async function sendNotificationEmail(mail: { subject: string; text: string; html: string }): Promise<boolean> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return false;
+  try {
+    const { error } = await new Resend(apiKey).emails.send({
+      from: process.env.LEAD_NOTIFICATION_FROM || "Home7 Leads <onboarding@resend.dev>",
+      to: getNotificationRecipients(),
+      ...mail,
+    });
+    if (error) console.error("sendNotificationEmail: Resend rejected the email:", error);
+    return !error;
+  } catch (err) {
+    console.error("sendNotificationEmail: failed:", err);
+    return false;
+  }
+}

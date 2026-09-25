@@ -35,7 +35,9 @@ export function PublicChrome({
   isAdmin: boolean;
 }) {
   const pathname = usePathname();
-  if (pathname?.startsWith("/admin")) {
+  // /lp/* are the Google Ads landing pages: single-goal pages with their own
+  // minimal header/footer (see app/lp/layout.tsx), so no site nav, no exits.
+  if (pathname?.startsWith("/admin") || pathname?.startsWith("/lp/")) {
     return <>{children}</>;
   }
 

@@ -24,6 +24,7 @@ const NAV_ITEMS = [
   { href: "/admin/agents", label: "Agents", description: "Team profiles", icon: UsersIcon },
   { href: "/admin/blog", label: "Blog", description: "Posts & articles", icon: DocumentIcon },
   { href: "/admin/leads", label: "Leads", description: "Enquiries from every form", icon: InboxIcon },
+  { href: "/admin/landing-pages", label: "Landing Pages", description: "Google Ads pages", icon: LinkIcon },
   { href: "/admin/redirects", label: "Redirects", description: "Old URLs → new URLs", icon: LinkIcon },
   { href: "/admin/tenancy-checks", label: "Tenancy Checks", description: "Rental reference requests", icon: ClipboardCheckIcon },
   { href: "/admin/rental-applications", label: "Rental Applications", description: "Tenant application submissions", icon: ClipboardCheckIcon },
