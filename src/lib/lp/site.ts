@@ -18,8 +18,7 @@ export const SITE = {
   // CONFIRM: licensee name + licence number. Not found anywhere in the project
   // (the main footer doesn't show one). LpFooter hides the line while empty.
   licensee: { name: "", licenceNumber: "" },
-  // CONFIRM: no opening hours exist on the site either. Unused until filled.
-  officeHours: "",
+  officeHours: "Mon–Fri 9am–5pm · Sat 9am–4pm · Sun closed",
   callbackPromise: "today, usually within minutes",
   feesLine: "Low fees, and yes, they're negotiable.",
   principal: {

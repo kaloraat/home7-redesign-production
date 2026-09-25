@@ -237,6 +237,7 @@ export function LpFooter() {
       <div className="mx-auto max-w-[1120px] space-y-1 px-4">
         <p className="font-semibold text-slate-800">{SITE.name}</p>
         <p>{SITE.address}</p>
+        {SITE.officeHours && <p>Office hours: {SITE.officeHours}</p>}
         {SITE.licensee.name && (
           <p>{SITE.licensee.name}{SITE.licensee.licenceNumber && ` · Licence No. ${SITE.licensee.licenceNumber}`}</p>
         )}
