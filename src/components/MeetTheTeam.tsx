@@ -58,7 +58,7 @@ export function MeetTheTeam({ agents }: { agents: IAgent[] }) {
       </div>
 
       {team.length > 0 && (
-        <ul className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        <ul className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
           {team.map((member) => (
             <li key={member.slug}>
               <Link
