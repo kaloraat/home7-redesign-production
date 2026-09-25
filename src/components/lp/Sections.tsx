@@ -144,7 +144,7 @@ export function Team({ agents }: { agents: IAgent[] }) {
         </div>
 
         {others.length > 0 && (
-          <ul className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+          <ul className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
             {others.map((m) => (
               <li key={m.slug} className="rounded-xl bg-white p-4 text-center shadow-sm ring-1 ring-slate-200">
                 {m.photo && <Image src={m.photo} alt={m.name} width={80} height={80} className="mx-auto h-20 w-20 rounded-full object-cover" />}

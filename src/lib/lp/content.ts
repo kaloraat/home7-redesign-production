@@ -50,7 +50,9 @@ function fill(str: string, region: RegionKey) {
   return str.replaceAll("{region}", r.name).replaceAll("{label}", r.label);
 }
 
-const first8 = (region: RegionKey) => REGIONS[region].suburbs.slice(0, 8).join(", ");
+const COVERAGE_AREAS = "pretty much all of South West and Western Sydney, including the main council areas of Liverpool, Campbelltown, Parramatta and Penrith, and suburbs such as Kellyville and Marsden Park";
+const COVERAGE_PM = `We manage properties across ${COVERAGE_AREAS}. Not sure if you're in our area? Just ask.`;
+const COVERAGE_SELL = `We sell homes across ${COVERAGE_AREAS}. Not sure if you're in our area? Just ask.`;
 
 const MICROCOPY = `No obligation. No spam. Mohammed or one of our team will call you back ${SITE.callbackPromise}.`;
 
@@ -117,10 +119,10 @@ function pmContent(region: RegionKey, intent: LpIntent): LpCopy {
     faq: [
       { q: "How much do you charge?", a: "Our fees are low and negotiable. Tell us what you pay now and we'll give you a straight answer, in writing." },
       { q: "How do I switch from my current agent?", a: "Just say yes. We handle the whole switch with your current agent, including the notice, keys, tenant file and bond details, so you don't have to do anything." },
-      { q: "How quickly can you find a tenant?", a: "It depends on the property and the time of year, but we'll give you an honest timeframe at your appraisal, along with what we'll do to find the right tenant quickly." },
+      { q: "How quickly can you find a tenant?", a: "Quickly. Rental demand across Sydney is strong, so we move fast to get your property leased as soon as it's vacant, or on the timing that suits you. We still do our due diligence on every applicant, so you get the best tenant, not just the first one." },
       { q: "What happens if my tenant stops paying?", a: "We follow up arrears quickly and keep you informed at every step, including the NSW Civil and Administrative Tribunal (NCAT) process if it ever comes to that." },
       { q: "Am I locked into a long contract?", a: "No long lock-ins. Our management agreement has a standard notice period, and we'll walk you through it before you sign anything." },
-      { q: "Which suburbs do you cover?", a: fill(`We manage properties across {label}, including ${first8(region)}, and surrounding suburbs.`, region) },
+      { q: "Which suburbs do you cover?", a: COVERAGE_PM },
       { q: "Can I talk to my property manager directly?", a: "Yes. You'll have their direct number. That's the point of a small local team." },
     ],
     finalHeading: "Get your free rental appraisal",
@@ -172,7 +174,7 @@ function sellContent(region: RegionKey): LpCopy {
       { q: "Do I have to sign anything at the appraisal?", a: "No. An appraisal is free and there's no obligation at all." },
       { q: "How long will it take to sell?", a: "It depends on your property and the market. We'll give you a realistic timeframe at the appraisal based on recent local sales." },
       { q: "Auction or private treaty?", a: "We'll recommend what suits your property and your timeline, and explain the trade-offs honestly." },
-      { q: "Which suburbs do you cover?", a: fill(`We sell homes across {label}, including ${first8(region)}, and surrounding suburbs.`, region) },
+      { q: "Which suburbs do you cover?", a: COVERAGE_SELL },
     ],
     finalHeading: "Find out what your home is worth",
     finalSub: "A free, honest appraisal from a friendly local team. No obligation.",
