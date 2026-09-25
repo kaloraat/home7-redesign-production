@@ -111,6 +111,12 @@ export const COMPANY = {
   // one current number per an earlier explicit instruction.
   mobileSecondary: "0430 303 059",
   email: "admin@home7.com.au",
+  // Shown on the contact page and the ad landing pages' footer.
+  openingHours: [
+    { days: "Monday – Friday", hours: "9am – 5pm" },
+    { days: "Saturday", hours: "9am – 4pm" },
+    { days: "Sunday", hours: "Closed" },
+  ],
   // Official Home7 pages — confirmed against the Laravel export
   // (team_members.json): every team member's social icon pointed at one
   // of these same two URLs (nobody had a genuinely personal profile

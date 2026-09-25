@@ -99,6 +99,16 @@ export default async function Page() {
                 </li>
               ))}
             </ul>
+
+            <h3 className="mt-8 font-display text-2xl text-brand-navy">Opening Hours</h3>
+            <dl className="mt-4 space-y-2 text-lg text-slate-600">
+              {COMPANY.openingHours.map(({ days, hours }) => (
+                <div key={days} className="flex justify-between gap-4">
+                  <dt>{days}</dt>
+                  <dd className="font-medium text-slate-700">{hours}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
         </div>
 
