@@ -12,18 +12,35 @@ type GoogleMap = object;
 type GoogleMarker = object;
 
 interface MapsLibrary {
-  Map: new (el: HTMLElement, opts: { center: LatLngLiteral; zoom: number; minZoom?: number }) => GoogleMap;
+  Map: new (
+    el: HTMLElement,
+    opts: { center: LatLngLiteral; zoom: number; minZoom?: number; mapId: string }
+  ) => GoogleMap;
   InfoWindow: new (opts: { content: string }) => {
     open(opts: { map: GoogleMap; anchor: GoogleMarker }): void;
   };
 }
 
+interface MarkerLibrary {
+  AdvancedMarkerElement: new (opts: {
+    position: LatLngLiteral;
+    map: GoogleMap;
+    title: string;
+  }) => GoogleMarker;
+}
+
 interface GoogleMapsGlobal {
   maps: {
     importLibrary(name: "maps"): Promise<MapsLibrary>;
-    Marker: new (opts: { position: LatLngLiteral; map: GoogleMap; title: string }) => GoogleMarker;
+    importLibrary(name: "marker"): Promise<MarkerLibrary>;
   };
 }
+
+// AdvancedMarkerElement (the replacement for the deprecated
+// google.maps.Marker) only renders on a map that has a Map ID. DEMO_MAP_ID
+// is Google's built-in testing ID; set NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID to a
+// real one from Cloud Console (Map Management — free) for production.
+const MAP_ID = process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID || "DEMO_MAP_ID";
 
 // Same coordinates the old iframe embed used (decoded from its pb= param:
 // !2d150.9208817756947!3d-33.922678721851504) — Home7 Real Estate, Suite
@@ -68,7 +85,10 @@ export function ContactMap() {
       .then(async () => {
         if (cancelled || !containerRef.current) return;
         const google = (window as unknown as { google: GoogleMapsGlobal }).google;
-        const { Map, InfoWindow } = await google.maps.importLibrary("maps");
+        const [{ Map, InfoWindow }, { AdvancedMarkerElement }] = await Promise.all([
+          google.maps.importLibrary("maps"),
+          google.maps.importLibrary("marker"),
+        ]);
 
         const map = new Map(containerRef.current, {
           center: HOME7_LOCATION,
@@ -79,9 +99,10 @@ export function ContactMap() {
           // visitor zooming out past South West Sydney into a useless
           // world view. Full zoom-in is left uncapped.
           minZoom: 10,
+          mapId: MAP_ID,
         });
 
-        const marker = new google.maps.Marker({
+        const marker = new AdvancedMarkerElement({
           position: HOME7_LOCATION,
           map,
           title: "Home7 Real Estate",

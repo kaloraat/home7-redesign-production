@@ -115,8 +115,7 @@ export default async function Page() {
         {/* Map — was a free iframe embed (no API key needed); swapped for
             an interactive JS-rendered map now that a Places/Maps key is
             configured. See ContactMap.tsx for the exact same coordinates,
-            decoded from that iframe's own pb= parameter, and the reasoning
-            on google.maps.Marker vs. AdvancedMarkerElement. */}
+            decoded from that iframe's own pb= parameter. */}
         <div className="mt-16">
           <h3 className="font-display text-2xl text-brand-navy mb-4">Our Location</h3>
           <div className="rounded-lg overflow-hidden border border-slate-200">
