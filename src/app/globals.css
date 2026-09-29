@@ -171,3 +171,76 @@ gmp-place-autocomplete::part(input) {
   animation-timing-function: ease-out;
   animation-iteration-count: infinite;
 }
+
+/*
+ * Corner status ribbon on PropertyCard. A 130px clipping box pinned 6px
+ * outside the card's top-right corner; the rotated band inside it is cut
+ * off by that box at the top and right edges, and the two ::before/::after
+ * triangles peek out beneath the band's ends there — the "folded over the
+ * card edge" look. Band geometry scales with the box: width 1.5x, left
+ * -W/6, top W/5, height ~0.32x keeps the band's inner edge on the box's
+ * diagonal so the folds line up with its ends.
+ */
+.ribbon {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 130px;
+  height: 130px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+}
+.ribbon::before,
+.ribbon::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  border: 6px solid var(--ribbon-fold);
+  border-top-color: transparent;
+  border-right-color: transparent;
+}
+.ribbon::before {
+  top: 0;
+  left: 0;
+}
+.ribbon::after {
+  bottom: 0;
+  right: 0;
+}
+.ribbon span {
+  position: absolute;
+  top: 26px;
+  left: -22px;
+  width: 195px;
+  padding: 10px 0;
+  transform: rotate(45deg);
+  background: var(--ribbon-bg);
+  box-shadow: 0 5px 10px rgb(0 0 0 / 0.2);
+  color: #fff;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+  text-shadow: 0 1px 1px rgb(0 0 0 / 0.35);
+}
+.ribbon-sale {
+  --ribbon-bg: linear-gradient(to bottom, #e53935, #b3161b);
+  --ribbon-fold: #7a0d10;
+}
+.ribbon-rent {
+  --ribbon-bg: linear-gradient(to bottom, #3b7bea, #1440a8);
+  --ribbon-fold: #0c2a70;
+}
+.ribbon-sold {
+  --ribbon-bg: linear-gradient(to bottom, #e6b95e, #b8862b);
+  --ribbon-fold: #7a5716;
+}
+/* Gunmetal-to-silver rather than a light silver — a pale band disappears
+   against the white card and can't carry white text. */
+.ribbon-leased {
+  --ribbon-bg: linear-gradient(to bottom, #c3c9d1, #6b7480);
+  --ribbon-fold: #434a54;
+}

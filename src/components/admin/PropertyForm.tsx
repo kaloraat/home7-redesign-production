@@ -50,6 +50,7 @@ function draftToDefaultValues(raw: Record<string, string>): Partial<IProperty> {
     priceValue: num(raw.priceValue),
     rentPerWeek: num(raw.rentPerWeek),
     featured: raw.featured === "on",
+    featuredUntil: raw.featuredUntil || undefined,
     auctionDate: raw.auctionDate || undefined,
     agent: raw.agent || undefined,
     bedrooms: num(raw.bedrooms),
@@ -164,12 +165,20 @@ export function PropertyForm({ action, agents, defaultValues, submitLabel }: Pro
         <div>
           <label className="flex items-center gap-2 text-sm text-slate-700">
             <input type="checkbox" name="featured" defaultChecked={d.featured} />
-            Feature on homepage
+            Featured / Spotlight on homepage
           </label>
           <p className="mt-1 text-xs text-slate-500">
-            Shows this listing in a dedicated &quot;Featured Properties&quot; section near the top of the
-            homepage, ahead of the latest-listings sections below it. Leave unchecked and the homepage
-            just shows the most recent listings automatically — no need to feature anything.
+            For deliberate promotion — a premium listing, an upcoming auction, or a standout sale
+            result. Not needed for new listings: they already appear first in their own homepage
+            section with a &quot;New&quot; badge. A featured sale or rental is un-featured automatically
+            when you change it to Sold or Leased; tick it again afterwards to showcase the result.
+          </p>
+        </div>
+        <div>
+          <label className="block text-sm text-slate-600 mb-1">Featured until (optional)</label>
+          <DateInput name="featuredUntil" defaultValue={toDateInputValue(d.featuredUntil ?? undefined)} />
+          <p className="mt-1 text-xs text-slate-500">
+            Last day it shows in the Featured section. Leave blank to keep it featured until unticked.
           </p>
         </div>
         <div>

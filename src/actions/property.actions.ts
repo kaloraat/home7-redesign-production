@@ -28,6 +28,16 @@ function dateOrUndefined(value: FormDataEntryValue | null) {
   return Number.isNaN(d.getTime()) ? undefined : d;
 }
 
+// "Featured until 30/10" should include the whole of the 30th, not stop at
+// UTC midnight (10-11am Sydney). Fixed +10:00 offset, so during daylight
+// saving it runs an hour past midnight — harmless for this.
+function endOfSydneyDay(value: FormDataEntryValue | null) {
+  const str = String(value ?? "").trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(str)) return undefined;
+  const d = new Date(`${str}T23:59:59+10:00`);
+  return Number.isNaN(d.getTime()) ? undefined : d;
+}
+
 /**
  * Shared field parsing for create + edit. Images are a simple one-URL-per-line
  * textarea for now, not a file upload — no image host (S3/Cloudinary/Vercel
@@ -80,6 +90,9 @@ function parseFields(formData: FormData) {
     floorPlanImage: String(formData.get("floorPlanImage") || "").trim() || undefined,
     agent: String(formData.get("agent") || "").trim() || undefined,
     featured: formData.get("featured") === "on",
+    // null (not undefined) so clearing the date actually unsets it — the
+    // update drops undefined keys rather than writing them.
+    featuredUntil: endOfSydneyDay(formData.get("featuredUntil")) ?? null,
     auctionDate: dateOrUndefined(formData.get("auctionDate")),
     seoTitle: String(formData.get("seoTitle") || "").trim() || undefined,
     seoDescription: String(formData.get("seoDescription") || "").trim() || undefined,
@@ -137,6 +150,20 @@ export async function updateProperty(id: string, formData: FormData) {
   const existing = await Property.findById(id);
   if (!existing) {
     throw new Error("Property not found");
+  }
+
+  // A featured sale that sells (or rental that leases) drops out of the
+  // homepage Featured section automatically — a forgotten tick would
+  // otherwise keep it at the top of the homepage indefinitely. Only on the
+  // save that changes the status: ticking Featured again afterwards (to
+  // show off a result) sticks.
+  const closedOut =
+    existing.featured &&
+    existing.listingType !== fields.listingType &&
+    (fields.listingType === "sold" || fields.listingType === "leased");
+  if (closedOut) {
+    fields.featured = false;
+    fields.featuredUntil = null;
   }
 
   // Slug intentionally isn't regenerated on edit — the whole point of this

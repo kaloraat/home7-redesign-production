@@ -42,6 +42,10 @@ export interface IProperty extends Document {
   floorPlanImage?: string;
   agent?: mongoose.Types.ObjectId;
   featured: boolean;
+  // Optional last day a featured listing stays in the homepage Featured
+  // section — past it, getFeaturedProperties skips the listing without
+  // anyone having to untick it. Unset = featured until unticked.
+  featuredUntil?: Date | null;
   auctionDate?: Date;
   seoTitle?: string;
   seoDescription?: string;
@@ -98,6 +102,7 @@ const PropertySchema = new Schema<IProperty>(
     floorPlanImage: String,
     agent: { type: Schema.Types.ObjectId, ref: "Agent" },
     featured: { type: Boolean, default: false },
+    featuredUntil: Date,
     auctionDate: Date,
     seoTitle: String,
     seoDescription: String,

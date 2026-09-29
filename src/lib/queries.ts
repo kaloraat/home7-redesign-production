@@ -63,7 +63,11 @@ export async function getPropertiesByType(
 export async function getFeaturedProperties(limit = 6): Promise<IProperty[]> {
   try {
     await dbConnect();
-    const docs = await Property.find({ featured: true })
+    // `featuredUntil: null` also matches listings with no end date set.
+    const docs = await Property.find({
+      featured: true,
+      $or: [{ featuredUntil: null }, { featuredUntil: { $gte: new Date() } }],
+    })
       .sort({ createdAt: -1 })
       .limit(limit)
       .lean<IProperty[]>();
