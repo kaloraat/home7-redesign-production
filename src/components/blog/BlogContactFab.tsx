@@ -78,17 +78,19 @@ export function BlogContactFab({
             role="dialog"
             aria-modal="true"
             tabIndex={-1}
-            className="relative w-full max-w-sm p-4 outline-none"
+            // Full-width bottom sheet on phones (max-w-sm plus two layers of
+            // padding squeezed the form to ~310px); a centered card from sm up.
+            className="relative w-full outline-none sm:max-w-md sm:p-4"
           >
             <button
               type="button"
               onClick={() => setOpen(false)}
               aria-label="Close"
-              className="absolute -top-1 right-6 flex h-9 w-9 items-center justify-center rounded-full bg-white text-brand-navy shadow-lg cursor-pointer"
+              className="absolute -top-12 right-3 sm:-top-1 sm:right-6 flex h-9 w-9 items-center justify-center rounded-full bg-white text-brand-navy shadow-lg cursor-pointer"
             >
               <CloseIcon size={16} />
             </button>
-            <div className="rounded-lg border border-slate-200 bg-white p-5 max-h-[85vh] overflow-y-auto">
+            <div className="rounded-t-2xl border border-slate-200 bg-white px-4 pt-5 pb-8 max-h-[85vh] overflow-y-auto sm:rounded-lg sm:p-5">
               <ContactForm
                 leadType="blog"
                 heading={BLOG_CONTACT_FORM_HEADING}
