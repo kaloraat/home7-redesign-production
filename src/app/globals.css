@@ -173,29 +173,34 @@ gmp-place-autocomplete::part(input) {
 }
 
 /*
- * Corner status ribbon on PropertyCard. A 130px clipping box pinned 6px
+ * Corner status ribbon on PropertyCard. A 110px clipping box pinned 6px
  * outside the card's top-right corner; the rotated band inside it is cut
  * off by that box at the top and right edges, and the two ::before/::after
  * triangles peek out beneath the band's ends there — the "folded over the
  * card edge" look. Band geometry scales with the box: width 1.5x, left
  * -W/6, top W/5, height ~0.32x keeps the band's inner edge on the box's
  * diagonal so the folds line up with its ends.
+ *
+ * Deliberately no z-index on .ribbon itself (so it forms no stacking
+ * context): the folds (z 0) then paint BEHIND the photo box (z 1, set in
+ * PropertyCard) and only show where they stick out past the card edge,
+ * while the band (z 2) paints over the photo. PropertyCard's `isolate`
+ * keeps all of this local to the card.
  */
 .ribbon {
   position: absolute;
   top: -6px;
   right: -6px;
-  width: 130px;
-  height: 130px;
+  width: 110px;
+  height: 110px;
   overflow: hidden;
   pointer-events: none;
-  z-index: 2;
 }
 .ribbon::before,
 .ribbon::after {
   content: "";
   position: absolute;
-  z-index: -1;
+  z-index: 0;
   border: 6px solid var(--ribbon-fold);
   border-top-color: transparent;
   border-right-color: transparent;
@@ -210,16 +215,17 @@ gmp-place-autocomplete::part(input) {
 }
 .ribbon span {
   position: absolute;
-  top: 26px;
-  left: -22px;
-  width: 195px;
-  padding: 10px 0;
+  z-index: 2;
+  top: 22px;
+  left: -18px;
+  width: 165px;
+  padding: 8px 0;
   transform: rotate(45deg);
   background: var(--ribbon-bg);
-  box-shadow: 0 5px 10px rgb(0 0 0 / 0.2);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 0.2);
   color: #fff;
-  font-size: 15px;
-  line-height: 22px;
+  font-size: 13px;
+  line-height: 19px;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;

@@ -74,9 +74,9 @@ export function PropertyCard({
   return (
     <Link
       href={`/property/${property.slug}`}
-      className="relative block rounded-lg border border-slate-200 bg-white hover:shadow-md transition-shadow"
+      className="relative isolate block rounded-lg border border-slate-200 bg-white hover:shadow-md transition-shadow"
     >
-      <div className="relative aspect-[4/3] overflow-hidden rounded-t-lg bg-slate-100 flex items-center justify-center text-slate-400 text-sm">
+      <div className="relative z-[1] aspect-[4/3] overflow-hidden rounded-t-lg bg-slate-100 flex items-center justify-center text-slate-400 text-sm">
         {property.images?.[0] ? (
           <Image
             src={property.images[0]}
