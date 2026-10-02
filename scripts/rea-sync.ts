@@ -1,14 +1,24 @@
 /**
  * realestate.com.au → Property sync, run by hand.
  *
- * For now it only has a dry run: it fetches every Home7 listing from REA,
- * compares them with the properties collection, and prints what a real
- * sync WOULD do (link / update / create / superseded). It reads MongoDB
- * but writes nothing. The full plan is also saved to
- * rea-probe-output/dry-run-report.json (gitignored) for review.
+ *   --dry-run          Fetch every Home7 listing from REA, compare with the
+ *                      properties collection, print what a sync WOULD do.
+ *                      Reads only. Full plan → rea-probe-output/dry-run-report.json
  *
- * Run: npx tsx scripts/rea-sync.ts --dry-run
- * Requires in .env.local: MONGODB_URI, REA_CLIENT_ID, REA_CLIENT_SECRET, REA_AGENCY_ID.
+ *   --link             Step B preview: exactly what --link --apply will change,
+ *                      page by page. Reads only.
+ *   --link --apply     Step B: back up all properties, then link existing
+ *                      pages to REA (REA's status/price/facts + REA ID),
+ *                      refresh the pages that had duplicates, and delete the
+ *                      duplicates that already 301 to the kept page. Every
+ *                      change goes in an undo journal first.
+ *
+ *   --undo <journal>   Reverse a run, using the journal file it printed.
+ *
+ * Backups and journals: rea-probe-output/backups/ (gitignored).
+ * Requires in .env.local: MONGODB_URI, REA_CLIENT_ID, REA_CLIENT_SECRET,
+ * REA_AGENCY_ID; --link --apply also needs the AWS_* / CloudFront vars
+ * (to copy REA photos to S3).
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -19,34 +29,36 @@ import mongoose from "mongoose";
 import dbConnect from "../src/lib/db";
 import Property from "../src/models/Property";
 import Agent from "../src/models/Agent";
+import Redirect from "../src/models/Redirect";
 import { exportListings } from "../src/lib/rea/client";
-import { parseReaXml } from "../src/lib/rea/parse";
-import { LISTING_TYPE_LABEL, streetAddress, suburbName } from "../src/lib/rea/map";
+import { parseReaXml, type ReaListing } from "../src/lib/rea/parse";
+import { factsFor, LISTING_TYPE_LABEL, streetAddress, suburbName } from "../src/lib/rea/map";
 import { buildPlan, describeChange, type PlanAgent, type PlanProperty } from "../src/lib/rea/plan";
+import { applyLinkSteps, linkSteps } from "../src/lib/rea/link";
+import { backupProperties, Journal, undoJournal } from "../src/lib/rea/journal";
 
-async function main() {
-  if (!process.argv.includes("--dry-run")) {
-    console.error("Only --dry-run is available yet. Run: npx tsx scripts/rea-sync.ts --dry-run");
-    process.exit(1);
-  }
+const OUT_DIR = path.resolve("rea-probe-output");
+const BACKUP_DIR = path.join(OUT_DIR, "backups");
+const args = process.argv.slice(2);
+const stamp = () => new Date().toISOString().replace(/[:.]/g, "-");
+const rel = (p: string) => path.relative(".", p);
 
+const label = (l: ReaListing) => `${streetAddress(l)}, ${suburbName(l)} [REA ${l.listingId}, ${l.status}]`;
+
+async function load() {
   const pages = await exportListings();
   const listings = pages.flatMap(parseReaXml);
   console.log(`REA: ${listings.length} listings (${pages.length} page${pages.length === 1 ? "" : "s"})`);
 
-  // A dry run must not change the database at all — not even the new
-  // reaListingId index Mongoose would otherwise build on first use.
-  mongoose.set("autoIndex", false);
   await dbConnect();
   const props = (await Property.find({}).lean()).map((p) => ({ ...p, _id: String(p._id) })) as unknown as PlanProperty[];
   const agents = (await Agent.find({}, { name: 1 }).lean()).map((a) => ({ _id: String(a._id), name: a.name })) as PlanAgent[];
   console.log(`Database: ${props.length} properties, ${agents.length} agents\n`);
+  return { listings, plan: buildPlan(listings, props, agents) };
+}
 
-  const plan = buildPlan(listings, props, agents);
-  const label = (l: (typeof listings)[number]) =>
-    `${streetAddress(l)}, ${suburbName(l)} [REA ${l.listingId}, ${l.status}]`;
-
-  const by = <A extends string>(a: A) => plan.items.filter((i) => i.action === a);
+async function dryRun() {
+  const { listings, plan } = await load();
   const links = plan.items.flatMap((i) => (i.action === "link" ? [i] : []));
   const updates = plan.items.flatMap((i) => (i.action === "update" ? [i] : []));
   const creates = plan.items.flatMap((i) => (i.action === "create" ? [i] : []));
@@ -59,13 +71,14 @@ async function main() {
     for (const d of i.duplicates) console.log(`    DUPLICATE page: /property/${d.slug} (${LISTING_TYPE_LABEL[d.listingType]})`);
   }
 
-  if (updates.length) {
-    console.log(`\n=== UPDATE an already-linked page (${updates.length}) ===`);
-    for (const i of updates) {
-      console.log(`• ${label(i.listing)} → /property/${i.property.slug}`);
-      for (const c of i.changes) console.log(`    ${describeChange(c)}`);
-    }
+  console.log(`\n=== UPDATE an already-linked page (${updates.length}) ===`);
+  for (const i of updates) {
+    if (!i.changes.length) continue;
+    console.log(`• ${label(i.listing)} → /property/${i.property.slug}`);
+    for (const c of i.changes) console.log(`    ${describeChange(c)}`);
   }
+  const unchanged = updates.filter((i) => !i.changes.length).length;
+  if (unchanged) console.log(`  (${unchanged} already up to date)`);
 
   console.log(`\n=== CREATE a new page (${creates.length}) ===`);
   for (const i of creates) {
@@ -81,26 +94,94 @@ async function main() {
   for (const i of superseded) console.log(`• ${label(i.listing)} (newer: REA ${i.newerListingId})`);
 
   const statusFixes = links.filter((i) => i.changes.some((c) => c.field === "listingType"));
-  const withDuplicates = links.filter((i) => i.duplicates.length);
   console.log(`\n=== SUMMARY ===`);
   console.log(`REA listings:        ${listings.length}`);
   console.log(`  link existing:     ${links.length}  (status differs on ${statusFixes.length})`);
-  console.log(`  already linked:    ${by("update").length}`);
+  console.log(`  already linked:    ${updates.length}  (${updates.length - unchanged} with changes)`);
   console.log(`  create new:        ${creates.length}`);
   console.log(`  superseded:        ${superseded.length}`);
-  console.log(`Addresses with duplicate pages: ${withDuplicates.length}`);
+  console.log(`Addresses with duplicate pages: ${links.filter((i) => i.duplicates.length).length}`);
   console.log(`Unknown REA agents:  ${plan.unknownAgents.join(", ") || "none"}`);
   console.log(`\nNothing was written to the database.`);
 
-  const out = path.resolve("rea-probe-output");
-  fs.mkdirSync(out, { recursive: true });
-  fs.writeFileSync(path.join(out, "dry-run-report.json"), JSON.stringify(plan, null, 2));
-  console.log(`Full plan: ${path.relative(".", path.join(out, "dry-run-report.json"))}`);
+  fs.mkdirSync(OUT_DIR, { recursive: true });
+  fs.writeFileSync(path.join(OUT_DIR, "dry-run-report.json"), JSON.stringify(plan, null, 2));
+  console.log(`Full plan: ${rel(path.join(OUT_DIR, "dry-run-report.json"))}`);
+}
 
+async function link(apply: boolean) {
+  const { listings, plan } = await load();
+  const facts = new Map(listings.map((l) => [l.listingId, factsFor(l)]));
+  const redirects = new Map(
+    (await Redirect.find({ fromPath: /^\/property\// }).lean()).map((r) => [r.fromPath, r.toPath])
+  );
+  const { links, deletes } = linkSteps(plan, facts, redirects);
+
+  console.log(`=== ${apply ? "APPLYING" : "PREVIEW"}: link ${links.length} pages to REA ===`);
+  for (const s of links) {
+    console.log(`\n• /property/${s.property.slug}  ←  ${label(s.listing)}`);
+    for (const c of s.changes) console.log(`    ${describeChange(c)}`);
+    if (!s.changes.length) console.log(`    (facts already match REA)`);
+    console.log(
+      s.refreshContent
+        ? `    description + photos: REPLACED with REA's current ad (${s.listing.images.length + s.listing.floorplans.length} photos copied to S3)`
+        : `    description + photos: kept, protected from future syncs`
+    );
+    if (s.unfeature) console.log(`    featured: switched off (now ${LISTING_TYPE_LABEL[s.facts.listingType]})`);
+  }
+
+  console.log(`\n=== ${apply ? "APPLYING" : "PREVIEW"}: delete ${deletes.length} duplicate pages ===`);
+  for (const d of deletes) {
+    console.log(
+      `• /property/${d.property.slug} → 301 to /property/${d.keepSlug}: ` +
+        (d.redirectOk ? "redirect in place, will delete" : "NO MATCHING REDIRECT — will be skipped")
+    );
+  }
+
+  if (!apply) {
+    console.log(`\nNothing was written. To apply: npx tsx scripts/rea-sync.ts --link --apply`);
+    return;
+  }
+
+  const backup = path.join(BACKUP_DIR, `properties-${stamp()}.json`);
+  console.log(`\nBackup: ${await backupProperties(backup)} properties → ${rel(backup)}`);
+  // Builds the unique reaListingId index before any IDs are written; it
+  // would otherwise be built implicitly the next time the app starts.
+  await Property.collection.createIndex(
+    { reaListingId: 1 },
+    { unique: true, partialFilterExpression: { reaListingId: { $type: "string" } } }
+  );
+  const journal = new Journal(path.join(BACKUP_DIR, `journal-link-${stamp()}.json`), "step B: link existing pages");
+  console.log(`Undo journal: ${rel(journal.file)}\n`);
+  try {
+    await applyLinkSteps(links, deletes, journal, (line) => console.log(`  ${line}`));
+  } finally {
+    console.log(`\n${journal.size} change(s) recorded. To reverse: npx tsx scripts/rea-sync.ts --undo ${rel(journal.file)}`);
+  }
+}
+
+async function undo(file: string) {
+  await dbConnect();
+  const { restored, removed } = await undoJournal(file);
+  console.log(`Undo complete: ${restored} record(s) restored, ${removed} created record(s) removed.`);
+}
+
+async function main() {
+  // Only --link --apply may change indexes, and it does so explicitly.
+  mongoose.set("autoIndex", false);
+
+  if (args.includes("--dry-run")) await dryRun();
+  else if (args.includes("--link")) await link(args.includes("--apply"));
+  else if (args[0] === "--undo" && args[1]) await undo(args[1]);
+  else {
+    console.error("Usage: npx tsx scripts/rea-sync.ts --dry-run | --link [--apply] | --undo <journal-file>");
+    process.exit(1);
+  }
   await mongoose.disconnect();
 }
 
-main().catch((err) => {
+main().catch(async (err) => {
   console.error(err instanceof Error ? err.message : err);
+  await mongoose.disconnect();
   process.exit(1);
 });
