@@ -5,14 +5,7 @@ import { redirect } from "next/navigation";
 import dbConnect from "@/lib/db";
 import Property from "@/models/Property";
 import { requireAdmin, requireOwner } from "@/lib/authz";
-
-function slugify(input: string) {
-  return input
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
+import { slugify } from "@/lib/slug";
 
 function numberOrUndefined(value: FormDataEntryValue | null) {
   const str = String(value ?? "").trim();

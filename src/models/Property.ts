@@ -71,6 +71,31 @@ export interface IProperty extends Document {
   // not a real value), which is why this is validated as a genuine embed
   // URL at backfill time rather than carried over verbatim.
   videoEmbedUrl?: string;
+  // From realestate.com.au's listing export (see src/lib/rea/). Rendered
+  // later; stored now so the sync has a home for REA facts the old site
+  // never had.
+  inspectionTimes?: string[]; // REA's own text, e.g. "22-Aug-2026 10:30AM to 11:00AM"
+  dateAvailable?: Date; // rentals
+  soldPrice?: number; // only when REA says the sold price may be shown
+  soldDate?: Date;
+  // --- REA sync ---
+  // "rea" = created by the sync; "manual" = entered in admin or migrated
+  // from the old site (it may still be linked to REA via reaListingId).
+  source: "manual" | "rea";
+  // REA's listing ID — the link between this record and REA. Set once,
+  // never changed; every future sync finds the record by it, which is what
+  // keeps re-syncs from creating duplicates.
+  reaListingId?: string;
+  reaStatus?: "current" | "offmarket" | "sold" | "leased";
+  reaModTime?: Date; // REA's last-modified time for the listing
+  reaSyncedAt?: Date;
+  // Fields a person edited by hand that the sync must leave alone
+  // ("description", "images"). Facts (status, price, beds...) always
+  // follow REA, so they're never in here.
+  reaLockedFields: string[];
+  // The edit form's "Replace my edits on the next sync" toggle: the next
+  // sync overwrites the locked fields from REA, then clears both.
+  reaResyncRequested: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -110,8 +135,26 @@ const PropertySchema = new Schema<IProperty>(
     amenities: { type: [String], default: [] },
     mapEmbedUrl: String,
     videoEmbedUrl: String,
+    inspectionTimes: { type: [String], default: undefined },
+    dateAvailable: Date,
+    soldPrice: Number,
+    soldDate: Date,
+    source: { type: String, enum: ["manual", "rea"], default: "manual" },
+    reaListingId: String,
+    reaStatus: { type: String, enum: ["current", "offmarket", "sold", "leased"] },
+    reaModTime: Date,
+    reaSyncedAt: Date,
+    reaLockedFields: { type: [String], default: [] },
+    reaResyncRequested: { type: Boolean, default: false },
   },
   { timestamps: true }
+);
+
+// Unique only among linked records — the ~100 records with no REA listing
+// (building profiles, old manual entries) don't collide on "missing".
+PropertySchema.index(
+  { reaListingId: 1 },
+  { unique: true, partialFilterExpression: { reaListingId: { $type: "string" } } }
 );
 
 export const Property: Model<IProperty> =

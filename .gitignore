@@ -43,3 +43,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# REA sync dry-run reports and raw API output (may contain vendor data)
+/rea-probe-output/
