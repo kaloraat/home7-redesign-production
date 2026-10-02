@@ -13,6 +13,11 @@
  *                      duplicates that already 301 to the kept page. Every
  *                      change goes in an undo journal first.
  *
+ *   --unlock-content [--apply]
+ *                      Clear "Keep my description and photos" on every
+ *                      REA-linked page, so content follows REA by default
+ *                      (2026-10-02 decision). Preview unless --apply; journaled.
+ *
  *   --undo <journal>   Reverse a run, using the journal file it printed.
  *
  * Backups and journals: rea-probe-output/backups/ (gitignored).
@@ -160,6 +165,26 @@ async function link(apply: boolean) {
   }
 }
 
+async function unlockContent(apply: boolean) {
+  await dbConnect();
+  const locked = await mongoose.connection
+    .collection("properties")
+    .find({ reaListingId: { $type: "string" }, "reaLockedFields.0": { $exists: true } })
+    .toArray();
+  console.log(`${locked.length} REA-linked page(s) have "Keep my description and photos" on:`);
+  for (const d of locked) console.log(`  /property/${d.slug}  (${(d.reaLockedFields as string[]).join(", ")})`);
+  if (!apply) {
+    console.log(`\nNothing was written. To apply: npx tsx scripts/rea-sync.ts --unlock-content --apply`);
+    return;
+  }
+  const journal = new Journal(path.join(BACKUP_DIR, `journal-unlock-${stamp()}.json`), "clear content locks");
+  for (const d of locked) {
+    journal.record("update", d._id, d as never);
+    await mongoose.connection.collection("properties").updateOne({ _id: d._id }, { $set: { reaLockedFields: [] } });
+  }
+  console.log(`\nCleared on ${journal.size} page(s). To reverse: npx tsx scripts/rea-sync.ts --undo ${rel(journal.file)}`);
+}
+
 async function undo(file: string) {
   await dbConnect();
   const { restored, removed } = await undoJournal(file);
@@ -172,9 +197,10 @@ async function main() {
 
   if (args.includes("--dry-run")) await dryRun();
   else if (args.includes("--link")) await link(args.includes("--apply"));
+  else if (args.includes("--unlock-content")) await unlockContent(args.includes("--apply"));
   else if (args[0] === "--undo" && args[1]) await undo(args[1]);
   else {
-    console.error("Usage: npx tsx scripts/rea-sync.ts --dry-run | --link [--apply] | --undo <journal-file>");
+    console.error("Usage: npx tsx scripts/rea-sync.ts --dry-run | --link [--apply] | --unlock-content [--apply] | --undo <journal-file>");
     process.exit(1);
   }
   await mongoose.disconnect();
