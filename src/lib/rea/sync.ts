@@ -51,7 +51,7 @@ export async function getSyncSettings(): Promise<IReaSync> {
   return ReaSync.findOneAndUpdate(
     { key: "rea" },
     { $setOnInsert: { key: "rea" } },
-    { upsert: true, new: true }
+    { upsert: true, returnDocument: "after" }
   ) as Promise<IReaSync>;
 }
 
@@ -73,7 +73,7 @@ export async function runSync(opts: { trigger: SyncTrigger; full?: boolean }): P
   const locked = await ReaSync.findOneAndUpdate(
     { key: "rea", $or: [{ lockedUntil: null }, { lockedUntil: { $lt: now } }] },
     { $set: { lockedUntil: new Date(now.getTime() + LOCK_MINUTES * 60_000), lastRunAt: now } },
-    { new: true }
+    { returnDocument: "after" }
   );
   if (!locked) return { skipped: "another sync is already running" };
 
