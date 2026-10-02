@@ -15,11 +15,21 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
  * via history.replaceState (router.replace) so refreshing the list page
  * afterward doesn't keep re-showing it.
  */
-export function CreatedToast({ message }: { message: string }) {
+export function CreatedToast({
+  message,
+  param = "created",
+  value = "1",
+}: {
+  message: string;
+  // Which query param/value shows this toast — `?created=1` by default;
+  // the property list also uses `?saved=rea-kept|rea-follow` after an edit.
+  param?: string;
+  value?: string;
+}) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-  const created = searchParams.get("created") === "1";
+  const created = searchParams.get(param) === value;
   const [visible, setVisible] = useState(created);
 
   useEffect(() => {
@@ -30,7 +40,7 @@ export function CreatedToast({ message }: { message: string }) {
     // keep re-triggering the toast — scroll:false since this is purely a
     // URL cleanup, not a real navigation the page should jump for.
     const params = new URLSearchParams(searchParams.toString());
-    params.delete("created");
+    params.delete(param);
     const next = params.toString() ? `${pathname}?${params.toString()}` : pathname;
     router.replace(next, { scroll: false });
 

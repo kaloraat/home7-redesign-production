@@ -11,6 +11,7 @@ import {
   LinkIcon,
   ClipboardCheckIcon,
   UserCogIcon,
+  SyncIcon,
 } from "@/components/admin/icons";
 
 // Flat nav — every item one click away, no nested dropdowns to expand/
@@ -21,6 +22,7 @@ import {
 const NAV_ITEMS = [
   { href: "/admin", label: "Dashboard", description: "Overview & stats", icon: DashboardIcon, exact: true },
   { href: "/admin/properties", label: "Properties", description: "Buy, rent & sold listings", icon: BuildingIcon },
+  { href: "/admin/rea-sync", label: "REA Sync", description: "realestate.com.au listings", icon: SyncIcon },
   { href: "/admin/agents", label: "Agents", description: "Team profiles", icon: UsersIcon },
   { href: "/admin/blog", label: "Blog", description: "Posts & articles", icon: DocumentIcon },
   { href: "/admin/leads", label: "Leads", description: "Enquiries from every form", icon: InboxIcon },

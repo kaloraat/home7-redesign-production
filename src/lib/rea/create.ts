@@ -19,7 +19,11 @@ export type CreateItem = Extract<PlanItem, { action: "create" }>;
 
 const raw = () => mongoose.connection.collection("properties");
 
-export async function applyCreates(items: CreateItem[], journal: Journal, log: (line: string) => void) {
+export async function applyCreates(
+  items: CreateItem[],
+  journal: Journal | null,
+  log: (line: string) => void
+) {
   const now = new Date();
   for (const item of items) {
     const { listing, facts, content } = item;
@@ -47,7 +51,7 @@ export async function applyCreates(items: CreateItem[], journal: Journal, log: (
     // Inserted directly so createdAt can be REA's date — Mongoose's own
     // timestamps would stamp it with today.
     const record = { ...doc.toObject(), createdAt: listing.modTime, updatedAt: now };
-    journal.record("insert", record._id, null);
+    journal?.record("insert", record._id, null);
     await raw().insertOne(record);
     log(`created /property/${item.slug} (${content.images.length} photos)`);
   }

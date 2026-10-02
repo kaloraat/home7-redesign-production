@@ -10,6 +10,23 @@ import { uploadFileDirectly } from "@/lib/s3";
  * safe. REA's own URLs change whenever a photo is replaced, which gives a
  * new key, exactly as wanted.
  */
+/** S3 key for an REA photo, minus the extension: "properties/<slug>/rea-<hash>." */
+function keyPrefix(slug: string, url: string): string {
+  return `properties/${slug}/rea-${createHash("sha1").update(url).digest("hex").slice(0, 16)}.`;
+}
+
+/**
+ * Whether a page's photos are already exactly REA's photos, in REA's order
+ * — checked from the S3 keys alone, so an unchanged gallery is never
+ * downloaded again.
+ */
+export function imagesMatchRea(stored: string[], slug: string, reaUrls: string[]): boolean {
+  return (
+    stored.length === reaUrls.length &&
+    reaUrls.every((url, i) => stored[i]?.includes(`/${keyPrefix(slug, url)}`))
+  );
+}
+
 export async function copyReaImages(slug: string, urls: string[]): Promise<Map<string, string>> {
   const copied = new Map<string, string>();
   for (const url of urls) {
@@ -20,8 +37,7 @@ export async function copyReaImages(slug: string, urls: string[]): Promise<Map<s
     // REA serves photos as application/octet-stream, which browsers may
     // download instead of display — so the type comes from the file itself.
     const { ext, contentType } = imageType(body, url);
-    const hash = createHash("sha1").update(url).digest("hex").slice(0, 16);
-    const key = `properties/${slug}/rea-${hash}.${ext}`;
+    const key = `${keyPrefix(slug, url)}${ext}`;
     copied.set(url, await uploadFileDirectly(key, body, contentType));
   }
   return copied;

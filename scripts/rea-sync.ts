@@ -22,6 +22,9 @@
  *                      REA-linked page, so content follows REA by default
  *                      (2026-10-02 decision). Preview unless --apply; journaled.
  *
+ *   --sync [--full]    One real sync run, exactly as cron/admin would do it
+ *                      (logged on the admin REA Sync page). Not journaled.
+ *
  *   --undo <journal>   Reverse a run, using the journal file it printed.
  *
  * Backups and journals: rea-probe-output/backups/ (gitignored).
@@ -46,6 +49,7 @@ import { buildPlan, describeChange, type PlanAgent, type PlanProperty } from "..
 import { applyLinkSteps, linkSteps } from "../src/lib/rea/link";
 import { backupProperties, Journal, undoJournal } from "../src/lib/rea/journal";
 import { applyCreates, type CreateItem } from "../src/lib/rea/create";
+import { runSync } from "../src/lib/rea/sync";
 
 const OUT_DIR = path.resolve("rea-probe-output");
 const BACKUP_DIR = path.join(OUT_DIR, "backups");
@@ -244,9 +248,14 @@ async function main() {
   else if (args.includes("--link")) await link(args.includes("--apply"));
   else if (args.includes("--create")) await create(args.includes("--apply"));
   else if (args.includes("--unlock-content")) await unlockContent(args.includes("--apply"));
-  else if (args[0] === "--undo" && args[1]) await undo(args[1]);
+  else if (args.includes("--sync")) {
+    await dbConnect();
+    const r = await runSync({ trigger: "script", full: args.includes("--full") });
+    console.log(r.skipped ? `Skipped: ${r.skipped}` : r.ok ? `OK — ${r.changes?.length ?? 0} change(s)` : `FAILED: ${r.error}`);
+    for (const c of r.changes ?? []) console.log(`  ${c.action.padEnd(8)} ${c.slug ?? c.reaListingId}  ${c.summary}`);
+  } else if (args[0] === "--undo" && args[1]) await undo(args[1]);
   else {
-    console.error("Usage: npx tsx scripts/rea-sync.ts --dry-run | --link [--apply] | --create [--apply] | --unlock-content [--apply] | --undo <journal-file>");
+    console.error("Usage: npx tsx scripts/rea-sync.ts --dry-run | --link [--apply] | --create [--apply] | --unlock-content [--apply] | --sync [--full] | --undo <journal-file>");
     process.exit(1);
   }
   await mongoose.disconnect();

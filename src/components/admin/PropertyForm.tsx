@@ -11,6 +11,7 @@ import DraftSavingIndicator from "./DraftSavingIndicator";
 import ImageUploader from "./ImageUploader";
 import LandSizeInput from "./LandSizeInput";
 import PropertyAddressFields from "./PropertyAddressFields";
+import ReaSyncBox from "./ReaSyncBox";
 import RichTextEditor from "./RichTextEditor";
 
 type Props = {
@@ -117,6 +118,12 @@ export function PropertyForm({ action, agents, defaultValues, submitLabel }: Pro
     <>
     <DraftSavingIndicator show={isCreate && showSavedIndicator} />
     <form ref={formRef} key={formKey} action={action} onSubmit={clearDraftOnSubmit} className="mt-6 space-y-6 max-w-2xl">
+      {!isCreate && d.reaListingId && (
+        <ReaSyncBox
+          reaListingId={d.reaListingId}
+          defaultKeep={(d.reaLockedFields ?? []).includes("description")}
+        />
+      )}
       <fieldset className="space-y-4">
         <legend className="font-semibold text-slate-900 mb-1">Address</legend>
         <PropertyAddressFields defaultAddress={d.address} defaultSuburb={d.suburb} defaultPostcode={d.postcode} />

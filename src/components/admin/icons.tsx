@@ -69,6 +69,14 @@ export function UserCogIcon({ className = "shrink-0", size = 18 }: IconProps) {
   );
 }
 
+export function SyncIcon({ className = "shrink-0", size = 18 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}>
+      <path d="M12 4a8 8 0 0 0-7.4 4.95.75.75 0 1 0 1.39.57A6.5 6.5 0 0 1 17.6 8H15a.75.75 0 0 0 0 1.5h4.25a.75.75 0 0 0 .75-.75V4.5a.75.75 0 0 0-1.5 0v2.16A7.98 7.98 0 0 0 12 4Zm7.4 10.48a.75.75 0 0 0-.98.41A6.5 6.5 0 0 1 6.4 16H9a.75.75 0 0 0 0-1.5H4.75a.75.75 0 0 0-.75.75v4.25a.75.75 0 0 0 1.5 0v-2.16A8 8 0 0 0 19.82 15.46a.75.75 0 0 0-.42-.98Z" />
+    </svg>
+  );
+}
+
 export function SignOutIcon({ className = "shrink-0", size = 16 }: IconProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}>

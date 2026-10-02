@@ -51,6 +51,16 @@ export default async function AdminPropertiesPage({
     <div>
       <Suspense fallback={null}>
         <CreatedToast message="Listing created." />
+        <CreatedToast
+          param="saved"
+          value="rea-kept"
+          message="Saved. Your description and photos are protected from realestate.com.au updates."
+        />
+        <CreatedToast
+          param="saved"
+          value="rea-follow"
+          message="Saved. Description and photos will follow realestate.com.au when they change there."
+        />
       </Suspense>
       <AdminPageHeader
         title="Properties"
@@ -116,6 +126,22 @@ export default async function AdminPropertiesPage({
                     <span className="inline-block rounded-full bg-slate-100 text-slate-600 px-2 py-0.5 text-xs font-medium capitalize">
                       {p.listingType}
                     </span>
+                    {/* Which listings the REA sync manages, and which have
+                        their own description/photos protected from it. */}
+                    {p.reaListingId && (
+                      <span
+                        className={`ml-1.5 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
+                          p.reaLockedFields?.length ? "bg-amber-50 text-amber-700" : "bg-sky-50 text-sky-700"
+                        }`}
+                        title={
+                          p.reaLockedFields?.length
+                            ? "Synced from realestate.com.au — your description and photos are kept"
+                            : "Synced from realestate.com.au"
+                        }
+                      >
+                        {p.reaLockedFields?.length ? "REA · kept" : "REA"}
+                      </span>
+                    )}
                   </td>
                   <td className="py-3 px-4 text-slate-600">
                     {p.priceDisplay || (p.rentPerWeek ? `$${p.rentPerWeek} P/W` : "—")}

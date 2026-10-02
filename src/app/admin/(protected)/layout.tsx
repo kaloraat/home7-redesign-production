@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth, signOut } from "@/auth";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import ReaSyncWarning from "@/components/admin/ReaSyncWarning";
 
 // This layout only wraps the (protected) route group — /admin/login sits
 // outside it — so redirecting here never creates a login-page redirect loop.
@@ -36,7 +37,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       {/* overflow-x-auto: a data table (Properties/Leads/etc.) wider than a
           narrow viewport now scrolls sideways to reveal it, instead of the
           excess just being clipped off with no way to reach it. */}
-      <main className="flex-1 min-w-0 overflow-y-auto overflow-x-auto p-6 sm:p-8">{children}</main>
+      <main className="flex-1 min-w-0 overflow-y-auto overflow-x-auto p-6 sm:p-8">
+        <ReaSyncWarning />
+        {children}
+      </main>
     </div>
   );
 }

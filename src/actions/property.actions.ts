@@ -159,15 +159,26 @@ export async function updateProperty(id: string, formData: FormData) {
     fields.featuredUntil = null;
   }
 
+  // REA-linked listings: the edit form's "Keep my description and photos"
+  // toggle (ReaSyncBox) decides whether the sync may replace them.
+  const reaKeep =
+    existing.reaListingId && formData.get("reaSyncBox") === "1"
+      ? formData.get("reaKeepContent") === "on"
+      : undefined;
+  const reaFields = reaKeep === undefined ? {} : { reaLockedFields: reaKeep ? ["description", "images"] : [] };
+
   // Slug intentionally isn't regenerated on edit — the whole point of this
   // rebuild is that once a URL is live, it stays live. Editing the address
   // shouldn't silently change the URL and break whatever's linking to it.
-  await Property.findByIdAndUpdate(id, fields);
+  await Property.findByIdAndUpdate(id, { ...fields, ...reaFields });
 
   revalidatePath("/admin/properties");
   revalidatePath(listingTypePath(fields.listingType));
   revalidatePath(`/property/${existing.slug}`);
-  redirect("/admin/properties");
+  // Repeats on the list page what the toggle said, so it's confirmed after Save.
+  redirect(
+    reaKeep === undefined ? "/admin/properties" : `/admin/properties?saved=${reaKeep ? "rea-kept" : "rea-follow"}`
+  );
 }
 
 export async function deleteProperty(id: string) {
