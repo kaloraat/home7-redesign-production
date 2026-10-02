@@ -24,6 +24,12 @@ const STATIC_PATHS = [
   "/property-tenant-application-download",
 ];
 
+// Rebuilt at most hourly. Without this the sitemap is generated once at
+// build time and keeps listing deleted pages (and missing new ones) until
+// the next deploy — which matters now that the REA sync adds, changes and
+// removes listings between deploys.
+export const revalidate = 3600;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // The `images` field is what produces the <image:image><image:loc>...
   // entries Google's Image Sitemaps extension reads — the old Laravel
