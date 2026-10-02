@@ -73,13 +73,29 @@ export default async function Page() {
           // for the full writeup: that component hides trailing items so a
           // wide-screen row never ends up partial, right for a homepage
           // preview but not for this page, which IS the full list.
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {properties.map((p) => (
-              // Every card keeps its ribbon: active ones say "For Rent" (with
-              // the New badge when recent), fill cards say Sold/Leased.
-              <PropertyCard key={String(p._id)} property={p} />
-            ))}
-          </div>
+          <>
+            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {properties.map((p) => (
+                // Every card keeps its ribbon: active ones say "For Rent" (with
+                // the New badge when recent), fill cards say Sold/Leased.
+                <PropertyCard key={String(p._id)} property={p} />
+              ))}
+            </div>
+            {/* The fill cards are only the latest few; this leads on to the
+                full archive without needing the nav dropdown. Same style as
+                the homepage's "View All" buttons (ListingsSection). */}
+            <div className="mt-10 text-center">
+              <Link
+                href="/leased-properties"
+                className="inline-flex items-center gap-2 rounded-full border-2 border-brand-navy px-8 py-3 text-lg font-semibold text-brand-navy transition-colors hover:bg-brand-navy hover:text-white"
+              >
+                View More Leased Properties
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </Link>
+            </div>
+          </>
         )}
 
         {/* SEO copy from the live site (property_rent_page_content) — its
