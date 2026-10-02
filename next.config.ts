@@ -3,13 +3,11 @@ import type { NextConfig } from "next";
 const cloudfrontDomain = process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN;
 
 const nextConfig: NextConfig = {
-  // Lets deploy.sh build into a throwaway directory (NEXT_DIST_DIR=.next-new)
-  // instead of overwriting the live `.next` in place while the old process
-  // is still serving from it — see deploy.sh's own comment for the full
-  // reasoning. `next start` always runs with this unset, so it always reads
-  // the default `.next` — only the build step ever sets it.
+  // Lets a build go to a throwaway directory (NEXT_DIST_DIR=.next-check)
+  // without touching `.next` — used for test builds. `next start` always
+  // runs with this unset, so it always reads the default `.next`.
   distDir: process.env.NEXT_DIST_DIR || ".next",
-  // deploy.sh sets SKIP_BUILD_TYPECHECK=1 on the droplet: a full type check
+  // Deploys on the droplet run `SKIP_BUILD_TYPECHECK=1 npm run build`: a full type check
   // ran Node out of heap there ("JavaScript heap out of memory" during
   // "Running TypeScript", 2026-10-02, 2GB box). Types are still checked on
   // every change before it's committed (`npx tsc --noEmit`), so the server

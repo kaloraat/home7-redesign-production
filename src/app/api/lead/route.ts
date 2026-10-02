@@ -12,8 +12,8 @@ import { sendNotificationEmail } from "@/lib/notifyLead";
  * requires an email address, which these 3-field forms don't collect.)
  */
 
-// In-memory limiter: fine for a single Node process (this deploys via
-// deploy.sh on one droplet). Swap for Redis if that ever changes.
+// In-memory limiter: fine for a single Node process (one pm2 process on
+// one droplet). Swap for Redis if that ever changes.
 const WINDOW_MS = 10 * 60 * 1000;
 const MAX_PER_WINDOW = 5;
 const hits = new Map<string, number[]>();

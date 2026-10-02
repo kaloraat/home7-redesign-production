@@ -2,7 +2,7 @@
 
 # dependencies
 /node_modules
-# deploy.sh dependency staging/rollback
+# leftovers from the old deploy.sh (removed 2026-10-02) — safe to delete
 /node_modules-old
 /.deps-new
 /.deps-hash
