@@ -93,7 +93,7 @@ export default async function Page() {
                 href="/sold-properties"
                 className="inline-flex items-center gap-2 rounded-full border-2 border-brand-navy px-8 py-3 text-lg font-semibold text-brand-navy transition-colors hover:bg-brand-navy hover:text-white"
               >
-                View More Sold Properties
+                View Sold Properties
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
