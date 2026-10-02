@@ -89,13 +89,12 @@ export interface IProperty extends Document {
   reaStatus?: "current" | "offmarket" | "sold" | "leased";
   reaModTime?: Date; // REA's last-modified time for the listing
   reaSyncedAt?: Date;
-  // Fields a person edited by hand that the sync must leave alone
-  // ("description", "images"). Facts (status, price, beds...) always
+  // Content the sync must leave alone ("description", "images") — set by
+  // the edit form's "Keep my description and photos" toggle. Empty (the
+  // default) means description and photos follow REA too, updating
+  // whenever REA's copy changes. Facts (status, price, beds...) always
   // follow REA, so they're never in here.
   reaLockedFields: string[];
-  // The edit form's "Replace my edits on the next sync" toggle: the next
-  // sync overwrites the locked fields from REA, then clears both.
-  reaResyncRequested: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -145,7 +144,6 @@ const PropertySchema = new Schema<IProperty>(
     reaModTime: Date,
     reaSyncedAt: Date,
     reaLockedFields: { type: [String], default: [] },
-    reaResyncRequested: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

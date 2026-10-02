@@ -83,7 +83,6 @@ export async function applyLinkSteps(
       reaListingId: step.listing.listingId,
       reaSyncedAt: now,
       reaLockedFields: step.refreshContent ? [] : ["description", "images"],
-      reaResyncRequested: false,
     };
     const unset: Record<string, ""> = {};
     if (step.unfeature) Object.assign(set, { featured: false, featuredUntil: null });

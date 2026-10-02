@@ -8,8 +8,9 @@ import type { ReaListing } from "./parse";
  *  - facts: always follow REA (status, price, beds, inspections...). The
  *    sync overwrites these on every change; a hand edit to them lasts only
  *    until REA's next update.
- *  - content: description and photos. Copied from REA when a listing is
- *    first created, then protected once someone edits them by hand (see
+ *  - content: description and photos. Also follow REA by default —
+ *    updated whenever REA's copy of the listing changes — unless the
+ *    page's "Keep my description and photos" toggle is on (see
  *    Property.reaLockedFields).
  *
  * A fact REA leaves empty is left out rather than set to undefined, so the
