@@ -9,6 +9,14 @@ const nextConfig: NextConfig = {
   // reasoning. `next start` always runs with this unset, so it always reads
   // the default `.next` — only the build step ever sets it.
   distDir: process.env.NEXT_DIST_DIR || ".next",
+  // deploy.sh sets SKIP_BUILD_TYPECHECK=1 on the droplet: a full type check
+  // ran Node out of heap there ("JavaScript heap out of memory" during
+  // "Running TypeScript", 2026-10-02, 2GB box). Types are still checked on
+  // every change before it's committed (`npx tsc --noEmit`), so the server
+  // build doesn't need to repeat it. Local builds keep checking.
+  typescript: {
+    ignoreBuildErrors: process.env.SKIP_BUILD_TYPECHECK === "1",
+  },
   images: {
     remotePatterns: [
       // Property/agent/blog photos, served through CloudFront in front of

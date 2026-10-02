@@ -91,8 +91,13 @@ rm -rf .next-new
 # takes ~80s when run directly). With no terminal for stdin or stdout, it
 # never touches it; tee still shows the output live and keeps a copy.
 # pipefail makes the `if` see the build's exit status, not tee's.
+#
+# SKIP_BUILD_TYPECHECK=1: the type-check pass alone exceeded Node's ~1GB
+# default heap here (see next.config.ts) — types are checked before commit
+# instead. NODE_OPTIONS raises the heap to 1.5GB for the rest of the build;
+# the 2GB swapfile covers the running site meanwhile.
 set -o pipefail
-if ! timeout --kill-after=15 300 env NEXT_DIST_DIR=.next-new npm run build < /dev/null 2>&1 | tee .deploy-build.log; then
+if ! timeout --kill-after=15 300 env NEXT_DIST_DIR=.next-new SKIP_BUILD_TYPECHECK=1 NODE_OPTIONS=--max-old-space-size=1536 npm run build < /dev/null 2>&1 | tee .deploy-build.log; then
   echo "==> Build TIMED OUT or FAILED — cleaning up and aborting"
   pkill -9 -f "turbopack-node" 2>/dev/null || true
   rm -rf .next-new
