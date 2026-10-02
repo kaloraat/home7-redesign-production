@@ -41,20 +41,13 @@ function priceLine(property: IProperty) {
 }
 
 /**
- * `showRibbon` defaults on — the corner status ribbon is what tells a sold
+ * Every card carries its corner status ribbon (For Sale / For Rent / Sold /
+ * Leased), on every page — consistent site-wide, and it's what tells a sold
  * card apart from an active one wherever types sit together (homepage,
- * search, suburb/agent pages, and /properties-for-sale and -rent, which
- * top up with sold/leased cards). Pages that only ever list one type
- * (/sold-properties, /leased-properties) turn it off, since there the page
- * heading already says it on every card.
+ * /properties-for-sale and -rent, which top up with sold/leased cards).
+ * Off-market ("other") listings have no ribbon.
  */
-export function PropertyCard({
-  property,
-  showRibbon = true,
-}: {
-  property: IProperty;
-  showRibbon?: boolean;
-}) {
+export function PropertyCard({ property }: { property: IProperty }) {
   const facts = [
     property.bedrooms ? `${property.bedrooms} bed` : null,
     property.bathrooms ? `${property.bathrooms} bath` : null,
@@ -66,7 +59,7 @@ export function PropertyCard({
     property.landSize || property.floorSize || null,
   ].filter(Boolean);
 
-  const ribbon = showRibbon ? RIBBONS[property.listingType] : undefined;
+  const ribbon = RIBBONS[property.listingType];
   const isNew = isNewListing(property);
 
   // No overflow-hidden on the card itself — the ribbon's folded ends sit

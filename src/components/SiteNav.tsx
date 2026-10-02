@@ -42,6 +42,7 @@ const NAV: NavItem[] = [
     href: "/properties-for-rent",
     children: [
       { label: "Properties For Rent", href: "/properties-for-rent" },
+      { label: "Leased Properties", href: "/leased-properties" },
       { label: "Tenant Application Form", href: "/property-tenant-application-download" },
       { label: "Free Market Appraisal", href: "/free-market-appraisal?key=renting" },
       { label: "Our Team", href: "/agents" },
