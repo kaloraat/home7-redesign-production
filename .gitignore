@@ -2,6 +2,10 @@
 
 # dependencies
 /node_modules
+# deploy.sh dependency staging/rollback
+/node_modules-old
+/.deps-new
+/.deps-hash
 /.pnp
 .pnp.*
 .yarn/*

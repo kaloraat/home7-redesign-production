@@ -9,16 +9,59 @@
 # the comment at the bottom of this file for exactly when that's required.
 set -e
 
+# `git pull` below can rewrite this very file, and bash reads a script
+# while running it — so run from a private copy, never the file git edits.
+if [ -z "$DEPLOY_SH_COPY" ]; then
+  copy=$(mktemp)
+  cp "$0" "$copy"
+  DEPLOY_SH_COPY=1 exec bash "$copy" "$@"
+fi
+trap 'rm -f "$0"' EXIT
+
 cd ~/home7-redesign
+
+# The droplet has ~2GB RAM, and `npm ci` / `next build` next to the running
+# site need more than is free: on 2026-10-02 the kernel killed `npm ci`
+# halfway and took the site down. Swap gives them room. Refuse to start
+# without it rather than risk that again.
+if [ "$(awk '/SwapTotal/ {print $2}' /proc/meminfo)" -eq 0 ]; then
+  echo "==> No swap on this server — refusing to deploy (installs/builds can run out of memory)."
+  echo "    Add 2GB of swap once, then re-run:"
+  echo "      sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile"
+  echo "      sudo mkswap /swapfile && sudo swapon /swapfile"
+  echo "      echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab"
+  exit 1
+fi
 
 echo "==> Pulling latest code"
 git pull origin main
 
-# npm ci (not npm install) reads package-lock.json as the source of truth —
-# this is what picks up any newly added dependency automatically, as long
-# as the updated lockfile was committed alongside the code that needs it.
-echo "==> Installing dependencies"
-npm ci
+# Dependencies are reinstalled only when package-lock.json changed since the
+# last successful install (most deploys don't touch it). When they are,
+# they're installed into a separate folder and swapped in by rename — never
+# `npm ci` in place: npm ci deletes node_modules first, and the RUNNING site
+# loads modules from it, which is exactly what crashed it on 2026-10-02.
+LOCK_HASH=$(sha256sum package-lock.json | cut -d' ' -f1)
+if [ -d node_modules ] && [ "$(cat .deps-hash 2>/dev/null)" = "$LOCK_HASH" ]; then
+  echo "==> Dependencies unchanged — skipping install"
+else
+  echo "==> Installing dependencies into .deps-new (live node_modules untouched)"
+  rm -rf .deps-new
+  mkdir .deps-new
+  cp package.json package-lock.json .deps-new/
+  if ! (cd .deps-new && npm ci --no-audit --no-fund); then
+    echo "==> Dependency install FAILED — live site untouched."
+    rm -rf .deps-new
+    exit 1
+  fi
+  rm -rf node_modules-old
+  if [ -d node_modules ]; then
+    mv node_modules node_modules-old
+  fi
+  mv .deps-new/node_modules node_modules
+  rm -rf .deps-new
+  echo "$LOCK_HASH" > .deps-hash
+fi
 
 # Build into a throwaway directory (next.config.ts's `distDir` reads this
 # env var), never into the live `.next` directly. `home7` (pm2, still
@@ -103,14 +146,20 @@ if [ "$healthy" -ne 1 ]; then
   if [ -d .next-old ]; then
     mv .next-old .next
   fi
+  # Put the previous dependencies back too, if this deploy replaced them.
+  if [ -d node_modules-old ]; then
+    rm -rf node_modules
+    mv node_modules-old node_modules
+    rm -f .deps-hash
+  fi
   pm2 restart home7
   echo "==> Rolled back. Site should be back on the previous version — check pm2 logs for what broke in the new one before retrying."
   exit 1
 fi
 
 # Only reachable once the new build is live AND confirmed actually serving
-# requests — safe to drop the rollback copy.
-rm -rf .next-old
+# requests — safe to drop the rollback copies.
+rm -rf .next-old node_modules-old
 
 echo "==> Done"
 
