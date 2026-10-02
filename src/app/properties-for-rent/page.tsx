@@ -75,9 +75,9 @@ export default async function Page() {
           // preview but not for this page, which IS the full list.
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {properties.map((p) => (
-              // Ribbon only on the fill cards — the page heading already
-              // says "For Rent" for the rest.
-              <PropertyCard key={String(p._id)} property={p} showRibbon={p.listingType !== "rent"} />
+              // Every card keeps its ribbon: active ones say "For Rent" (with
+              // the New badge when recent), fill cards say Sold/Leased.
+              <PropertyCard key={String(p._id)} property={p} />
             ))}
           </div>
         )}

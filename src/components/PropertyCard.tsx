@@ -43,9 +43,10 @@ function priceLine(property: IProperty) {
 /**
  * `showRibbon` defaults on — the corner status ribbon is what tells a sold
  * card apart from an active one wherever types sit together (homepage,
- * search, suburb/agent pages). Pages that only ever list one type
- * (/sold-properties, /properties-for-rent, ...) turn it off, since there
- * the page heading already says it on every card.
+ * search, suburb/agent pages, and /properties-for-sale and -rent, which
+ * top up with sold/leased cards). Pages that only ever list one type
+ * (/sold-properties, /leased-properties) turn it off, since there the page
+ * heading already says it on every card.
  */
 export function PropertyCard({
   property,
