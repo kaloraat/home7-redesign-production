@@ -82,7 +82,17 @@ rm -rf .next-new
 # turbopack spawns — the explicit pkill below is what actually sweeps up a
 # hung worker like the one from tonight, regardless of which process
 # `timeout` itself managed to kill.
-if ! timeout --kill-after=15 300 env NEXT_DIST_DIR=.next-new npm run build; then
+#
+# `< /dev/null` and `| tee`: timeout runs the build in a BACKGROUND process
+# group, and Linux pauses a background process the moment it touches the
+# terminal — which next build does as soon as it draws its next progress
+# spinner. Run in a terminal, the build froze right after "Compiled
+# successfully" until the timeout killed it (2026-10-02; the same build
+# takes ~80s when run directly). With no terminal for stdin or stdout, it
+# never touches it; tee still shows the output live and keeps a copy.
+# pipefail makes the `if` see the build's exit status, not tee's.
+set -o pipefail
+if ! timeout --kill-after=15 300 env NEXT_DIST_DIR=.next-new npm run build < /dev/null 2>&1 | tee .deploy-build.log; then
   echo "==> Build TIMED OUT or FAILED — cleaning up and aborting"
   pkill -9 -f "turbopack-node" 2>/dev/null || true
   rm -rf .next-new

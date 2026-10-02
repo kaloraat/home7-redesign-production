@@ -6,6 +6,7 @@
 /node_modules-old
 /.deps-new
 /.deps-hash
+/.deploy-build.log
 /.pnp
 .pnp.*
 .yarn/*
