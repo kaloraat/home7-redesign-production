@@ -13,6 +13,10 @@
  *                      duplicates that already 301 to the kept page. Every
  *                      change goes in an undo journal first.
  *
+ *   --create           Step C preview: the new pages --create --apply will add.
+ *   --create --apply   Step C: back up all properties, copy each new REA
+ *                      listing's photos to S3 and create its page. Journaled.
+ *
  *   --unlock-content [--apply]
  *                      Clear "Keep my description and photos" on every
  *                      REA-linked page, so content follows REA by default
@@ -41,6 +45,7 @@ import { factsFor, LISTING_TYPE_LABEL, streetAddress, suburbName } from "../src/
 import { buildPlan, describeChange, type PlanAgent, type PlanProperty } from "../src/lib/rea/plan";
 import { applyLinkSteps, linkSteps } from "../src/lib/rea/link";
 import { backupProperties, Journal, undoJournal } from "../src/lib/rea/journal";
+import { applyCreates, type CreateItem } from "../src/lib/rea/create";
 
 const OUT_DIR = path.resolve("rea-probe-output");
 const BACKUP_DIR = path.join(OUT_DIR, "backups");
@@ -165,6 +170,46 @@ async function link(apply: boolean) {
   }
 }
 
+async function create(apply: boolean) {
+  const { plan } = await load();
+  const items = plan.items.filter((i): i is CreateItem => i.action === "create");
+  const agentNames = new Map(
+    (await Agent.find({}, { name: 1 }).lean()).map((a) => [String(a._id), a.name])
+  );
+
+  console.log(`=== ${apply ? "APPLYING" : "PREVIEW"}: create ${items.length} new pages ===`);
+  for (const i of items) {
+    const f = i.facts;
+    const facts = [
+      f.bedrooms && `${f.bedrooms} bed`,
+      f.bathrooms && `${f.bathrooms} bath`,
+      f.carSpaces && `${f.carSpaces} car`,
+      f.landSize || f.floorSize,
+    ].filter(Boolean);
+    console.log(
+      `\n• /property/${i.slug}\n` +
+        `    ${LISTING_TYPE_LABEL[f.listingType]} · ${f.priceDisplay ?? "no price"} · ${facts.join(", ") || "no room counts"}\n` +
+        `    ${i.content.images.length} photos → S3 · agent: ${i.agentId ? agentNames.get(i.agentId) : "NONE"} · ` +
+        `date added: ${i.listing.modTime.toISOString().slice(0, 10)} · REA ${i.listing.listingId}`
+    );
+  }
+  if (plan.unknownAgents.length) console.log(`\nUnknown REA agents (pages get no agent): ${plan.unknownAgents.join(", ")}`);
+
+  if (!apply) {
+    console.log(`\nNothing was written. To apply: npx tsx scripts/rea-sync.ts --create --apply`);
+    return;
+  }
+  const backup = path.join(BACKUP_DIR, `properties-${stamp()}.json`);
+  console.log(`\nBackup: ${await backupProperties(backup)} properties → ${rel(backup)}`);
+  const journal = new Journal(path.join(BACKUP_DIR, `journal-create-${stamp()}.json`), "step C: create new pages");
+  console.log(`Undo journal: ${rel(journal.file)}\n`);
+  try {
+    await applyCreates(items, journal, (line) => console.log(`  ${line}`));
+  } finally {
+    console.log(`\n${journal.size} page(s) created. To reverse: npx tsx scripts/rea-sync.ts --undo ${rel(journal.file)}`);
+  }
+}
+
 async function unlockContent(apply: boolean) {
   await dbConnect();
   const locked = await mongoose.connection
@@ -197,10 +242,11 @@ async function main() {
 
   if (args.includes("--dry-run")) await dryRun();
   else if (args.includes("--link")) await link(args.includes("--apply"));
+  else if (args.includes("--create")) await create(args.includes("--apply"));
   else if (args.includes("--unlock-content")) await unlockContent(args.includes("--apply"));
   else if (args[0] === "--undo" && args[1]) await undo(args[1]);
   else {
-    console.error("Usage: npx tsx scripts/rea-sync.ts --dry-run | --link [--apply] | --unlock-content [--apply] | --undo <journal-file>");
+    console.error("Usage: npx tsx scripts/rea-sync.ts --dry-run | --link [--apply] | --create [--apply] | --unlock-content [--apply] | --undo <journal-file>");
     process.exit(1);
   }
   await mongoose.disconnect();
