@@ -39,6 +39,10 @@
     ".next-new/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "node_modules-old",
+    ".deps-new",
+    "content-archive",
+    "old_laravel_site"
   ]
 }
