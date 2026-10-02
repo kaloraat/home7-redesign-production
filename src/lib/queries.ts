@@ -60,6 +60,38 @@ export async function getPropertiesByType(
   }
 }
 
+// A For Sale / For Rent row never shows fewer than this many cards: when
+// there aren't enough active listings, the most recent sold (or leased)
+// ones fill the gap. Their corner ribbon says Sold/Leased, so they read as
+// past results, not as available.
+export const MIN_LISTINGS_SHOWN = 6;
+
+const FILL_TYPE = { sale: "sold", rent: "leased" } as const;
+
+/**
+ * Active sale/rent listings, topped up to MIN_LISTINGS_SHOWN with the most
+ * recent sold/leased ones. Fill order is newest result first: sold date
+ * (or REA's last update, for leases — REA has no leased date) where known,
+ * then date added.
+ */
+export async function getActiveListingsWithFill(
+  listingType: keyof typeof FILL_TYPE,
+  limit = 10000
+): Promise<IProperty[]> {
+  const active = await getPropertiesByType(listingType, limit);
+  const missing = Math.min(MIN_LISTINGS_SHOWN, limit) - active.length;
+  if (missing <= 0) return active;
+  try {
+    const fill = await Property.find({ listingType: FILL_TYPE[listingType] })
+      .sort(listingType === "sale" ? { soldDate: -1, createdAt: -1 } : { reaModTime: -1, createdAt: -1 })
+      .limit(missing)
+      .lean<IProperty[]>();
+    return [...active, ...fill];
+  } catch {
+    return active;
+  }
+}
+
 export async function getFeaturedProperties(limit = 6): Promise<IProperty[]> {
   try {
     await dbConnect();

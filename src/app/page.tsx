@@ -1,6 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getPropertiesByType, getFeaturedProperties, getPublishedContent, getAgents } from "@/lib/queries";
+import {
+  getPropertiesByType,
+  getActiveListingsWithFill,
+  getFeaturedProperties,
+  getPublishedContent,
+  getAgents,
+} from "@/lib/queries";
 import HeroSearch from "@/components/HeroSearch";
 import HeroQuickLinks from "@/components/HeroQuickLinks";
 import CTAButtons from "@/components/CTAButtons";
@@ -73,8 +79,9 @@ function buildJsonLd() {
 export default async function Home() {
   const [featured, forSale, forRent, sold, leased, posts, agents] = await Promise.all([
     getFeaturedProperties(6),
-    getPropertiesByType("sale", 6),
-    getPropertiesByType("rent", 6),
+    // Topped up with recent sold/leased cards when fewer than 6 are active.
+    getActiveListingsWithFill("sale", 6),
+    getActiveListingsWithFill("rent", 6),
     getPropertiesByType("sold", 6),
     getPropertiesByType("leased", 6),
     getPublishedContent("blog", 4),

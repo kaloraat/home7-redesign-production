@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/constants";
 import { pageMetadata } from "@/lib/pageMetadata";
-import { getPropertiesByType } from "@/lib/queries";
+import { getActiveListingsWithFill } from "@/lib/queries";
 import PropertyCard from "@/components/PropertyCard";
 
 const TITLE = "Best Properties for Rent in Liverpool, NSW";
@@ -27,7 +27,9 @@ const breadcrumbJsonLd = {
 export default async function Page() {
   // limit was 100 — see sold-properties/page.tsx's comment for the full
   // writeup (same latent bug, fixed the same way across all five callers).
-  const properties = await getPropertiesByType("rent", 10000);
+  // Never fewer than 6 cards: recent leased ones fill the gap (see
+  // getActiveListingsWithFill).
+  const properties = await getActiveListingsWithFill("rent");
 
   return (
     <div>
@@ -73,7 +75,9 @@ export default async function Page() {
           // preview but not for this page, which IS the full list.
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {properties.map((p) => (
-              <PropertyCard key={String(p._id)} property={p} showRibbon={false} />
+              // Ribbon only on the fill cards — the page heading already
+              // says "For Rent" for the rest.
+              <PropertyCard key={String(p._id)} property={p} showRibbon={p.listingType !== "rent"} />
             ))}
           </div>
         )}
