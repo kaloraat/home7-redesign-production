@@ -1,9 +1,15 @@
 import { Resend } from "resend";
 import { getNotificationRecipients } from "@/lib/emailRecipients";
 import { SITE_NAME } from "@/lib/constants";
-import type { ILead } from "@/models/Lead";
+import { ATTRIBUTION_FIELDS, type AttributionField, type ILead } from "@/models/Lead";
 
-type LeadFields = Pick<ILead, "name" | "email" | "phone" | "message" | "type" | "suburb">;
+type LeadFields = Pick<ILead, "name" | "email" | "phone" | "message" | "type" | "suburb" | AttributionField>;
+
+/** Click ids/UTMs worth showing: only when the lead came from an ad or tagged link. */
+function trackingRows(lead: LeadFields): [string, string][] {
+  if (!lead.gclid && !lead.gbraid && !lead.wbraid && !lead.utm_source) return [];
+  return ATTRIBUTION_FIELDS.map((k) => [k, lead[k] || "-"]);
+}
 
 // Inline styles throughout, deliberately — this is an actual transactional
 // email (Gmail/Outlook/Apple Mail etc.), not a page in a browser, and a lot
@@ -81,6 +87,16 @@ function buildLeadEmailHtml(lead: LeadFields, typeLabel: string) {
         : `<div style="padding-bottom:8px;"></div>`
     }
 
+    ${
+      trackingRows(lead).length
+        ? `
+    <div style="padding:0 24px 20px;">
+      <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.08em;color:#94a3b8;text-transform:uppercase;">Tracking</p>
+      <div style="font-size:12px;color:#64748b;line-height:1.6;word-break:break-all;">${trackingRows(lead).map(([k, v]) => `${k}: ${escapeHtml(v)}`).join("<br>")}</div>
+    </div>`
+        : ""
+    }
+
     <div style="padding:14px 24px;border-top:1px solid #e2e8f0;background:#f8fafc;">
       <p style="margin:0;font-size:12px;color:#94a3b8;">Sent from the ${escapeHtml(typeLabel)} form &middot; ${escapeHtml(SITE_NAME)}</p>
     </div>
@@ -130,6 +146,7 @@ export async function notifyNewLead(lead: LeadFields) {
     lead.phone && `Phone: ${lead.phone}`,
     lead.suburb && `Suburb/Address: ${lead.suburb}`,
     lead.message && `\nMessage:\n${lead.message}`,
+    ...(trackingRows(lead).length ? ["\nTracking", ...trackingRows(lead).map(([k, v]) => `${k}: ${v}`)] : []),
   ].filter(Boolean);
 
   try {

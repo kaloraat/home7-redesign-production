@@ -15,6 +15,8 @@ import {
 import MeshBackground from "@/components/MeshBackground";
 import PropertyCard from "@/components/PropertyCard";
 import ResponsiveCardGrid from "@/components/ResponsiveCardGrid";
+import PhoneLink from "@/components/lp/PhoneLink";
+import { isOfficeNumber } from "@/lib/lp/phone";
 import ContactForm from "@/components/ContactForm";
 
 export async function generateMetadata({
@@ -224,9 +226,13 @@ export default async function Page({
               <p className="flex items-center gap-2">
                 <PhoneIcon size={14} className="shrink-0 text-brand-navy" />
                 <span className="font-semibold text-brand-navy">Office:</span>
-                <a href={`tel:${agent.phone}`} className="hover:text-brand-gold-dark">
-                  {agent.phone}
-                </a>
+                {isOfficeNumber(agent.phone) ? (
+                  <PhoneLink location="agent-page" className="hover:text-brand-gold-dark" />
+                ) : (
+                  <a href={`tel:${agent.phone}`} className="hover:text-brand-gold-dark">
+                    {agent.phone}
+                  </a>
+                )}
               </p>
             )}
             {agent.mobile && (

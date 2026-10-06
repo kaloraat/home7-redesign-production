@@ -1,15 +1,21 @@
 import Script from "next/script";
 import { SITE } from "@/lib/lp/site";
 
+/** The site-wide GA4 property the root layout already configures. */
+export const SITE_GA4_ID = "G-44SM0JMX0E";
+
 /**
- * Loads Google Ads (+ optional GA4 and Clarity) for /lp/* only, and only
- * when the env vars are set. The root layout may already have defined
- * `gtag` for the site's own GA4, so this reuses it if present.
+ * Loads Google Ads (+ optional GA4 and Clarity) on every page, so brand
+ * and sitelink clicks that land outside /lp still get the call-number swap
+ * and enhanced conversions. Only when the env vars are set. The root
+ * layout defines `gtag` for the site's own GA4, so this reuses it.
  */
 export function TrackingScripts({ enabled }: { enabled: boolean }) {
   if (!enabled) return null;
   const gads = process.env.NEXT_PUBLIC_GADS_ID;
-  const ga4 = process.env.NEXT_PUBLIC_GA4_ID;
+  // Skip if it's the GA4 property the root layout already configures, or
+  // every page view would be counted twice.
+  const ga4 = process.env.NEXT_PUBLIC_GA4_ID !== SITE_GA4_ID ? process.env.NEXT_PUBLIC_GA4_ID : undefined;
   const callLabel = process.env.NEXT_PUBLIC_GADS_CALL_LABEL;
   const clarity = process.env.NEXT_PUBLIC_CLARITY_ID;
   const loadId = gads || ga4;

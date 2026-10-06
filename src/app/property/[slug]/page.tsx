@@ -10,6 +10,8 @@ import { buildMapEmbedUrl } from "@/lib/maps";
 import { PhoneIcon, EmailIcon } from "@/components/icons";
 import PropertyCard from "@/components/PropertyCard";
 import ResponsiveCardGrid from "@/components/ResponsiveCardGrid";
+import PhoneLink from "@/components/lp/PhoneLink";
+import { isOfficeNumber } from "@/lib/lp/phone";
 import PropertyGallery from "@/components/PropertyGallery";
 import PropertyInquiryForm from "@/components/PropertyInquiryForm";
 
@@ -540,7 +542,13 @@ export default async function Page({
                       {agent.mobile}
                     </a>
                   )}
-                  {agent.phone && (
+                  {agent.phone && isOfficeNumber(agent.phone) ? (
+                    <PhoneLink
+                      location="property-page"
+                      icon={<PhoneIcon size={16} className="shrink-0 text-brand-navy" />}
+                      className="flex items-center gap-2 text-slate-600 hover:text-brand-gold-dark"
+                    />
+                  ) : agent.phone && (
                     <a
                       href={`tel:${agent.phone}`}
                       className="flex items-center gap-2 text-slate-600 hover:text-brand-gold-dark"

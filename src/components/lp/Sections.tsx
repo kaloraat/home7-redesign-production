@@ -115,12 +115,19 @@ export function SwitchSection({ type }: { type: "pm" | "sell" }) {
 
 const PRINCIPAL_SLUG = "mohammed-r-islam";
 
+// Only client-facing roles appear on the LPs, in this order (admin and
+// executive assistants are left out here; /contact still lists everyone).
+const CLIENT_FACING_ROLES = [/sales/i, /property manag|leasing/i];
+const roleRank = (role: string) => CLIENT_FACING_ROLES.findIndex((re) => re.test(role));
+
 /**
  * Same team data as the homepage (getAgents(), passed in) — no copy here.
  * Cards are deliberately not links: they'd take people off the page.
  */
 export function Team({ agents }: { agents: IAgent[] }) {
-  const others = agents.filter((a) => a.slug !== PRINCIPAL_SLUG);
+  const others = agents
+    .filter((a) => a.slug !== PRINCIPAL_SLUG && roleRank(a.role) !== -1)
+    .sort((a, b) => roleRank(a.role) - roleRank(b.role));
   const principal = agents.find((a) => a.slug === PRINCIPAL_SLUG);
   return (
     <section className="bg-[#f6f7f9] py-12 md:py-20">

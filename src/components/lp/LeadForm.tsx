@@ -167,7 +167,7 @@ export function LeadForm({ copy, instance }: { copy: LpCopy; instance: "hero" | 
         <div role="radiogroup" aria-label={copy.form.chipsLabel} className="flex flex-wrap gap-2">
           {copy.form.chips.map((chip, i) => (
             <div key={chip}>
-              <input id={id(`chip-${i}`)} type="radio" name="choice" value={chip} defaultChecked={chip === copy.defaultChoice} className="peer sr-only" />
+              <input id={id(`chip-${i}`)} type="radio" name="choice" value={chip} defaultChecked={chip === copy.defaultChoice} autoComplete="off" className="peer sr-only" />
               <label
                 htmlFor={id(`chip-${i}`)}
                 className="inline-flex min-h-11 cursor-pointer items-center rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:border-brand-navy peer-checked:border-brand-navy peer-checked:bg-brand-navy peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-brand-navy/50"
@@ -179,8 +179,11 @@ export function LeadForm({ copy, instance }: { copy: LpCopy; instance: "hero" | 
         </div>
       </fieldset>
 
-      {/* Honeypot: real people never see or fill this. */}
-      <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+      {/* Honeypot: real people never see or fill this. `inert` makes it
+          unfocusable, which also stops Chrome autofill (it ignores
+          autocomplete="off" for "company") filling it and silently
+          dropping a real lead. Bots that fill every input still trip it. */}
+      <div aria-hidden="true" inert className="pointer-events-none absolute left-[-9999px] h-px w-px overflow-hidden opacity-0">
         <label>
           Company
           <input type="text" name="company" tabIndex={-1} autoComplete="off" />

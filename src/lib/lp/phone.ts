@@ -17,3 +17,8 @@ export function toE164(raw: string): string {
   if (s.startsWith("61")) return `+${s}`;
   return `+61${s.replace(/^0/, "")}`;
 }
+
+/** True for any formatting of the office landline, e.g. an agent's "phone" field. */
+export function isOfficeNumber(raw: string | undefined | null): boolean {
+  return !!raw && isValidAuPhone(raw) && toE164(raw) === "+61287297753";
+}

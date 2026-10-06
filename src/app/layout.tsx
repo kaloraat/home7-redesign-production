@@ -10,6 +10,9 @@ import { COMPANY, SITE_NAME, SITE_URL } from "@/lib/constants";
 import { isCanonicalHost } from "@/lib/canonicalHost";
 import { auth } from "@/auth";
 import PublicChrome from "@/components/PublicChrome";
+import PhoneLink from "@/components/lp/PhoneLink";
+import TrackingScripts, { SITE_GA4_ID } from "@/components/lp/TrackingScripts";
+import { ClickIdCapture } from "@/components/lp/ClickIdCapture";
 import { PhoneIcon, MobileIcon, PinIcon, EmailIcon, FacebookIcon, LinkedInIcon } from "@/components/icons";
 
 // Rethink Sans (titles) + Inter (body) — matching upmind.com's exact pairing,
@@ -114,7 +117,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {gaEnabled && (
           <>
             <Script
-              src="https://www.googletagmanager.com/gtag/js?id=G-44SM0JMX0E"
+              src={`https://www.googletagmanager.com/gtag/js?id=${SITE_GA4_ID}`}
               strategy="afterInteractive"
             />
             <Script id="ga4-init" strategy="afterInteractive">
@@ -122,11 +125,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
-                gtag('config', 'G-44SM0JMX0E');
+                gtag('config', '${SITE_GA4_ID}');
               `}
             </Script>
           </>
         )}
+        {/* Google Ads tag + gclid/UTM cookie on every page, not just /lp,
+            so brand/sitelink clicks to the main site are attributed too. */}
+        <TrackingScripts enabled={gaEnabled} />
+        <ClickIdCapture />
         {/* Top loading progress bar (YouTube-style) — without it, a click
             on a dynamic route gives no feedback until the new page's HTML
             actually arrives, which reads as "did my click even register?"
@@ -246,7 +253,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     </li>
                     <li className="flex items-center gap-2">
                       <PhoneIcon size={14} className="shrink-0 text-brand-gold" />
-                      <span>{COMPANY.phone}</span>
+                      <PhoneLink location="site-footer" className="hover:text-brand-gold" />
                     </li>
                     <li className="flex items-center gap-2">
                       <MobileIcon size={14} className="shrink-0 text-brand-gold" />

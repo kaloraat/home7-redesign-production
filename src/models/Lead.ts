@@ -1,6 +1,14 @@
 import { Schema, models, model, type Document, type Model } from "mongoose";
 
-export interface ILead extends Document {
+/** Google Ads click ids + UTMs saved with each lead, for offline conversion uploads. */
+export const ATTRIBUTION_FIELDS = [
+  "gclid", "gbraid", "wbraid",
+  "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content",
+  "landing_url", "referrer",
+] as const;
+export type AttributionField = (typeof ATTRIBUTION_FIELDS)[number];
+
+export interface ILead extends Document, Partial<Record<AttributionField, string>> {
   name: string;
   email: string;
   phone?: string;
@@ -27,6 +35,7 @@ const LeadSchema = new Schema<ILead>(
     suburb: String,
     property: { type: Schema.Types.ObjectId, ref: "Property" },
     status: { type: String, enum: ["new", "contacted", "closed"], default: "new" },
+    ...Object.fromEntries(ATTRIBUTION_FIELDS.map((k) => [k, String])),
   },
   { timestamps: { createdAt: true, updatedAt: false } }
 );

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import PhoneLink from "@/components/lp/PhoneLink";
 import { COMPANY, SITE_URL } from "@/lib/constants";
 import DateInput from "@/components/DateInput";
 
@@ -390,7 +391,7 @@ export function TenancyReferenceForm({
             Email: <a href={`mailto:${COMPANY.email}`} className="text-brand-gold-dark hover:underline">{COMPANY.email}</a>
           </p>
           <p>
-            Phone: <a href={`tel:${COMPANY.phone}`} className="text-brand-gold-dark hover:underline">{COMPANY.phone}</a>
+            Phone: <PhoneLink location="tenancy-reference" className="text-brand-gold-dark hover:underline" />
           </p>
           <p>
             Website: <a href={SITE_URL} className="text-brand-gold-dark hover:underline">{SITE_URL.replace(/^https?:\/\//, "")}</a>

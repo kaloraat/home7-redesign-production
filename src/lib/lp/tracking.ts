@@ -37,7 +37,7 @@ function readCookie(): Attribution {
   }
 }
 
-/** Called once per /lp page load. Never overwrites saved values with blanks. */
+/** Called once per page load, site-wide. Never overwrites saved values with blanks. */
 export function captureAttribution() {
   const params = new URLSearchParams(window.location.search);
   const fresh: Attribution = {};
@@ -83,23 +83,25 @@ export function trackFormStart(leadType: string, region: string, instance: strin
  */
 export function trackLeadConversion(opts: {
   leadId: string;
-  phoneE164: string;
+  phoneE164?: string;
+  email?: string;
   firstName: string;
   leadType: string;
   region: string;
   instance: string;
-  done: () => void;
+  done?: () => void;
 }) {
   let called = false;
   const go = () => {
     if (called) return;
     called = true;
-    opts.done();
+    opts.done?.();
   };
   setTimeout(go, 1000);
 
   gtag("set", "user_data", {
-    phone_number: opts.phoneE164,
+    ...(opts.email && { email: opts.email.trim().toLowerCase() }),
+    ...(opts.phoneE164 && { phone_number: opts.phoneE164 }),
     address: { first_name: opts.firstName.toLowerCase() },
   });
   if (GADS_ID && GADS_LEAD_LABEL) {

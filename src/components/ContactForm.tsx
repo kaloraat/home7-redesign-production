@@ -3,6 +3,8 @@
 import { useState } from "react";
 import type { LeadType } from "@/lib/constants";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
+import { getAttribution, trackLeadConversion } from "@/lib/lp/tracking";
+import { isValidAuPhone, toE164 } from "@/lib/lp/phone";
 
 /**
  * Shared by the /contact page, the blog sidebar/mobile FAB, and the
@@ -45,19 +47,37 @@ export function ContactForm({
     setStatus("submitting");
     const formData = new FormData(e.currentTarget);
 
+    const name = String(formData.get("name") ?? "");
+    const email = String(formData.get("email") ?? "");
+    const phone = String(formData.get("phone") ?? "");
+
     try {
       const res = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: formData.get("name"),
-          email: formData.get("email"),
-          phone: formData.get("phone") || undefined,
+          name,
+          email,
+          phone: phone || undefined,
           message: formData.get("message") || fallbackMessage || undefined,
           suburb: formData.get("address") || undefined,
           type: leadType,
+          ...getAttribution(),
         }),
       });
+      if (res.ok) {
+        const data = (await res.json().catch(() => null)) as { id?: string } | null;
+        // Same Google Ads lead conversion (+ enhanced conversions) as the LPs.
+        trackLeadConversion({
+          leadId: data?.id ?? crypto.randomUUID(),
+          email,
+          phoneE164: isValidAuPhone(phone) ? toE164(phone) : undefined,
+          firstName: name.trim().split(/\s+/)[0] ?? "",
+          leadType,
+          region: "site",
+          instance: "contact-form",
+        });
+      }
       setStatus(res.ok ? "success" : "error");
     } catch {
       setStatus("error");

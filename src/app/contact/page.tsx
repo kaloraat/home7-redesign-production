@@ -7,6 +7,7 @@ import { PhoneIcon, MobileIcon, EmailIcon, PinIcon } from "@/components/icons";
 import ContactForm from "@/components/ContactForm";
 import ContactMap from "@/components/ContactMap";
 import MeetTheTeam from "@/components/MeetTheTeam";
+import PhoneLink from "@/components/lp/PhoneLink";
 import { getAgents } from "@/lib/queries";
 
 const TITLE = "Contact Us";
@@ -32,7 +33,8 @@ const breadcrumbJsonLd = {
 // (text-lg vs text-xl) — at the same size it read too large/heavy once it
 // wrapped across 3 lines, unlike the short one-line phone/email entries.
 const CONTACT_ITEMS = [
-  { Icon: PhoneIcon, label: COMPANY.phone, href: `tel:${COMPANY.phone}`, size: "text-xl" },
+  // Office number renders through PhoneLink (call tracking), not this href.
+  { Icon: PhoneIcon, label: COMPANY.phone, href: "office", size: "text-xl" },
   { Icon: MobileIcon, label: COMPANY.mobile, href: `tel:${COMPANY.mobile}`, size: "text-xl" },
   { Icon: MobileIcon, label: COMPANY.mobileSecondary, href: `tel:${COMPANY.mobileSecondary}`, size: "text-xl" },
   { Icon: EmailIcon, label: COMPANY.email, href: `mailto:${COMPANY.email}`, size: "text-xl" },
@@ -89,7 +91,9 @@ export default async function Page() {
               {CONTACT_ITEMS.map(({ Icon, label, href, size }) => (
                 <li key={label} className="flex items-start gap-3">
                   <Icon size={18} className="shrink-0 mt-1 text-brand-gold-dark" />
-                  {href ? (
+                  {href === "office" ? (
+                    <PhoneLink location="contact-page" className={`${size} text-slate-600 hover:text-brand-gold-dark`} />
+                  ) : href ? (
                     <a href={href} className={`${size} text-slate-600 hover:text-brand-gold-dark`}>
                       {label}
                     </a>

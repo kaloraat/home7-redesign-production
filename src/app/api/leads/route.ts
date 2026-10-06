@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import dbConnect from "@/lib/db";
-import Lead from "@/models/Lead";
+import Lead, { ATTRIBUTION_FIELDS } from "@/models/Lead";
 import { LEAD_TYPES } from "@/lib/constants";
 import { notifyNewLead } from "@/lib/notifyLead";
 
@@ -32,6 +32,8 @@ const LeadSchema = z.object({
     .string()
     .regex(/^[0-9a-f]{24}$/i)
     .optional(),
+  // Google Ads click ids + UTMs from the h7_attrib cookie (see ClickIdCapture).
+  ...Object.fromEntries(ATTRIBUTION_FIELDS.map((k) => [k, z.string().max(500).optional()])),
 });
 
 export async function POST(request: Request) {

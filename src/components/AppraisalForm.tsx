@@ -3,6 +3,8 @@
 import { useState } from "react";
 import type { LeadType } from "@/lib/constants";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
+import { getAttribution, trackLeadConversion } from "@/lib/lp/tracking";
+import { isValidAuPhone, toE164 } from "@/lib/lp/phone";
 
 type Tab = "selling" | "renting" | "buying";
 
@@ -136,8 +138,22 @@ export function AppraisalForm({ defaultTab = "selling" }: { defaultTab?: Tab }) 
           message: buildMessage(),
           suburb: suburb || undefined,
           type: leadType,
+          ...getAttribution(),
         }),
       });
+      if (res.ok) {
+        const data = (await res.json().catch(() => null)) as { id?: string } | null;
+        // Same Google Ads lead conversion (+ enhanced conversions) as the LPs.
+        trackLeadConversion({
+          leadId: data?.id ?? crypto.randomUUID(),
+          email,
+          phoneE164: isValidAuPhone(phone) ? toE164(phone) : undefined,
+          firstName: name.trim().split(/\s+/)[0] ?? "",
+          leadType,
+          region: "site",
+          instance: "appraisal-form",
+        });
+      }
       setStatus(res.ok ? "success" : "error");
     } catch {
       setStatus("error");

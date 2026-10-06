@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import PhoneLink from "@/components/lp/PhoneLink";
 import { MESH_NAVY_BASE, COMPANY, SITE_NAME } from "@/lib/constants";
 import { PhoneIcon, MobileIcon, PinIcon } from "@/components/icons";
 
@@ -188,10 +189,11 @@ export function SiteNav({ isAdmin }: { isAdmin: boolean }) {
                 length, and/or cramming both numbers onto one row, that
                 overflowed. Address itself still only shows from `sm` up. */}
             <div className="flex flex-col items-end gap-0.5 sm:hidden">
-              <a href={`tel:${COMPANY.phone}`} className="flex items-center gap-0.5 hover:text-brand-gold whitespace-nowrap">
-                <PhoneIcon className="shrink-0 w-[1em] h-[1em]" />
-                {COMPANY.phone}
-              </a>
+              <PhoneLink
+                location="site-header"
+                icon={<PhoneIcon className="shrink-0 w-[1em] h-[1em]" />}
+                className="flex items-center gap-0.5 hover:text-brand-gold whitespace-nowrap"
+              />
               {COMPANY.mobile && (
                 <a href={`tel:${COMPANY.mobile}`} className="flex items-center gap-0.5 hover:text-brand-gold whitespace-nowrap">
                   <MobileIcon className="shrink-0 w-[1em] h-[1em]" />
@@ -201,10 +203,11 @@ export function SiteNav({ isAdmin }: { isAdmin: boolean }) {
             </div>
 
             <div className="hidden items-center gap-1 sm:flex sm:gap-3">
-              <a href={`tel:${COMPANY.phone}`} className="flex items-center gap-0.5 hover:text-brand-gold whitespace-nowrap">
-                <PhoneIcon className="shrink-0 w-[1em] h-[1em]" />
-                {COMPANY.phone}
-              </a>
+              <PhoneLink
+                location="site-header"
+                icon={<PhoneIcon className="shrink-0 w-[1em] h-[1em]" />}
+                className="flex items-center gap-0.5 hover:text-brand-gold whitespace-nowrap"
+              />
               {COMPANY.mobile && (
                 <a href={`tel:${COMPANY.mobile}`} className="flex items-center gap-0.5 hover:text-brand-gold whitespace-nowrap">
                   <MobileIcon className="shrink-0 w-[1em] h-[1em]" />
