@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import LpHeader from "@/components/lp/LpHeader";
 import { LpProvider } from "@/components/lp/LpContext";
+import ThankYouHeading from "@/components/lp/ThankYouHeading";
 import PhoneLink from "@/components/lp/PhoneLink";
 import { LpFooter } from "@/components/lp/Sections";
 import { THANK_YOU } from "@/lib/lp/content";
@@ -14,10 +15,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/lp/thank-you" },
 };
 
-export default async function ThankYou({ searchParams }: { searchParams: Promise<{ type?: string; n?: string; intent?: string }> }) {
-  const { type, n, intent } = await searchParams;
+export default async function ThankYou({ searchParams }: { searchParams: Promise<{ type?: string; intent?: string }> }) {
+  const { type, intent } = await searchParams;
   const kind = type === "sell" ? "sell" : "pm";
-  const name = (n ?? "").slice(0, 40).trim();
   const steps = kind === "pm" && intent === "switch" ? [THANK_YOU.pmSwitchFirst, ...THANK_YOU.pm.slice(1)] : THANK_YOU[kind];
 
   return (
@@ -25,9 +25,7 @@ export default async function ThankYou({ searchParams }: { searchParams: Promise
       <LpHeader />
       <main className="mx-auto max-w-2xl px-4 py-12 md:py-20">
         {/* The lead conversion is fired by the form on submit, never here, so a refresh can't double-count. */}
-        <h1 className="font-display text-3xl leading-tight text-brand-navy md:text-4xl">
-          Thanks{name ? ` ${name}` : ""}, we&apos;ve got your details.
-        </h1>
+        <ThankYouHeading />
         <p className="mt-4 text-lg text-slate-700">
           Mohammed or one of our team will call you {SITE.callbackPromise}.
         </p>

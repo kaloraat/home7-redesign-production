@@ -22,6 +22,11 @@ export function gtag(...args: unknown[]) {
   }
 }
 
+/** GA4-only event: routed to the GA4 property so it doesn't also hit the Google Ads tag. */
+export function gaEvent(name: string, params: Record<string, unknown>) {
+  gtag("event", name, GA4_ID ? { ...params, send_to: GA4_ID } : params);
+}
+
 const COOKIE = "h7_attrib";
 const KEYS = ["gclid", "gbraid", "wbraid", "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"] as const;
 
@@ -66,14 +71,14 @@ export function trackPhoneClick(location: string, leadType: string, region: stri
   if (GADS_ID && GADS_PHONE_CLICK_LABEL) {
     gtag("event", "conversion", { send_to: `${GADS_ID}/${GADS_PHONE_CLICK_LABEL}` });
   }
-  gtag("event", "phone_click", { lead_type: leadType, region, location });
+  gaEvent("phone_click", { lead_type: leadType, region, location });
 }
 
 let formStartSent = false;
 export function trackFormStart(leadType: string, region: string, instance: string) {
   if (formStartSent) return;
   formStartSent = true;
-  gtag("event", "form_start", { lead_type: leadType, region, form_instance: instance });
+  gaEvent("form_start", { lead_type: leadType, region, form_instance: instance });
 }
 
 /**
@@ -111,7 +116,7 @@ export function trackLeadConversion(opts: {
       event_callback: go,
     });
   }
-  gtag("event", "generate_lead", { lead_type: opts.leadType, region: opts.region, form_instance: opts.instance });
+  gaEvent("generate_lead", { lead_type: opts.leadType, region: opts.region, form_instance: opts.instance });
   // No Ads label configured (or tag blocked): don't make the visitor wait the full second.
   if (!(GADS_ID && GADS_LEAD_LABEL)) go();
 }

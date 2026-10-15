@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { SITE } from "@/lib/lp/site";
-import { gtag, trackPhoneClick } from "@/lib/lp/tracking";
+import { gaEvent, trackPhoneClick } from "@/lib/lp/tracking";
 import { PhoneIcon } from "@/components/icons";
 import { useLp } from "./LpContext";
 
@@ -47,7 +47,7 @@ export function StickyCallBar() {
   const show = pastHero && !formOnScreen && !typing;
 
   function goToForm() {
-    gtag("event", "sticky_cta_click", { lead_type: leadType, region });
+    gaEvent("sticky_cta_click", { lead_type: leadType, region });
     const first = document.querySelector<HTMLInputElement>('[data-lp-form="hero"] input[name="name"]');
     first?.scrollIntoView({ behavior: "smooth", block: "center" });
     // Focus after the scroll so iOS doesn't jump twice.

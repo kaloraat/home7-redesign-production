@@ -93,10 +93,13 @@ export function LeadForm({ copy, instance }: { copy: LpCopy; instance: "hero" | 
         leadType,
         region,
         instance,
-        done: () =>
-          router.push(
-            `/lp/thank-you?type=${leadType}&n=${encodeURIComponent(firstName)}${parsed.data.choice === SWITCH_CHIP ? "&intent=switch" : ""}`
-          ),
+        done: () => {
+          // Name goes via sessionStorage, never the URL (keeps PII out of analytics/logs).
+          try {
+            sessionStorage.setItem("h7_first_name", firstName);
+          } catch {}
+          router.push(`/lp/thank-you?type=${leadType}${parsed.data.choice === SWITCH_CHIP ? "&intent=switch" : ""}`);
+        },
       });
       // Stay in the "sending" state: the button must never be clickable twice.
     } catch {
