@@ -23,19 +23,15 @@ const breadcrumbJsonLd = {
   ],
 };
 
-const COPY: Record<string, { heading: string; blurb: string }> = {
-  selling: {
-    heading: "Sell My Property",
-    blurb: "Get a free, no-obligation appraisal before you list.",
-  },
-  renting: {
-    heading: "Lease My Property",
-    blurb: "Find out what your property could rent for.",
-  },
-  buying: {
-    heading: "Buy a Property for Me",
-    blurb: "Tell us what you're after and we'll help you find it.",
-  },
+// Optional subline under the neutral H1, shown only when the visitor
+// arrived via a ?key= link (e.g. the "Sell My Property" CTA). The H1 itself
+// stays "Free Property Appraisal" for everyone — the bare URL is the
+// canonical one and is linked from the footer/home/suburb pages, and the
+// form's tabs already make the selling/renting/buying intent clear.
+const BLURB: Record<string, string> = {
+  selling: "Get a free, no-obligation appraisal before you list.",
+  renting: "Find out what your property could rent for.",
+  buying: "Tell us what you're after and we'll help you find it.",
 };
 
 const TABS = ["selling", "renting", "buying"] as const;
@@ -47,8 +43,9 @@ export default async function Page({
   searchParams: Promise<{ key?: string }>;
 }) {
   const { key } = await searchParams;
-  const defaultTab: Tab = key && (TABS as readonly string[]).includes(key) ? (key as Tab) : "selling";
-  const variant = COPY[defaultTab];
+  const keyTab = key && (TABS as readonly string[]).includes(key) ? (key as Tab) : null;
+  const defaultTab: Tab = keyTab ?? "selling";
+  const blurb = keyTab ? BLURB[keyTab] : null;
 
   return (
     <div>
@@ -75,7 +72,8 @@ export default async function Page({
           <p className="text-shadow-hero text-sm text-white/80">
             <Link href="/" className="hover:text-brand-gold">Home</Link> / Free Market Appraisal
           </p>
-          <h1 className="text-shadow-hero mt-3 font-display text-5xl sm:text-6xl">{variant.heading}</h1>
+          <h1 className="text-shadow-hero mt-3 font-display text-5xl sm:text-6xl">Free Property Appraisal</h1>
+          {blurb && <p className="text-shadow-hero mt-3 text-base sm:text-lg text-white/90">{blurb}</p>}
         </div>
       </section>
 
