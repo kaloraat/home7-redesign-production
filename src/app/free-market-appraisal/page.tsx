@@ -83,7 +83,7 @@ export default async function Page({
       <div className="mx-auto max-w-2xl px-4 py-16 sm:py-20">
         <p className="text-lg text-slate-600 leading-relaxed text-center">
           As the real estate market twists and turns, it pays to keep an eye on the value of your
-          property — so you always know where you stand. By contacting one of our property
+          property, so you always know where you stand. By contacting one of our property
           experts, you can receive a no-obligation appraisal advising you of your investment&apos;s
           worth in today&apos;s market. Simply fill out the form below and we&apos;ll be in touch.
         </p>
