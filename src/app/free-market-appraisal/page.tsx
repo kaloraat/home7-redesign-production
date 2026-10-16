@@ -23,8 +23,9 @@ const breadcrumbJsonLd = {
   ],
 };
 
-// Optional subline under the neutral H1, shown only when the visitor
-// arrived via a ?key= link (e.g. the "Sell My Property" CTA). The H1 itself
+// Subline under the neutral H1: a targeted line when the visitor arrived
+// via a ?key= link (e.g. the "Sell My Property" CTA), otherwise a general
+// slogan covering sellers, landlords and property-management enquiries. The H1 itself
 // stays "Free Property Appraisal" for everyone — the bare URL is the
 // canonical one and is linked from the footer/home/suburb pages, and the
 // form's tabs already make the selling/renting/buying intent clear.
@@ -33,6 +34,8 @@ const BLURB: Record<string, string> = {
   renting: "Find out what your property could rent for.",
   buying: "Tell us what you're after and we'll help you find it.",
 };
+const DEFAULT_BLURB =
+  "Selling, renting out, or after affordable property management? Start with a free, no-obligation appraisal.";
 
 const TABS = ["selling", "renting", "buying"] as const;
 type Tab = (typeof TABS)[number];
@@ -45,7 +48,7 @@ export default async function Page({
   const { key } = await searchParams;
   const keyTab = key && (TABS as readonly string[]).includes(key) ? (key as Tab) : null;
   const defaultTab: Tab = keyTab ?? "selling";
-  const blurb = keyTab ? BLURB[keyTab] : null;
+  const blurb = keyTab ? BLURB[keyTab] : DEFAULT_BLURB;
 
   return (
     <div>
@@ -73,7 +76,7 @@ export default async function Page({
             <Link href="/" className="hover:text-brand-gold">Home</Link> / Free Market Appraisal
           </p>
           <h1 className="text-shadow-hero mt-3 font-display text-5xl sm:text-6xl">Free Property Appraisal</h1>
-          {blurb && <p className="text-shadow-hero mt-3 text-base sm:text-lg text-white/90">{blurb}</p>}
+          <p className="text-shadow-hero mt-3 max-w-xl text-base sm:text-lg text-white/90">{blurb}</p>
         </div>
       </section>
 
