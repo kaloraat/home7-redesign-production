@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-// Gold-to-navy gradient so the rental "Apply" call to action stands out
-// from the navy/white page chrome around it. White text stays legible on
-// both ends (gold-dark #c18847 and navy #081349).
+// Bright gold with navy text plus a periodic shiny sweep (.btn-shine in
+// globals.css) so the rental "Apply" call to action stands out from the
+// navy/white page chrome around it.
 const BUTTON_CLASS =
-  "block text-center rounded-lg px-5 py-3 font-semibold text-white bg-linear-to-r from-brand-gold-dark via-[#7a5a3a] to-brand-navy ring-2 ring-brand-gold/70 shadow-lg shadow-brand-gold-dark/30 hover:brightness-110 hover:shadow-xl transition";
+  "btn-shine block text-center rounded-lg px-5 py-3 font-bold text-brand-navy bg-linear-to-r from-[#ffe08a] via-brand-gold to-[#e9b04f] ring-1 ring-brand-gold-dark/50 shadow-lg shadow-brand-gold/40 hover:brightness-105 hover:shadow-xl transition";
 
 /**
  * Rental "Apply for This Property" button.

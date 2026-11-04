@@ -250,3 +250,46 @@ gmp-place-autocomplete::part(input) {
   --ribbon-bg: linear-gradient(to bottom, #c3c9d1, #6b7480);
   --ribbon-fold: #434a54;
 }
+
+/*
+ * Shiny sweep for the rental "Apply for This Property" button: a soft
+ * white diagonal band glides across the gold every few seconds (mostly
+ * idle between passes so it catches the eye without being busy). Off for
+ * users who ask for reduced motion.
+ */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.btn-shine::after {
+  content: "";
+  position: absolute;
+  inset: -50% auto -50% -60%;
+  width: 40%;
+  transform: skewX(-25deg) translateX(0);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.75),
+    transparent
+  );
+  z-index: -1;
+  animation: btn-shine 3.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes btn-shine {
+  0% {
+    left: -60%;
+  }
+  45%,
+  100% {
+    left: 130%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn-shine::after {
+    animation: none;
+    display: none;
+  }
+}
