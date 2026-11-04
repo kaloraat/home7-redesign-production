@@ -51,7 +51,7 @@ export default function ApplyForPropertyButton({
 
   if (variant === "sidebar") {
     return (
-      <Link href={href} className={BUTTON_CLASS}>
+      <Link href={href} className={BUTTON_CLASS} data-apply-inline>
         <ButtonContent />
       </Link>
     );
@@ -73,10 +73,27 @@ function FloatingApply({ href }: { href: string }) {
     return () => ro.disconnect();
   }, []);
 
+  // On phones the sidebar's own Apply button (under the map, above the
+  // agent card) eventually scrolls into view. Hide this sticky copy while
+  // any part of that one is on screen, so two identical buttons never show
+  // at once; it comes back as soon as the inline one leaves the screen.
+  const [inlineVisible, setInlineVisible] = useState(false);
+
+  useEffect(() => {
+    const inline = document.querySelector("[data-apply-inline]");
+    if (!inline) return;
+    const io = new IntersectionObserver(([entry]) => setInlineVisible(entry.isIntersecting));
+    io.observe(inline);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <div
-      className="lg:hidden sticky z-40 -mx-4 mt-4 px-4 py-2 bg-white/85 backdrop-blur"
+      className={`lg:hidden sticky z-40 -mx-4 mt-4 px-4 py-2 bg-white/85 backdrop-blur transition-opacity duration-200 ${inlineVisible ? "pointer-events-none opacity-0" : "opacity-100"}`}
       style={{ top }}
+      // Stays in the layout while hidden, so nothing below it shifts.
+      aria-hidden={inlineVisible || undefined}
+      inert={inlineVisible || undefined}
     >
       <Link href={href} className={BUTTON_CLASS}>
         <ButtonContent />
