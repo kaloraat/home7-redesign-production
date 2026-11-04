@@ -303,9 +303,6 @@ export default async function Page({
 
   return (
     <>
-    {property.listingType === "rent" && (
-      <ApplyForPropertyButton slug={property.slug} variant="floating" />
-    )}
     <div className="mx-auto max-w-7xl px-4 py-10">
       <script
         type="application/ld+json"
@@ -354,6 +351,10 @@ export default async function Page({
           <p className="mt-2 text-2xl font-semibold text-brand-gold-dark">{priceText}</p>
         </div>
       </div>
+
+      {property.listingType === "rent" && (
+        <ApplyForPropertyButton slug={property.slug} variant="floating" />
+      )}
 
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         {/* Main column */}
