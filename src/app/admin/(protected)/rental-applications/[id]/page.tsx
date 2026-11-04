@@ -56,13 +56,23 @@ export default async function RentalApplicationDetailPage({
             {a.propertyAddress} · Submitted {new Date(a.createdAt).toLocaleDateString("en-AU")}
           </p>
         </div>
-        {isOwner && (
-          <DeleteButton
-            onConfirm={deleteApplication.bind(null, String(a._id))}
-            itemLabel="this application"
-            requireTypedConfirmation="delete this application"
-          />
-        )}
+        <div className="flex shrink-0 items-start gap-3">
+          {/* Plain <a> to the Route Handler: Content-Disposition: attachment
+              makes the browser download it with no client JS. */}
+          <a
+            href={`/api/admin/rental-applications/${id}/pdf`}
+            className="rounded border border-brand-navy px-4 py-2 text-sm font-semibold text-brand-navy hover:bg-brand-navy hover:text-white transition-colors"
+          >
+            Download PDF
+          </a>
+          {isOwner && (
+            <DeleteButton
+              onConfirm={deleteApplication.bind(null, String(a._id))}
+              itemLabel="this application"
+              requireTypedConfirmation="delete this application"
+            />
+          )}
+        </div>
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
