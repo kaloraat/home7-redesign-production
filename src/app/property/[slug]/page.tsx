@@ -14,6 +14,7 @@ import PhoneLink from "@/components/lp/PhoneLink";
 import { isOfficeNumber } from "@/lib/lp/phone";
 import PropertyGallery from "@/components/PropertyGallery";
 import PropertyInquiryForm from "@/components/PropertyInquiryForm";
+import ApplyForPropertyButton from "@/components/ApplyForPropertyButton";
 
 // For the fallback title/description below (separate from the more
 // verbose LISTING_TYPE_LABELS the breadcrumb uses further down — "For
@@ -302,6 +303,9 @@ export default async function Page({
 
   return (
     <>
+    {property.listingType === "rent" && (
+      <ApplyForPropertyButton slug={property.slug} variant="floating" />
+    )}
     <div className="mx-auto max-w-7xl px-4 py-10">
       <script
         type="application/ld+json"
@@ -483,12 +487,7 @@ export default async function Page({
             article is. */}
         <aside className="lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto space-y-6">
           {property.listingType === "rent" && (
-            <Link
-              href={`/property-tenant-application-download?property=${property.slug}`}
-              className="block text-center bg-brand-navy text-white rounded px-5 py-3 font-semibold hover:brightness-110 transition"
-            >
-              Apply for This Property
-            </Link>
+            <ApplyForPropertyButton slug={property.slug} variant="sidebar" />
           )}
 
           <div className="rounded-lg border border-slate-200 bg-white p-6">
