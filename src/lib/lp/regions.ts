@@ -1,4 +1,6 @@
-export type RegionKey = "all" | "liverpool" | "campbelltown" | "parramatta";
+// "liverpool-campbelltown" is only used by /lp/local-agent. It is deliberately
+// not in REGION_KEYS, so it never becomes a /lp/sell/... or /lp/property-management/... route.
+export type RegionKey = "all" | "liverpool" | "campbelltown" | "parramatta" | "liverpool-campbelltown";
 
 export const REGION_KEYS = ["liverpool", "campbelltown", "parramatta"] as const;
 
@@ -17,6 +19,11 @@ export const REGIONS: Record<RegionKey, Region> = {
   liverpool: { name: "Liverpool", label: "the Liverpool area", suburbs: LIVERPOOL },
   campbelltown: { name: "Campbelltown", label: "the Campbelltown area", suburbs: CAMPBELLTOWN },
   parramatta: { name: "Parramatta", label: "the Parramatta area", suburbs: PARRAMATTA },
+  "liverpool-campbelltown": {
+    name: "Liverpool & Campbelltown",
+    label: "Liverpool and Campbelltown",
+    suburbs: [...new Set([...LIVERPOOL, ...CAMPBELLTOWN])],
+  },
 };
 
 export function isRegionKey(value: string): value is Exclude<RegionKey, "all"> {

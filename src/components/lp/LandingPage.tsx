@@ -12,7 +12,7 @@ import { SwitchBanner } from "./SwitchCta";
 import StickyCallBar from "./StickyCallBar";
 import { WhyCards, IncludedChecklist, FeesBlock, HowItWorks, SwitchSection, Team, RecentProperties, Faq, FinalCta, LpFooter } from "./Sections";
 
-export async function LandingPage({ type, region, intent }: { type: LpLeadType; region: RegionKey; intent?: LpIntent }) {
+export async function LandingPage({ type, region, intent }: { type: Exclude<LpLeadType, "local">; region: RegionKey; intent?: LpIntent }) {
   const copy = getContent(type, region, intent);
   const [ratingData, recent, agents] = await Promise.all([
     getRatingData(),

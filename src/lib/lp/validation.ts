@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { isValidAuPhone } from "./phone";
 
-export const LEAD_TYPES = ["pm", "sell"] as const;
+// "local" = /lp/local-agent (seller or landlord; the chip choice says which).
+export const LEAD_TYPES = ["pm", "sell", "local"] as const;
 export type LpLeadType = (typeof LEAD_TYPES)[number];
 
 const attrib = z.string().max(500).optional().default("");
@@ -14,10 +15,10 @@ export const leadSchema = z.object({
     .trim()
     .refine(isValidAuPhone, "Please enter a mobile number like 0412 345 678"),
   suburb: z.string().trim().min(2, "Please enter the property's suburb").max(120, "That's a bit long"),
-  // pm: intent chips, sell: timeframe chips — both optional.
+  // pm/local: intent chips, sell: timeframe chips — all optional.
   choice: z.string().max(80).optional().default(""),
   lead_type: z.enum(LEAD_TYPES),
-  region: z.enum(["all", "liverpool", "campbelltown", "parramatta"]),
+  region: z.enum(["all", "liverpool", "campbelltown", "parramatta", "liverpool-campbelltown"]),
   form_instance: z.enum(["hero", "footer"]),
   // Spam traps
   company: z.string().max(200).optional().default(""),

@@ -17,8 +17,8 @@ export const metadata: Metadata = {
 
 export default async function ThankYou({ searchParams }: { searchParams: Promise<{ type?: string; intent?: string }> }) {
   const { type, intent } = await searchParams;
-  const kind = type === "sell" ? "sell" : "pm";
-  const steps = kind === "pm" && intent === "switch" ? [THANK_YOU.pmSwitchFirst, ...THANK_YOU.pm.slice(1)] : THANK_YOU[kind];
+  const kind = type === "sell" ? "sell" : type === "local" ? "local" : "pm";
+  const steps = kind !== "sell" && intent === "switch" ? [THANK_YOU.pmSwitchFirst, ...THANK_YOU[kind].slice(1)] : THANK_YOU[kind];
 
   return (
     <LpProvider leadType={kind} region="all">

@@ -7,7 +7,7 @@ import { toE164 } from "@/lib/lp/phone";
 import { REGIONS } from "@/lib/lp/regions";
 import { SITE } from "@/lib/lp/site";
 import { getAttribution, trackFormStart, trackLeadConversion } from "@/lib/lp/tracking";
-import { SWITCH_CHIP, type LpCopy } from "@/lib/lp/content";
+import { SWITCH_CHIP, localLeadKind, type LpCopy } from "@/lib/lp/content";
 import { useLp } from "./LpContext";
 import PhoneLink from "./PhoneLink";
 
@@ -98,7 +98,9 @@ export function LeadForm({ copy, instance }: { copy: LpCopy; instance: "hero" | 
           try {
             sessionStorage.setItem("h7_first_name", firstName);
           } catch {}
-          router.push(`/lp/thank-you?type=${leadType}${parsed.data.choice === SWITCH_CHIP ? "&intent=switch" : ""}`);
+          // /lp/local-agent: send sellers/landlords to their own next steps.
+          const tyType = leadType === "local" ? (localLeadKind(parsed.data.choice) ?? "local") : leadType;
+          router.push(`/lp/thank-you?type=${tyType}${parsed.data.choice === SWITCH_CHIP ? "&intent=switch" : ""}`);
         },
       });
       // Stay in the "sending" state: the button must never be clickable twice.

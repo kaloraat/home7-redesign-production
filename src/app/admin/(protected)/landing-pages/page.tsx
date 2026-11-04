@@ -69,11 +69,20 @@ export default function AdminLandingPagesPage() {
         ))}
 
         <section>
+          <h2 className="font-display text-xl text-brand-navy">Sellers and landlords (general)</h2>
+          <p className="mt-1 text-sm text-slate-500">Campaigns: general searches like &ldquo;real estate agent near me&rdquo;. Liverpool and Campbelltown only. The &ldquo;What do you need?&rdquo; choice tells you seller or landlord in the lead email.</p>
+          <ul className="mt-3 rounded-lg border border-slate-200 bg-white">
+            <Row path="/lp/local-agent" label="Local agent (sell or rent)" />
+          </ul>
+        </section>
+
+        <section>
           <h2 className="font-display text-xl text-brand-navy">Other</h2>
           <ul className="mt-3 rounded-lg border border-slate-200 bg-white">
             <Row path="/lp/thank-you?type=pm" label="Thank-you page (landlord)" />
             <Row path="/lp/thank-you?type=pm&intent=switch" label="Thank-you page (switch lead)" />
             <Row path="/lp/thank-you?type=sell" label="Thank-you page (seller)" />
+            <Row path="/lp/thank-you?type=local" label="Thank-you page (local agent, appraisal only)" />
           </ul>
           <p className="mt-3 text-sm text-slate-500">
             Test attribution by adding <code>?gclid=TEST123</code> to any page, then submit the form. It appears in the lead email&apos;s tracking block.

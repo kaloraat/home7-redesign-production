@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { leadSchema, type LeadInput } from "@/lib/lp/validation";
 import { toE164 } from "@/lib/lp/phone";
 import { REGIONS } from "@/lib/lp/regions";
+import { localLeadKind } from "@/lib/lp/content";
 import { sendNotificationEmail } from "@/lib/notifyLead";
 
 /**
@@ -48,12 +49,16 @@ async function turnstileOk(token: string | undefined, ip: string): Promise<boole
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 function buildEmail(lead: LeadInput, leadId: string, phoneE164: string) {
-  const isPm = lead.lead_type === "pm";
-  const kind = isPm ? "LANDLORD" : "SELLER";
+  // /lp/local-agent leads say seller or landlord via the chip they picked.
+  const isLocal = lead.lead_type === "local";
+  const resolved = isLocal ? localLeadKind(lead.choice) : lead.lead_type;
+  const isPm = resolved === "pm" || (isLocal && resolved === null);
+  const kind = resolved === "pm" ? "LANDLORD" : resolved === "sell" ? "SELLER" : "OWNER";
   const subject = `🔥 NEW ${kind} LEAD – ${lead.suburb} – call within 5 minutes`;
   const received = new Date().toLocaleString("en-AU", { timeZone: "Australia/Sydney", dateStyle: "medium", timeStyle: "short" });
-  const choiceLabel = isPm ? "Needs" : "Selling in";
-  const page = `${isPm ? "Property management" : "Sell"} – ${REGIONS[lead.region].name} (${lead.form_instance} form)`;
+  const choiceLabel = isLocal || isPm ? "Needs" : "Selling in";
+  const pageName = isLocal ? "Local agent" : isPm ? "Property management" : "Sell";
+  const page = `${pageName} – ${REGIONS[lead.region].name} (${lead.form_instance} form)`;
 
   const tracking: [string, string][] = [
     ["leadId", leadId], ["gclid", lead.gclid], ["gbraid", lead.gbraid], ["wbraid", lead.wbraid],

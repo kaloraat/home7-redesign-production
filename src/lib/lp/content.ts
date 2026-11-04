@@ -181,7 +181,100 @@ function sellContent(region: RegionKey): LpCopy {
   };
 }
 
+/** Chips on /lp/local-agent. The choice tells the office seller vs landlord. */
+export const LOCAL_CHIPS = {
+  sell: "Sell my property",
+  rent: "Rent out my property",
+  switch: SWITCH_CHIP,
+  appraisal: "Just an appraisal",
+} as const;
+
+/** Seller / landlord / not yet known, from a /lp/local-agent chip choice. */
+export function localLeadKind(choice: string): "sell" | "pm" | null {
+  if (choice === LOCAL_CHIPS.sell) return "sell";
+  if (choice === LOCAL_CHIPS.rent) return "pm";
+  return null;
+}
+
+/**
+ * /lp/local-agent: general "real estate agent near me" searches, so it has
+ * to work for sellers and landlords. Every line is reused (or lightly
+ * combined) from the sell and PM copy above. Service area is Liverpool and
+ * Campbelltown only on this page.
+ */
+function localContent(): LpCopy {
+  return {
+    title: "Local Real Estate Agent Liverpool & Campbelltown | Home7 Real Estate",
+    description: "Selling or renting out your property in Liverpool or Campbelltown? Family-owned local agents, low, negotiable fees and a free, no-obligation appraisal.",
+    eyebrow: "Liverpool & Campbelltown real estate",
+    h1: "Selling or renting out your property? Talk to a local agent who picks up the phone.",
+    subheading: "A small, family-owned local team. Low, negotiable fees. Free appraisal, no obligation.",
+    form: {
+      heading: "Get your free appraisal",
+      chipsLabel: "What do you need?",
+      chips: [LOCAL_CHIPS.sell, LOCAL_CHIPS.rent, LOCAL_CHIPS.switch, LOCAL_CHIPS.appraisal],
+      chipsName: "intent",
+      suburbLabel: "Property suburb",
+      suburbAutocomplete: "address-level2",
+      button: "Get my free appraisal",
+    },
+    defaultChoice: null,
+    microcopy: MICROCOPY,
+    whyHeading: "Why owners in Liverpool and Campbelltown choose Home7",
+    why: [
+      { title: "We answer. Every time.", body: "Call, text or email and you'll hear back the same day from the person who actually looks after your property. No call centres, no being passed around." },
+      { title: "Low fees, and they're negotiable.", body: "We keep our fees low because we'd rather grow by looking after owners well than by charging more. Tell us what you pay now and let's talk." },
+      { title: "An honest price, not an inflated one.", body: "We won't overquote to win your listing. You'll get a realistic price range backed by recent local sales, or an honest rent estimate if you're leasing." },
+    ],
+    included: null,
+    feesHeading: "What it costs",
+    fees: {
+      text: "Our fees are low, and they're negotiable. Tell us what you're paying now and we'll give you a straight answer, in writing, with no pressure to sign.",
+      button: "Compare my fees",
+    },
+    howHeading: "How it works",
+    how: [
+      { title: "Tell us about your property", body: "Fill in the form or call us. It takes 30 seconds." },
+      { title: "Free appraisal", body: "We look at your property and tell you honestly what it should sell or rent for in today's market." },
+      { title: "We sell it or lease it", body: "We negotiate hard for you or find a quality tenant, keep you informed at every step, and you always have someone to call." },
+    ],
+    recentHeading: "",
+    recentBadge: "Sold",
+    faqHeading: "Common questions",
+    faq: [],
+    finalHeading: "Get your free appraisal",
+    finalSub: "A friendly local team, low fees and real support. Let's talk about your property.",
+  };
+}
+
+/** The two "which one are you?" cards on /lp/local-agent. Points come from the sell and PM pages. */
+export const LOCAL_PATHS = [
+  {
+    title: "Selling your home",
+    href: "/lp/sell",
+    cta: "More about selling with Home7",
+    points: [
+      "Honest price advice, not an inflated one",
+      "Lower commission, agreed in writing up front",
+      "Regular updates after every open home and offer",
+      "Free, no-obligation market appraisal",
+    ],
+  },
+  {
+    title: "Renting out your property",
+    href: "/lp/property-management",
+    cta: "More about property management",
+    points: [
+      "Full management, all included",
+      "Routine inspections with photo reports",
+      "Rent arrears followed up fast",
+      "Switching agents? Just say yes. We handle the switch.",
+    ],
+  },
+] as const;
+
 export function getContent(type: LpLeadType, region: RegionKey, intent?: LpIntent): LpCopy {
+  if (type === "local") return localContent();
   return type === "pm" ? pmContent(region, intent) : sellContent(region);
 }
 
@@ -189,4 +282,5 @@ export const THANK_YOU = {
   pmSwitchFirst: "We'll take care of the switch with your current agent. You don't need to contact them.",
   pm: ["We'll ask a few quick questions about your property.", "We'll arrange a time for your free rental appraisal.", "You'll get an honest rent estimate and our fees in writing."],
   sell: ["We'll ask a few quick questions about your home.", "We'll book your free market appraisal at a time that suits you.", "You'll get an honest price range backed by recent local sales."],
+  local: ["We'll ask a few quick questions about your property.", "We'll arrange a time for your free appraisal.", "You'll get honest advice and our fees in writing."],
 } as const;
