@@ -54,9 +54,11 @@ function FieldGrid({ children, cols = 2 }: { children: React.ReactNode; cols?: 2
  * The site's "Residential Tenancy Application" — previously a blank,
  * printable PDF (see TenancyApplication.ts's own comment for the full
  * migration story) that had to be filled by hand and returned separately.
- * This is that same field set as a real, submittable online form. One
- * application per person, matching the source PDF's own instruction — not
- * a household-wide multi-applicant form.
+ * This is that same field set as a real, submittable online form. A couple
+ * can apply together: ticking "add a second applicant" opens a section for
+ * the second person's own details, documents and signature (sent as
+ * co_-prefixed fields), while property, address, reference and household
+ * answers are shared.
  *
  * `propertyAddress`/`propertySlug` are pre-filled (and, when present,
  * read-only) when this is reached from a specific rental listing's
@@ -86,6 +88,7 @@ export function TenancyApplicationForm({
   const [selfEmployed, setSelfEmployed] = useState(false);
   const [isStudent, setIsStudent] = useState(false);
   const [idDocumentsProvided, setIdDocumentsProvided] = useState<string[]>([]);
+  const [hasCoApplicant, setHasCoApplicant] = useState(false);
 
   function toggleIdDoc(doc: string) {
     setIdDocumentsProvided((prev) => (prev.includes(doc) ? prev.filter((d) => d !== doc) : [...prev, doc]));
@@ -131,8 +134,8 @@ export function TenancyApplicationForm({
       <div>
         <h1 className="font-display text-2xl sm:text-3xl text-brand-navy">Residential Tenancy Application</h1>
         <p className="mt-2 text-slate-500">
-          One application per person applying for the property. Fields marked{" "}
-          <span className="text-red-500">*</span> are required.
+          Applying as a couple? You can add a second applicant (husband, wife or partner) on this same form. Fields
+          marked <span className="text-red-500">*</span> are required.
         </p>
       </div>
 
@@ -188,7 +191,7 @@ export function TenancyApplicationForm({
 
       {/* Applicant details */}
       <section className="space-y-4">
-        <h2 className={sectionHeadingClass}>Applicant Details</h2>
+        <h2 className={sectionHeadingClass}>{hasCoApplicant ? "Applicant 1 Details" : "Applicant Details"}</h2>
         <FieldGrid cols={3}>
           <div>
             <label className={labelClass}>Title</label>
@@ -319,9 +322,158 @@ export function TenancyApplicationForm({
         </FieldGrid>
       </section>
 
+      {/* Second applicant (optional) */}
+      <section className="space-y-4">
+        <label className="flex items-start gap-3 rounded-lg border-2 border-brand-gold/60 bg-brand-gold/10 p-4 cursor-pointer">
+          <input
+            type="checkbox"
+            name="hasCoApplicant"
+            checked={hasCoApplicant}
+            onChange={(e) => setHasCoApplicant(e.target.checked)}
+            className="mt-0.5 h-5 w-5 shrink-0"
+          />
+          <span>
+            <span className="block font-semibold text-brand-navy">Add a second applicant</span>
+            <span className="block text-sm text-slate-600">
+              Applying with your husband, wife or partner? Add their details here instead of filling in a separate
+              form. Address, references and other answers below are shared by both of you.
+            </span>
+          </span>
+        </label>
+
+        {hasCoApplicant && (
+          <div className="space-y-4">
+            <h2 className={sectionHeadingClass}>Applicant 2 Details</h2>
+            <FieldGrid cols={3}>
+              <div>
+                <label className={labelClass}>Relationship to Applicant 1</label>
+                <input name="co_relationshipToApplicant" placeholder="Husband / Wife / Partner" className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Title</label>
+                <input name="co_title" placeholder="Mr / Mrs / Ms / Dr" className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>
+                  Date of Birth <span className="text-red-500">*</span>
+                </label>
+                <DateInput name="co_dateOfBirth" required className={inputClass} />
+              </div>
+            </FieldGrid>
+            <FieldGrid>
+              <div>
+                <label className={labelClass}>
+                  First Name <span className="text-red-500">*</span>
+                </label>
+                <input name="co_firstName" required className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>
+                  Family/Last Name <span className="text-red-500">*</span>
+                </label>
+                <input name="co_lastName" required className={inputClass} />
+              </div>
+            </FieldGrid>
+            <FieldGrid cols={3}>
+              <div>
+                <label className={labelClass}>
+                  Email <span className="text-red-500">*</span>
+                </label>
+                <input name="co_email" type="email" required className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>
+                  Mobile Phone <span className="text-red-500">*</span>
+                </label>
+                <input name="co_mobilePhone" type="tel" required className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Work Phone</label>
+                <input name="co_workPhone" type="tel" className={inputClass} />
+              </div>
+            </FieldGrid>
+            <FieldGrid>
+              <div>
+                <label className={labelClass}>Driver&apos;s Licence Number</label>
+                <input name="co_driversLicenceNumber" className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Licence Expiry Date</label>
+                <DateInput name="co_driversLicenceExpiry" className={inputClass} />
+              </div>
+            </FieldGrid>
+            <FieldGrid cols={3}>
+              <div>
+                <label className={labelClass}>Passport Number</label>
+                <input name="co_passportNumber" className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Passport Expiry Date</label>
+                <DateInput name="co_passportExpiry" className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Passport Country</label>
+                <input name="co_passportCountry" className={inputClass} />
+              </div>
+            </FieldGrid>
+
+            <p className="pt-2 text-sm font-semibold text-brand-navy">Applicant 2 Employment</p>
+            <FieldGrid>
+              <div>
+                <label className={labelClass}>Present Occupation</label>
+                <input name="co_presentOccupation" className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Nature of Employment</label>
+                <select name="co_natureOfEmployment" className={inputClass} defaultValue="">
+                  <option value="">Select</option>
+                  <option value="Full Time">Full Time</option>
+                  <option value="Part Time">Part Time</option>
+                  <option value="Casual">Casual</option>
+                </select>
+              </div>
+            </FieldGrid>
+            <FieldGrid>
+              <div>
+                <label className={labelClass}>Employer&apos;s Name</label>
+                <input name="co_employerName" className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Employer Phone</label>
+                <input name="co_employerPhone" type="tel" className={inputClass} />
+              </div>
+            </FieldGrid>
+            <FieldGrid>
+              <div>
+                <label className={labelClass}>Length of Employment (years/months)</label>
+                <input name="co_lengthOfEmployment" className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Weekly Income ($)</label>
+                <input name="co_weeklyIncome" className={inputClass} />
+              </div>
+            </FieldGrid>
+
+            <p className="pt-2 text-sm font-semibold text-brand-navy">Applicant 2 Documents</p>
+            <div>
+              <label className={labelClass}>
+                ID Documents (passport, licence, Medicare card, etc.) <span className="text-red-500">*</span>
+              </label>
+              <input name="co_idDocuments" type="file" multiple required accept=".pdf,.jpg,.jpeg,.png" className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Proof of Income (payslips, bank statement, tax return), if working</label>
+              <input name="co_proofOfIncome" type="file" multiple accept=".pdf,.jpg,.jpeg,.png" className={inputClass} />
+            </div>
+          </div>
+        )}
+      </section>
+
       {/* 100 points + documents */}
       <section className="space-y-4">
-        <h2 className={sectionHeadingClass}>Identification &amp; Supporting Documents</h2>
+        <h2 className={sectionHeadingClass}>
+          Identification &amp; Supporting Documents{hasCoApplicant ? " (Applicant 1)" : ""}
+        </h2>
         <p className="text-sm text-slate-500">
           Tick everything you&apos;re providing as part of your 100 points of ID and supporting documents (passport,
           driver&apos;s licence, tenancy ledger, rent receipts, bank statements, utility accounts, Medicare card,
@@ -465,7 +617,7 @@ export function TenancyApplicationForm({
 
       {/* Employment */}
       <section className="space-y-4">
-        <h2 className={sectionHeadingClass}>Employment</h2>
+        <h2 className={sectionHeadingClass}>{hasCoApplicant ? "Employment (Applicant 1)" : "Employment"}</h2>
         <div>
           <label className={labelClass}>Present Occupation</label>
           <input name="presentOccupation" className={inputClass} />
@@ -722,7 +874,7 @@ export function TenancyApplicationForm({
         <h2 className={sectionHeadingClass}>Declaration &amp; Signature</h2>
         <label className="flex items-start gap-2 text-sm text-slate-700">
           <input type="checkbox" name="consentOneFormPerApplicant" required className="mt-0.5 h-4 w-4" />
-          I acknowledge that one application form has to be completed per person applying.
+          I acknowledge that every adult applying must be named on this application or complete their own.
         </label>
         <label className="flex items-start gap-2 text-sm text-slate-700">
           <input type="checkbox" name="consentPrivacyPolicyReceived" required className="mt-0.5 h-4 w-4" />
@@ -736,10 +888,18 @@ export function TenancyApplicationForm({
 
         <div>
           <label className={labelClass}>
-            Type your full name to sign this application <span className="text-red-500">*</span>
+            {hasCoApplicant ? "Applicant 1: type" : "Type"} your full name to sign this application <span className="text-red-500">*</span>
           </label>
           <input name="signatureName" required placeholder="Full name" className={inputClass} />
         </div>
+        {hasCoApplicant && (
+          <div>
+            <label className={labelClass}>
+              Applicant 2: type your full name to sign this application <span className="text-red-500">*</span>
+            </label>
+            <input name="co_signatureName" required placeholder="Full name" className={inputClass} />
+          </div>
+        )}
 
         {errorMsg && <p className="text-sm text-red-600">{errorMsg}</p>}
 

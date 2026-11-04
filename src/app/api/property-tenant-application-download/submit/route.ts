@@ -129,6 +129,31 @@ const FieldsSchema = z.object({
   signatureName: z.string().min(1),
 });
 
+// Second applicant (couple applying together). Submitted as co_-prefixed
+// fields, only read when the form's "add a second applicant" box is ticked.
+const CoApplicantSchema = z.object({
+  relationshipToApplicant: z.string().optional(),
+  title: z.string().optional(),
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+  dateOfBirth: z.coerce.date(),
+  email: z.string().email(),
+  mobilePhone: z.string().min(1),
+  workPhone: z.string().optional(),
+  driversLicenceNumber: z.string().optional(),
+  driversLicenceExpiry: z.coerce.date().optional(),
+  passportNumber: z.string().optional(),
+  passportExpiry: z.coerce.date().optional(),
+  passportCountry: z.string().optional(),
+  presentOccupation: z.string().optional(),
+  natureOfEmployment: z.enum(["Full Time", "Part Time", "Casual"]).optional(),
+  employerName: z.string().optional(),
+  employerPhone: z.string().optional(),
+  lengthOfEmployment: z.string().optional(),
+  weeklyIncome: z.string().optional(),
+  signatureName: z.string().min(1),
+});
+
 const ALLOWED_FILE_TYPES = new Set(["application/pdf", "image/jpeg", "image/png"]);
 const MAX_FILE_BYTES = 5 * 1024 * 1024; // 5MB per file — several files expected per application
 
@@ -165,9 +190,26 @@ export async function POST(request: Request) {
   for (const key of Object.keys(raw)) {
     if (raw[key] === "") delete raw[key];
   }
+  const hasCoApplicant = raw.hasCoApplicant === "on";
+  const coRaw: Record<string, unknown> = {};
+  for (const key of Object.keys(raw)) {
+    if (key.startsWith("co_")) {
+      coRaw[key.slice(3)] = raw[key];
+      delete raw[key];
+    }
+  }
+  delete raw.hasCoApplicant;
+
   const parsed = FieldsSchema.safeParse(raw);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+  }
+  const coParsed = hasCoApplicant ? CoApplicantSchema.safeParse(coRaw) : null;
+  if (coParsed && !coParsed.success) {
+    return NextResponse.json(
+      { error: "Please complete the second applicant's required details (name, date of birth, email, mobile and signature)." },
+      { status: 400 }
+    );
   }
 
   const idDocumentsProvided = formData.getAll("idDocumentsProvided").filter((v): v is string => typeof v === "string");
@@ -181,10 +223,16 @@ export async function POST(request: Request) {
   let idDocumentUrls: string[] = [];
   let proofOfIncomeUrls: string[] = [];
   let rentalHistoryUrls: string[] = [];
+  let coIdDocumentUrls: string[] = [];
+  let coProofOfIncomeUrls: string[] = [];
   try {
     idDocumentUrls = await uploadMany(formData.getAll("idDocuments") as File[], uploadId, "ID Documents");
     proofOfIncomeUrls = await uploadMany(formData.getAll("proofOfIncome") as File[], uploadId, "Proof of Income");
     rentalHistoryUrls = await uploadMany(formData.getAll("rentalHistory") as File[], uploadId, "Rental History");
+    if (coParsed) {
+      coIdDocumentUrls = await uploadMany(formData.getAll("co_idDocuments") as File[], uploadId, "Second applicant ID Documents");
+      coProofOfIncomeUrls = await uploadMany(formData.getAll("co_proofOfIncome") as File[], uploadId, "Second applicant Proof of Income");
+    }
   } catch (err) {
     return NextResponse.json({ error: err instanceof Error ? err.message : "File upload failed" }, { status: 400 });
   }
@@ -194,6 +242,11 @@ export async function POST(request: Request) {
   if (proofOfIncomeUrls.length === 0) {
     return NextResponse.json({ error: "At least one proof of income document is required" }, { status: 400 });
   }
+  // Proof of income stays optional for the second applicant: one partner
+  // may not be working. ID is still required for both.
+  if (coParsed && coIdDocumentUrls.length === 0) {
+    return NextResponse.json({ error: "At least one ID document is required for the second applicant" }, { status: 400 });
+  }
 
   const application = new TenancyApplication({
     ...parsed.data,
@@ -202,6 +255,13 @@ export async function POST(request: Request) {
     proofOfIncomeUrls,
     rentalHistoryUrls,
     signedAt: new Date(),
+    ...(coParsed?.success && {
+      coApplicant: {
+        ...coParsed.data,
+        idDocumentUrls: coIdDocumentUrls,
+        proofOfIncomeUrls: coProofOfIncomeUrls,
+      },
+    }),
   });
   await application.save();
 

@@ -20,7 +20,8 @@ export async function notifyNewTenancyApplication(application: ITenancyApplicati
   if (!client) return;
 
   const to = getNotificationRecipients();
-  const applicantName = `${application.firstName} ${application.lastName}`;
+  const co = application.coApplicant;
+  const applicantName = `${application.firstName} ${application.lastName}${co ? ` & ${co.firstName} ${co.lastName}` : ""}`;
 
   try {
     const { error } = await client.resend.emails.send({
@@ -34,6 +35,7 @@ export async function notifyNewTenancyApplication(application: ITenancyApplicati
         `Property: ${application.propertyAddress}`,
         `Email: ${application.email}`,
         `Mobile: ${application.mobilePhone}`,
+        ...(co ? ["", `Second applicant: ${co.firstName} ${co.lastName}`, `Email: ${co.email}`, `Mobile: ${co.mobilePhone}`] : []),
         "",
         `Full application: ${SITE_URL}/admin/rental-applications/${application._id}`,
       ].join("\n"),

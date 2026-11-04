@@ -57,6 +57,7 @@ export default async function AdminRentalApplicationsPage() {
                     <td className="py-3 px-4">
                       <p className="font-medium text-slate-900">
                         {a.firstName} {a.lastName}
+                        {a.coApplicant && ` & ${a.coApplicant.firstName} ${a.coApplicant.lastName}`}
                       </p>
                       <p className="text-slate-500">{a.email}</p>
                     </td>

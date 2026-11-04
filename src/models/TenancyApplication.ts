@@ -8,10 +8,42 @@ import { Schema, models, model, type Document, type Model } from "mongoose";
 // is that same field set rebuilt as a real, submittable online form —
 // every field below traces to a labeled cell in that exact PDF, not
 // approximated. The PDF's own note ("one application form has to be
-// completed per person applying") confirms this is genuinely a
-// single-applicant form — each person submits their own copy, not one
-// form covering a whole household.
+// completed per person applying") made it a single-applicant form; the
+// online version also lets a couple apply together on one form, with the
+// second person's own details in `coApplicant` below.
 type YesNo = "Yes" | "No";
+
+// Optional second applicant on the same application (a couple applying
+// together, e.g. husband and wife). The PDF's "one form per person" rule
+// meant partners had to fill in everything twice even though they share
+// the property, addresses, references and household answers. This holds
+// only what is genuinely per-person: identity, contact, ID, employment,
+// their own documents and their own signature. Everything else on the
+// application is shared by both.
+export interface ICoApplicant {
+  relationshipToApplicant?: string; // "Spouse", "Partner", ...
+  title?: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: Date;
+  email: string;
+  mobilePhone: string;
+  workPhone?: string;
+  driversLicenceNumber?: string;
+  driversLicenceExpiry?: Date;
+  passportNumber?: string;
+  passportExpiry?: Date;
+  passportCountry?: string;
+  presentOccupation?: string;
+  natureOfEmployment?: "Full Time" | "Part Time" | "Casual";
+  employerName?: string;
+  employerPhone?: string;
+  lengthOfEmployment?: string;
+  weeklyIncome?: string;
+  idDocumentUrls: string[];
+  proofOfIncomeUrls: string[];
+  signatureName: string;
+}
 
 export interface ITenancyApplication extends Document {
   // Property/tenancy preference
@@ -158,12 +190,42 @@ export interface ITenancyApplication extends Document {
   signatureName: string;
   signedAt: Date;
 
+  coApplicant?: ICoApplicant;
+
   status: "new" | "reviewed" | "approved" | "declined";
   createdAt: Date;
   updatedAt: Date;
 }
 
 const YES_NO = ["Yes", "No"];
+
+const CoApplicantSchema = new Schema<ICoApplicant>(
+  {
+    relationshipToApplicant: String,
+    title: String,
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    dateOfBirth: { type: Date, required: true },
+    email: { type: String, required: true },
+    mobilePhone: { type: String, required: true },
+    workPhone: String,
+    driversLicenceNumber: String,
+    driversLicenceExpiry: Date,
+    passportNumber: String,
+    passportExpiry: Date,
+    passportCountry: String,
+    presentOccupation: String,
+    natureOfEmployment: { type: String, enum: ["Full Time", "Part Time", "Casual"] },
+    employerName: String,
+    employerPhone: String,
+    lengthOfEmployment: String,
+    weeklyIncome: String,
+    idDocumentUrls: [String],
+    proofOfIncomeUrls: [String],
+    signatureName: { type: String, required: true },
+  },
+  { _id: false }
+);
 
 const TenancyApplicationSchema = new Schema<ITenancyApplication>(
   {
@@ -285,6 +347,8 @@ const TenancyApplicationSchema = new Schema<ITenancyApplication>(
 
     signatureName: { type: String, required: true },
     signedAt: { type: Date, required: true },
+
+    coApplicant: { type: CoApplicantSchema, required: false },
 
     status: { type: String, enum: ["new", "reviewed", "approved", "declined"], default: "new" },
   },

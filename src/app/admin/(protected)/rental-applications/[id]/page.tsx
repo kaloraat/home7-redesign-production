@@ -50,6 +50,7 @@ export default async function RentalApplicationDetailPage({
         <div>
           <h1 className="font-display text-2xl text-brand-navy">
             {a.firstName} {a.lastName}
+            {a.coApplicant && ` & ${a.coApplicant.firstName} ${a.coApplicant.lastName}`}
           </h1>
           <p className="mt-1 text-slate-500">
             {a.propertyAddress} · Submitted {new Date(a.createdAt).toLocaleDateString("en-AU")}
@@ -103,7 +104,9 @@ export default async function RentalApplicationDetailPage({
       </div>
 
       <div className="mt-6 rounded-lg border border-slate-200 bg-white p-6">
-        <p className="text-sm font-medium text-slate-900 mb-3">Applicant Details</p>
+        <p className="text-sm font-medium text-slate-900 mb-3">
+          {a.coApplicant ? "Applicant 1 Details" : "Applicant Details"}
+        </p>
         <div className="grid grid-cols-2 gap-4">
           <Field label="Title" value={a.title} />
           <Field label="Full name" value={`${a.firstName} ${a.lastName}`} />
@@ -130,8 +133,59 @@ export default async function RentalApplicationDetailPage({
         </div>
       </div>
 
+      {a.coApplicant && (
+        <div className="mt-6 rounded-lg border-2 border-brand-gold/60 bg-white p-6">
+          <p className="text-sm font-medium text-slate-900 mb-3">Applicant 2 Details</p>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Relationship to applicant 1" value={a.coApplicant.relationshipToApplicant} />
+            <Field label="Title" value={a.coApplicant.title} />
+            <Field label="Full name" value={`${a.coApplicant.firstName} ${a.coApplicant.lastName}`} />
+            <Field label="Date of birth" value={fmtDate(a.coApplicant.dateOfBirth)} />
+            <Field label="Email" value={a.coApplicant.email} />
+            <Field label="Mobile" value={a.coApplicant.mobilePhone} />
+            <Field label="Work phone" value={a.coApplicant.workPhone} />
+            <Field label="Driver's licence" value={a.coApplicant.driversLicenceNumber} />
+            <Field label="Licence expiry" value={fmtDate(a.coApplicant.driversLicenceExpiry)} />
+            <Field label="Passport number" value={a.coApplicant.passportNumber} />
+            <Field label="Passport expiry" value={fmtDate(a.coApplicant.passportExpiry)} />
+            <Field label="Passport country" value={a.coApplicant.passportCountry} />
+          </div>
+          <div className="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 gap-4">
+            <Field label="Present occupation" value={a.coApplicant.presentOccupation} />
+            <Field label="Nature of employment" value={a.coApplicant.natureOfEmployment} />
+            <Field label="Employer" value={a.coApplicant.employerName} />
+            <Field label="Employer phone" value={a.coApplicant.employerPhone} />
+            <Field label="Length of employment" value={a.coApplicant.lengthOfEmployment} />
+            <Field label="Weekly income" value={a.coApplicant.weeklyIncome} />
+          </div>
+          <div className="mt-4 pt-4 border-t border-slate-100 space-y-3">
+            {(
+              [
+                ["ID Documents", a.coApplicant.idDocumentUrls],
+                ["Proof of Income", a.coApplicant.proofOfIncomeUrls],
+              ] as const
+            ).map(([label, urls]) =>
+              urls?.length > 0 ? (
+                <div key={label}>
+                  <p className="text-xs text-slate-400 mb-1">{label}</p>
+                  <div className="flex flex-wrap gap-3">
+                    {urls.map((url: string, i: number) => (
+                      <a key={url} href={url} target="_blank" rel="noopener noreferrer" className="text-brand-gold-dark hover:underline text-sm">
+                        File {i + 1}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              ) : null
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="mt-6 rounded-lg border border-slate-200 bg-white p-6">
-        <p className="text-sm font-medium text-slate-900 mb-3">Identification &amp; Documents</p>
+        <p className="text-sm font-medium text-slate-900 mb-3">
+          Identification &amp; Documents{a.coApplicant ? " (Applicant 1)" : ""}
+        </p>
         {a.idDocumentsProvided?.length > 0 && (
           <p className="text-sm text-slate-600 mb-3">Provided: {a.idDocumentsProvided.join(", ")}</p>
         )}
@@ -208,7 +262,9 @@ export default async function RentalApplicationDetailPage({
       )}
 
       <div className="mt-6 rounded-lg border border-slate-200 bg-white p-6">
-        <p className="text-sm font-medium text-slate-900 mb-3">Employment</p>
+        <p className="text-sm font-medium text-slate-900 mb-3">
+          Employment{a.coApplicant ? " (Applicant 1)" : ""}
+        </p>
         <div className="grid grid-cols-2 gap-4">
           <Field label="Present occupation" value={a.presentOccupation} />
           <Field label="Nature of employment" value={a.natureOfEmployment} />
@@ -290,7 +346,8 @@ export default async function RentalApplicationDetailPage({
       <div className="mt-6 rounded-lg border border-slate-200 bg-white p-6">
         <p className="text-sm font-medium text-slate-900 mb-3">Signature</p>
         <div className="grid grid-cols-2 gap-4">
-          <Field label="Signed by" value={a.signatureName} />
+          <Field label={a.coApplicant ? "Signed by applicant 1" : "Signed by"} value={a.signatureName} />
+          {a.coApplicant && <Field label="Signed by applicant 2" value={a.coApplicant.signatureName} />}
           <Field label="Signed at" value={fmtDate(a.signedAt)} />
         </div>
       </div>
