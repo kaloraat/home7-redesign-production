@@ -287,7 +287,10 @@ gmp-place-autocomplete::part(input) {
     left: 130%;
   }
 }
-@media (prefers-reduced-motion: reduce) {
+/* No shine below Tailwind's lg breakpoint (64rem): on phones the button is
+   pinned under the header the whole time, where a repeating sweep is more
+   distracting than helpful. */
+@media (prefers-reduced-motion: reduce), (max-width: 63.999rem) {
   .btn-shine::after {
     animation: none;
     display: none;
