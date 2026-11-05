@@ -296,3 +296,33 @@ gmp-place-autocomplete::part(input) {
     display: none;
   }
 }
+
+/*
+ * Tailwind v4's reset gives <button> the default arrow cursor. Every
+ * clickable control gets the pointer hand here, site-wide. In the base
+ * layer, so an explicit utility (cursor-not-allowed, cursor-default, ...)
+ * on an element still wins.
+ */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="radio"],
+  [role="tab"],
+  summary,
+  select:not(:disabled),
+  label:has(> input[type="checkbox"]:not(:disabled)),
+  label:has(> input[type="radio"]:not(:disabled)),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled),
+  input[type="file"]:not(:disabled),
+  input[type="submit"]:not(:disabled),
+  input[type="button"]:not(:disabled),
+  input[type="date"]:not(:disabled)::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+  }
+  button:disabled,
+  select:disabled,
+  input:disabled {
+    cursor: not-allowed;
+  }
+}
