@@ -98,13 +98,10 @@ export async function signedPrivateGet(key: string, filename: string, seconds = 
 }
 
 /** What the bytes say the file is, regardless of its name. */
-export function sniffType(bytes: Uint8Array): "pdf" | "jpg" | "png" | "heic" | null {
+export function sniffType(bytes: Uint8Array): "pdf" | "jpg" | "png" | null {
   const b = bytes;
   if (b[0] === 0x25 && b[1] === 0x50 && b[2] === 0x44 && b[3] === 0x46) return "pdf"; // %PDF
   if (b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff) return "jpg";
   if (b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47) return "png";
-  const ftyp = String.fromCharCode(...b.slice(4, 8));
-  const brand = String.fromCharCode(...b.slice(8, 12));
-  if (ftyp === "ftyp" && /^(heic|heix|heim|heis|hevc|hevx|mif1|msf1)$/.test(brand)) return "heic";
   return null;
 }

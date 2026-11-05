@@ -20,7 +20,7 @@ import { clientIp, createRateLimiter } from "@/lib/rateLimit";
  *  2. strict shape check (schema.ts), then the same completeness rules the
  *     form uses (validate.ts)
  *  3. every uploaded file: must belong to this upload session, exist, be
- *     ≤10MB, and its first bytes must really be a PDF/JPG/PNG/HEIC
+ *     ≤10MB, and its first bytes must really be a PDF/JPG/PNG
  *  4. files move from pending/ to applications/<id>/ in the private bucket
  *  5. save, then email staff a link to the admin page (no attachments)
  * Nothing personal is logged.
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
     const real = bytes ? sniffType(bytes) : null;
     const expected = ext === "jpeg" ? "jpg" : ext;
     if (!head || head.size === 0 || head.size > MAX_FILE_BYTES || real !== expected) {
-      return NextResponse.json({ error: `"${file.name}" couldn't be verified. Please remove it and upload it again (PDF, JPG, PNG or HEIC, up to 10MB).` }, { status: 400 });
+      return NextResponse.json({ error: `"${file.name}" couldn't be verified. Please remove it and upload it again (PDF, JPG or PNG, up to 10MB).` }, { status: 400 });
     }
     file.size = head.size;
     file.type = ALLOWED_UPLOADS[ext];

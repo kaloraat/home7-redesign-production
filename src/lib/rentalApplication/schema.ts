@@ -13,7 +13,7 @@ const month = opt(MONTHS as unknown as [string, ...string[]]);
 const year = z.string().regex(/^(|\d{4})$/);
 
 const fileRef = z.object({
-  key: z.string().regex(/^pending\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.(pdf|jpg|jpeg|png|heic)$/),
+  key: z.string().regex(/^pending\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.(pdf|jpg|jpeg|png)$/),
   name: s(200),
   size: z.number().int().nonnegative(),
   type: s(50),

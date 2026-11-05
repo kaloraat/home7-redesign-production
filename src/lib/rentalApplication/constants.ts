@@ -14,11 +14,13 @@ export const ALLOWED_UPLOADS: Record<string, string> = {
   jpg: "image/jpeg",
   jpeg: "image/jpeg",
   png: "image/png",
-  heic: "image/heic",
 };
-export const IMAGE_ONLY_EXTS = ["jpg", "jpeg", "png", "heic"];
-export const ACCEPT_ALL = ".pdf,.jpg,.jpeg,.png,.heic";
-export const ACCEPT_IMAGES = ".jpg,.jpeg,.png,.heic";
+// No HEIC on purpose: when a page doesn't accept HEIC, iPhones convert
+// photos to JPEG before uploading, so everything we store is JPG/PNG/PDF
+// (and every image can be embedded in the admin PDF).
+export const IMAGE_ONLY_EXTS = ["jpg", "jpeg", "png"];
+export const ACCEPT_ALL = ".pdf,.jpg,.jpeg,.png";
+export const ACCEPT_IMAGES = ".jpg,.jpeg,.png";
 
 export type UploadCategory = "about" | "proof-a" | "proof-b" | "id-a" | "id-b";
 

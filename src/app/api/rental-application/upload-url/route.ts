@@ -33,7 +33,7 @@ export async function POST(request: Request) {
   const ext = parsed.data.filename.split(".").pop()?.toLowerCase() ?? "";
   const contentType = ALLOWED_UPLOADS[ext];
   if (!contentType) {
-    return NextResponse.json({ error: "Use a PDF, JPG, PNG or HEIC file." }, { status: 400 });
+    return NextResponse.json({ error: "Use a PDF, JPG or PNG file." }, { status: 400 });
   }
 
   const key = `pending/${parsed.data.uploadSession}/${randomUUID()}.${ext}`;
