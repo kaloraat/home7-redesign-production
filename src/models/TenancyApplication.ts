@@ -1,4 +1,5 @@
 import { Schema, models, model, type Document, type Model } from "mongoose";
+import type { ApplicationData } from "@/lib/rentalApplication/types";
 
 // The old Laravel site's /property-tenant-application-download route never
 // rendered a page at all — it generated and force-downloaded a blank,
@@ -192,12 +193,26 @@ export interface ITenancyApplication extends Document {
 
   coApplicant?: ICoApplicant;
 
+  // v2 ("hub and sections" form, Nov 2026). Old applications have no
+  // formVersion and keep using the flat fields above. v2 applications fill
+  // only the summary fields above (names, email, mobile, property, rent,
+  // signature) and keep the full answers in `v2`, with uploads stored as
+  // private-bucket keys in v2's FileRefs (never public URLs).
+  formVersion?: number;
+  v2?: ApplicationData;
+  coApplicantName?: string;
+
   status: "new" | "reviewed" | "approved" | "declined";
   createdAt: Date;
   updatedAt: Date;
 }
 
 const YES_NO = ["Yes", "No"];
+
+// Only the old (v1) form collects these, so only v1 documents require them.
+function legacyRequired(this: { formVersion?: number }) {
+  return this.formVersion !== 2;
+}
 
 const CoApplicantSchema = new Schema<ICoApplicant>(
   {
@@ -243,13 +258,13 @@ const TenancyApplicationSchema = new Schema<ITenancyApplication>(
     title: String,
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    knownByOtherName: { type: String, enum: YES_NO, required: true },
+    knownByOtherName: { type: String, enum: YES_NO, required: legacyRequired },
     otherName: String,
-    hasDependents: { type: String, enum: YES_NO, required: true },
+    hasDependents: { type: String, enum: YES_NO, required: legacyRequired },
     dependentsAges: String,
     totalApplicants: String,
     dependentsNames: String,
-    dateOfBirth: { type: Date, required: true },
+    dateOfBirth: { type: Date, required: legacyRequired },
     email: { type: String, required: true },
     mobilePhone: { type: String, required: true },
     homePhone: String,
@@ -269,7 +284,7 @@ const TenancyApplicationSchema = new Schema<ITenancyApplication>(
     proofOfIncomeUrls: [String],
     rentalHistoryUrls: [String],
 
-    currentAddress: { type: String, required: true },
+    currentAddress: { type: String, required: legacyRequired },
     currentPostcode: String,
     currentLengthOfStay: String,
     currentRent: String,
@@ -330,25 +345,29 @@ const TenancyApplicationSchema = new Schema<ITenancyApplication>(
     overseasStudent: { type: String, enum: YES_NO },
     visaExpiry: Date,
 
-    everEvicted: { type: String, enum: YES_NO, required: true },
-    reasonAffectingRentAbility: { type: String, enum: YES_NO, required: true },
-    lastBondRefundedInFull: { type: String, enum: YES_NO, required: true },
-    inDebtToAgent: { type: String, enum: YES_NO, required: true },
+    everEvicted: { type: String, enum: YES_NO, required: legacyRequired },
+    reasonAffectingRentAbility: { type: String, enum: YES_NO, required: legacyRequired },
+    lastBondRefundedInFull: { type: String, enum: YES_NO, required: legacyRequired },
+    inDebtToAgent: { type: String, enum: YES_NO, required: legacyRequired },
     bondDeductionsOrDebtExplanation: String,
 
-    consentOneFormPerApplicant: { type: Boolean, required: true },
-    consentPrivacyPolicyReceived: { type: Boolean, required: true },
-    consentBindingApplication: { type: Boolean, required: true },
+    consentOneFormPerApplicant: { type: Boolean, required: legacyRequired },
+    consentPrivacyPolicyReceived: { type: Boolean, required: legacyRequired },
+    consentBindingApplication: { type: Boolean, required: legacyRequired },
 
     childrenCountAges: String,
     pets: String,
     vehicleMakeTypeRego: String,
-    smoker: { type: String, enum: YES_NO, required: true },
+    smoker: { type: String, enum: YES_NO, required: legacyRequired },
 
     signatureName: { type: String, required: true },
     signedAt: { type: Date, required: true },
 
     coApplicant: { type: CoApplicantSchema, required: false },
+
+    formVersion: Number,
+    v2: Schema.Types.Mixed,
+    coApplicantName: String,
 
     status: { type: String, enum: ["new", "reviewed", "approved", "declined"], default: "new" },
   },

@@ -1,5 +1,6 @@
 import { Document, Page, View, Text, Link, Image, StyleSheet } from "@react-pdf/renderer";
 import type { ITenancyApplication, ICoApplicant } from "@/models/TenancyApplication";
+import { applicationView } from "@/lib/rentalApplication/summary";
 
 // Same look as TenancyCheckPdf.tsx (brand hex values duplicated on purpose:
 // react-pdf has its own styling system and can't read the site's CSS vars).
@@ -156,7 +157,8 @@ export function TenancyApplicationPdf({
   attachments: PdfAttachment[];
 }) {
   const co = a.coApplicant;
-  const names = `${a.firstName} ${a.lastName}${co ? ` & ${co.firstName} ${co.lastName}` : ""}`;
+  const coName = co ? `${co.firstName} ${co.lastName}` : a.coApplicantName;
+  const names = `${a.firstName} ${a.lastName}${coName ? ` & ${coName}` : ""}`;
   const generatedAt = new Date().toLocaleString("en-AU", {
     day: "numeric",
     month: "short",
@@ -170,6 +172,51 @@ export function TenancyApplicationPdf({
       <Text render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`} />
     </View>
   );
+
+  // v2 (hub form): generic label/value groups from the shared view model.
+  if (a.formVersion === 2 && a.v2) {
+    const view = applicationView(a.v2, { propertyAddress: a.propertyAddress, rentPerWeek: a.rentPerWeek ? Number(a.rentPerWeek) : null });
+    return (
+      <Document title={`Rental Application: ${names}`}>
+        <Page size="A4" style={styles.page}>
+          <View style={styles.header}>
+            <View>
+              <Text style={styles.companyName}>Home7 Real Estate</Text>
+              <Text style={styles.docTitle}>Rental Application</Text>
+            </View>
+            <Text style={styles.meta}>Generated {generatedAt}</Text>
+          </View>
+          <Text style={styles.applicantName}>{names}</Text>
+          <Text style={styles.applicantSub}>
+            {a.propertyAddress} · Submitted {fmtDate(a.createdAt)} · Status: {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
+          </Text>
+          {view.groups.map((g) => (
+            <Section key={g.title} title={g.title}>
+              {g.fields.map((f) => (
+                <Field key={f.label} label={f.label} value={f.value} full={f.value.length > 60} />
+              ))}
+            </Section>
+          ))}
+          <Section title="Uploaded documents">
+            {view.files.length === 0 && <Field label="Files" value="None uploaded" full />}
+            {view.files.map((g) => (
+              <Field key={g.label} label={g.label} value={g.files.map((f) => f.name).join(", ")} full />
+            ))}
+            <Field label="Note" value="Files are stored privately. Open them from the admin page (staff login required). JPG and PNG images are included as pages at the end of this PDF." full />
+          </Section>
+          {footer}
+        </Page>
+        {attachments.map((att, i) => (
+          <Page key={i} size="A4" style={styles.page}>
+            <Text style={styles.attachmentTitle}>{att.label}</Text>
+            {/* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image, not an HTML img */}
+            <Image src={{ data: att.data, format: att.format }} style={styles.attachmentImage} />
+            {footer}
+          </Page>
+        ))}
+      </Document>
+    );
+  }
 
   return (
     <Document title={`Rental Application: ${names}`}>

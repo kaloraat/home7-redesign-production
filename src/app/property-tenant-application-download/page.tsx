@@ -1,10 +1,11 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/pageMetadata";
 import { getPropertyBySlug } from "@/lib/queries";
-import TenancyApplicationForm from "@/components/TenancyApplicationForm";
+import RentalApplication, { type Listing } from "@/components/rental-application/RentalApplication";
 
-const TITLE = "Tenant Application Form";
-const DESCRIPTION = "Apply online for a Home7 Real Estate rental property — the full Residential Tenancy Application.";
+const TITLE = "Rental Application";
+const DESCRIPTION = "Apply online for a Home7 Real Estate rental property.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -12,25 +13,31 @@ export const metadata: Metadata = {
   ...pageMetadata(TITLE, DESCRIPTION, "/property-tenant-application-download"),
 };
 
-// This URL previously force-downloaded a blank PDF on the old Laravel
-// site (see TenancyApplication.ts's own comment for the full story) — kept
-// exactly as-is per the zero-broken-links constraint, now rendering a real
-// online version of that same form instead of a download. `?property=`
-// (set by the rental-listing sidebar link, see property/[slug]/page.tsx)
-// pre-fills and locks the "First Preference" address; reached from the
-// nav with no query param, the field is blank and editable.
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<{ property?: string }>;
-}) {
-  const { property: propertySlug } = await searchParams;
-  const property = propertySlug ? await getPropertyBySlug(propertySlug) : null;
-  const propertyAddress = property ? `${property.address}, ${property.suburb} NSW ${property.postcode}` : undefined;
+// Kept at this URL (the old Laravel site's blank-PDF download link) so
+// existing links keep working. `?property=<slug>` loads the listing card;
+// without it, or for a slug that isn't a current rental, the applicant
+// types the address instead. `&step=<section>` is handled client-side.
+export default async function Page({ searchParams }: { searchParams: Promise<{ property?: string }> }) {
+  const { property: slug } = await searchParams;
+  const p = slug ? await getPropertyBySlug(slug) : null;
+  const listing: Listing | null =
+    p && p.listingType === "rent"
+      ? {
+          slug: p.slug,
+          street: p.address,
+          fullAddress: `${p.address}, ${p.suburb} ${p.state || "NSW"} ${p.postcode}`,
+          image: p.images?.[0] ?? null,
+          rentPerWeek: p.rentPerWeek ?? null,
+          available: p.dateAvailable ? new Date(p.dateAvailable).toISOString() : null,
+          beds: p.bedrooms ?? null,
+          baths: p.bathrooms ?? null,
+          cars: p.carSpaces ?? null,
+        }
+      : null;
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10">
-      <TenancyApplicationForm propertyAddress={propertyAddress} propertySlug={property?.slug} />
-    </div>
+    <Suspense fallback={<div className="mx-auto max-w-[900px] px-4 py-16 text-center text-slate-500">Loading your application…</div>}>
+      <RentalApplication listing={listing} />
+    </Suspense>
   );
 }

@@ -5,6 +5,8 @@ import dbConnect from "@/lib/db";
 import TenancyApplication from "@/models/TenancyApplication";
 import { updateApplicationStatus, deleteApplication } from "@/actions/rentalApplication.actions";
 import DeleteButton from "@/components/admin/DeleteButton";
+import { applicationView } from "@/lib/rentalApplication/summary";
+import type { ApplicationData } from "@/lib/rentalApplication/types";
 
 async function getApplication(id: string) {
   await dbConnect();
@@ -51,6 +53,7 @@ export default async function RentalApplicationDetailPage({
           <h1 className="font-display text-2xl text-brand-navy">
             {a.firstName} {a.lastName}
             {a.coApplicant && ` & ${a.coApplicant.firstName} ${a.coApplicant.lastName}`}
+            {!a.coApplicant && a.coApplicantName && ` & ${a.coApplicantName}`}
           </h1>
           <p className="mt-1 text-slate-500">
             {a.propertyAddress} · Submitted {new Date(a.createdAt).toLocaleDateString("en-AU")}
@@ -99,6 +102,10 @@ export default async function RentalApplicationDetailPage({
         ))}
       </div>
 
+      {a.formVersion === 2 && a.v2 ? (
+        <V2Details id={id} app={a.v2 as ApplicationData} propertyAddress={a.propertyAddress} rentPerWeek={a.rentPerWeek} />
+      ) : (
+        <>
       <div className="mt-6 rounded-lg border border-slate-200 bg-white p-6">
         <p className="text-sm font-medium text-slate-900 mb-3">Property &amp; Tenancy</p>
         <div className="grid grid-cols-2 gap-4">
@@ -361,6 +368,57 @@ export default async function RentalApplicationDetailPage({
           <Field label="Signed at" value={fmtDate(a.signedAt)} />
         </div>
       </div>
+        </>
+      )}
     </div>
+  );
+}
+
+/** v2 (hub form) applications: shared view model, files via the staff-only signed-link route. */
+function V2Details({ id, app, propertyAddress, rentPerWeek }: { id: string; app: ApplicationData; propertyAddress: string; rentPerWeek?: string }) {
+  const view = applicationView(app, { propertyAddress, rentPerWeek: rentPerWeek ? Number(rentPerWeek) : null });
+  return (
+    <>
+      {view.groups.map((g) => (
+        <div key={g.title} className="mt-6 rounded-lg border border-slate-200 bg-white p-6">
+          <p className="text-sm font-medium text-slate-900 mb-3">{g.title}</p>
+          <div className="grid grid-cols-2 gap-4">
+            {g.fields.map((f) => (
+              <div key={f.label} className={f.value.length > 60 ? "col-span-2" : undefined}>
+                <Field label={f.label} value={f.value} />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+      <div className="mt-6 rounded-lg border border-slate-200 bg-white p-6">
+        <p className="text-sm font-medium text-slate-900 mb-1">Uploaded documents</p>
+        <p className="mb-3 text-xs text-slate-400">Stored privately. Each link opens a copy that expires after 5 minutes.</p>
+        {view.files.length === 0 ? (
+          <p className="text-sm text-slate-500">No files uploaded.</p>
+        ) : (
+          <div className="space-y-3">
+            {view.files.map((g) => (
+              <div key={g.label}>
+                <p className="text-xs text-slate-400">{g.label}</p>
+                <div className="flex flex-wrap gap-3">
+                  {g.files.map((f) => (
+                    <a
+                      key={f.key}
+                      href={`/api/admin/rental-applications/${id}/file?key=${encodeURIComponent(f.key)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-brand-gold-dark hover:underline text-sm"
+                    >
+                      {f.name}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
   );
 }

@@ -4,6 +4,8 @@ import { auth } from "@/auth";
 import dbConnect from "@/lib/db";
 import TenancyApplication, { type ITenancyApplication } from "@/models/TenancyApplication";
 import { TenancyApplicationPdf, type PdfAttachment } from "@/lib/pdf/TenancyApplicationPdf";
+import { applicationView } from "@/lib/rentalApplication/summary";
+import { readPrivate } from "@/lib/s3Private";
 
 // @react-pdf/renderer needs real Node APIs (Buffer, streams).
 export const runtime = "nodejs";
@@ -26,6 +28,7 @@ function imageFormat(url: string): "jpg" | "png" | null {
  * just skipped instead of failing the whole PDF.
  */
 async function loadAttachments(a: ITenancyApplication): Promise<PdfAttachment[]> {
+  if (a.formVersion === 2 && a.v2) return loadPrivateAttachments(a);
   const co = a.coApplicant;
   const p1 = co ? "Applicant 1: " : "";
   const groups: [string, string[] | undefined][] = [
@@ -58,6 +61,25 @@ async function loadAttachments(a: ITenancyApplication): Promise<PdfAttachment[]>
   return results.filter((r): r is PdfAttachment => r !== null);
 }
 
+/** v2: JPG/PNG uploads read straight from the private bucket (no public URLs). */
+async function loadPrivateAttachments(a: ITenancyApplication): Promise<PdfAttachment[]> {
+  const { files } = applicationView(a.v2!, { propertyAddress: a.propertyAddress });
+  const wanted: { label: string; key: string; format: "jpg" | "png" }[] = [];
+  for (const g of files) {
+    g.files.forEach((f, i) => {
+      const format = imageFormat(f.key);
+      if (format) wanted.push({ label: `${g.label}, file ${i + 1}`, key: f.key, format });
+    });
+  }
+  const results = await Promise.all(
+    wanted.slice(0, MAX_EMBEDDED_IMAGES).map(async (w): Promise<PdfAttachment | null> => {
+      const data = await readPrivate(w.key);
+      return data ? { label: w.label, format: w.format, data } : null;
+    })
+  );
+  return results.filter((r): r is PdfAttachment => r !== null);
+}
+
 /** Admin-only PDF export of one rental application (same auth as tenancy-checks/[id]/pdf). */
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
@@ -76,7 +98,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const attachments = await loadAttachments(application);
   const buffer = await renderToBuffer(<TenancyApplicationPdf application={application} attachments={attachments} />);
 
-  const filenameSlug = [application.firstName, application.lastName, application.coApplicant?.firstName]
+  const filenameSlug = [application.firstName, application.lastName, application.coApplicant?.firstName ?? application.coApplicantName?.split(" ")[0]]
     .filter(Boolean)
     .join(" ")
     .toLowerCase()

@@ -21,7 +21,9 @@ export async function notifyNewTenancyApplication(application: ITenancyApplicati
 
   const to = getNotificationRecipients();
   const co = application.coApplicant;
-  const applicantName = `${application.firstName} ${application.lastName}${co ? ` & ${co.firstName} ${co.lastName}` : ""}`;
+  const coName = co ? `${co.firstName} ${co.lastName}` : application.coApplicantName;
+  const applicantName = `${application.firstName} ${application.lastName}${coName ? ` & ${coName}` : ""}`;
+  const v2Second = application.v2?.second?.personal;
 
   try {
     const { error } = await client.resend.emails.send({
@@ -36,6 +38,9 @@ export async function notifyNewTenancyApplication(application: ITenancyApplicati
         `Email: ${application.email}`,
         `Mobile: ${application.mobilePhone}`,
         ...(co ? ["", `Second applicant: ${co.firstName} ${co.lastName}`, `Email: ${co.email}`, `Mobile: ${co.mobilePhone}`] : []),
+        ...(v2Second ? ["", `Second applicant: ${coName}`, `Email: ${v2Second.email}`, `Mobile: ${v2Second.mobile}`] : []),
+        "",
+        "Documents are stored privately. Open them from the admin page (staff login required).",
         "",
         `Full application: ${SITE_URL}/admin/rental-applications/${application._id}`,
       ].join("\n"),

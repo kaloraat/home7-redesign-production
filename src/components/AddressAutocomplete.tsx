@@ -42,9 +42,29 @@ interface GoogleMapsGlobal {
  * (network issue, ad blocker, revoked key), the field still works as an
  * ordinary optional text field rather than disappearing.
  */
-export function AddressAutocomplete({ name = "address" }: { name?: string }) {
+export function AddressAutocomplete({
+  name = "address",
+  onChange,
+  placeholder = "Your Address",
+  inputClassName = "w-full border border-slate-300 rounded px-3 py-2.5 text-xl bg-white",
+}: {
+  name?: string;
+  /** Optional: report every change to a controlled parent (rental application). */
+  onChange?: (value: string) => void;
+  placeholder?: string;
+  inputClassName?: string;
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [address, setAddress] = useState("");
+  const [address, setAddressState] = useState("");
+  // Read through a ref so the once-only effect below always calls the latest prop.
+  const onChangeRef = useRef(onChange);
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+  const setAddress = (value: string) => {
+    setAddressState(value);
+    onChangeRef.current?.(value);
+  };
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -95,7 +115,7 @@ export function AddressAutocomplete({ name = "address" }: { name?: string }) {
         // treatment instead, so this element just needs to sit flush inside
         // it (full width, no border/padding of its own to avoid doubling up).
         autocomplete.style.width = "100%";
-        autocomplete.setAttribute("placeholder", "Your Address");
+        autocomplete.setAttribute("placeholder", placeholder);
         // Hides the built-in search-icon — documented attribute per Google's
         // reference (reflects the noInputIcon IDL property). The input
         // text/placeholder itself is styled to match the sibling fields via
@@ -164,7 +184,8 @@ export function AddressAutocomplete({ name = "address" }: { name?: string }) {
       unsubscribe();
       element?.remove();
     };
-  }, []);
+    // placeholder is a fixed string per usage; it never changes after mount.
+  }, [placeholder]);
 
   return (
     <div>
@@ -172,8 +193,10 @@ export function AddressAutocomplete({ name = "address" }: { name?: string }) {
         <input
           name={name}
           type="text"
-          placeholder="Your Address"
-          className="w-full border border-slate-300 rounded px-3 py-2.5 text-xl bg-white"
+          placeholder={placeholder}
+          aria-label={placeholder}
+          onChange={(e) => onChange?.(e.target.value)}
+          className={inputClassName}
         />
       )}
       <div

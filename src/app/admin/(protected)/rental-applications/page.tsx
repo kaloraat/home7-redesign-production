@@ -58,6 +58,7 @@ export default async function AdminRentalApplicationsPage() {
                       <p className="font-medium text-slate-900">
                         {a.firstName} {a.lastName}
                         {a.coApplicant && ` & ${a.coApplicant.firstName} ${a.coApplicant.lastName}`}
+                        {!a.coApplicant && a.coApplicantName && ` & ${a.coApplicantName}`}
                       </p>
                       <p className="text-slate-500">{a.email}</p>
                     </td>
