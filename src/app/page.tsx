@@ -19,7 +19,7 @@ import WhyHome7 from "@/components/WhyHome7";
 import BrandStory from "@/components/BrandStory";
 import TeamGrid from "@/components/TeamGrid";
 import Testimonials from "@/components/Testimonials";
-import { COMPANY, SITE_NAME, SITE_URL, TARGET_SUBURBS, GOOGLE_RATING } from "@/lib/constants";
+import { COMPANY, SITE_NAME, SITE_URL, TARGET_SUBURBS, GOOGLE_RATING, ORG_ID, GOOGLE_MAPS_URL, OFFICE_GEO } from "@/lib/constants";
 
 // JSON-LD structured data for the homepage — RealEstateAgent (a LocalBusiness
 // subtype) is the single highest-leverage addition for the project's stated
@@ -35,9 +35,24 @@ function buildJsonLd() {
     {
       "@context": "https://schema.org",
       "@type": "RealEstateAgent",
+      "@id": ORG_ID,
       name: SITE_NAME,
       image: `${SITE_URL}/images/logo-footer.png`,
+      logo: `${SITE_URL}/images/logo-footer.png`,
       url: SITE_URL,
+      geo: { "@type": "GeoCoordinates", latitude: OFFICE_GEO.lat, longitude: OFFICE_GEO.lng },
+      hasMap: GOOGLE_MAPS_URL,
+      // Must match COMPANY.openingHours (shown on the contact page) and the
+      // Google Business Profile hours.
+      openingHoursSpecification: [
+        {
+          "@type": "OpeningHoursSpecification",
+          dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+          opens: "09:00",
+          closes: "17:00",
+        },
+        { "@type": "OpeningHoursSpecification", dayOfWeek: "Saturday", opens: "09:00", closes: "16:00" },
+      ],
       telephone: COMPANY.phone,
       email: COMPANY.email,
       address: {
@@ -53,7 +68,7 @@ function buildJsonLd() {
       // own schema entity either way (a personal profile isn't "the same
       // as" the company), and inconsistent with COMPANY.facebook/linkedin
       // below anyway. See constants.ts for how these were confirmed.
-      sameAs: [COMPANY.facebook, COMPANY.linkedin],
+      sameAs: [COMPANY.facebook, COMPANY.linkedin, GOOGLE_MAPS_URL],
       // Real, sourced figures (Testimonials.tsx displays the same
       // GOOGLE_RATING to actual visitors on this same page) — not
       // fabricated, which matters: Google's structured-data guidelines
@@ -72,6 +87,7 @@ function buildJsonLd() {
       "@type": "WebSite",
       name: SITE_NAME,
       url: SITE_URL,
+      publisher: { "@id": ORG_ID },
     },
   ];
 }

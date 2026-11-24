@@ -273,6 +273,19 @@ export const GOOGLE_RATING = { value: 4.7, count: 44 };
 // (rlz, oq, gs_lcrp, sourceid, ...) that were on the original URL this came
 // from — those are tied to one browser's search session and serve no
 // purpose for other visitors, just clutter.
+// One identity for the business across every page's JSON-LD: the homepage
+// defines the full RealEstateAgent under this @id, and blog posts, agent
+// pages etc. reference it, so Google joins them into one entity.
+export const ORG_ID = `${SITE_URL}/#organization`;
+
+// Same Google place as GOOGLE_REVIEWS_URL below (its 0xe6b905e70ea37b51
+// half is the place's CID in hex). Used as hasMap/sameAs in schema so the
+// site's entity is tied to the Google Business Profile.
+export const GOOGLE_MAPS_URL = "https://maps.google.com/?cid=16625325989356075857";
+
+// Office pin, shared by the contact map and schema.org `geo`.
+export const OFFICE_GEO = { lat: -33.922678721851504, lng: 150.9208817756947 };
+
 export const GOOGLE_REVIEWS_URL =
   "https://www.google.com/search?q=home+7#lrd=0x6b129519b9b0156d:0xe6b905e70ea37b51,1,,,,";
 

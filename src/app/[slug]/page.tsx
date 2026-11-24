@@ -5,7 +5,7 @@ import Link from "next/link";
 import { notFound, redirect, permanentRedirect } from "next/navigation";
 import { getContentBySlug, getRedirect } from "@/lib/queries";
 import { normalizeLegacyHtml, stripDuplicateTitle } from "@/lib/legacyContent";
-import { SITE_URL, BLOG_CONTACT_FORM_HEADING, BLOG_CONTACT_FORM_INTRO } from "@/lib/constants";
+import { SITE_URL, SITE_NAME, ORG_ID, BLOG_CONTACT_FORM_HEADING, BLOG_CONTACT_FORM_INTRO } from "@/lib/constants";
 import ContactForm from "@/components/ContactForm";
 import BlogSidebar from "@/components/blog/BlogSidebar";
 import BlogContactFab from "@/components/blog/BlogContactFab";
@@ -84,6 +84,26 @@ export default async function Page({
       ],
     };
 
+    // Root pages are articles too (market guides, how-tos), so they get the
+    // same Article markup blog posts get, tied to the business via ORG_ID.
+    const articleJsonLd = {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: page.title,
+      description: page.seoDescription || page.excerpt,
+      image: page.coverImage || undefined,
+      datePublished: page.publishedAt?.toISOString(),
+      dateModified: page.updatedAt?.toISOString(),
+      author: { "@type": "Organization", "@id": ORG_ID, name: SITE_NAME, url: SITE_URL },
+      publisher: {
+        "@type": "Organization",
+        "@id": ORG_ID,
+        name: SITE_NAME,
+        logo: { "@type": "ImageObject", url: `${SITE_URL}/images/logo-footer.png` },
+      },
+      mainEntityOfPage: `${SITE_URL}/${page.slug}`,
+    };
+
     return (
       // No background here — the site's own light-grey textured background
       // (globals.css, on <body>) already shows through, matching every
@@ -92,6 +112,10 @@ export default async function Page({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
         />
 
         <div className="mx-auto max-w-7xl px-4 py-10">

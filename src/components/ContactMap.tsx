@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { COMPANY } from "@/lib/constants";
+import { COMPANY, OFFICE_GEO } from "@/lib/constants";
 import { loadGoogleMaps, onGoogleMapsAuthFailure } from "@/lib/googleMapsLoader";
 
 // No @types/google.maps package is installed — see AddressAutocomplete.tsx
@@ -45,7 +45,7 @@ const MAP_ID = process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID || "DEMO_MAP_ID";
 // Same coordinates the old iframe embed used (decoded from its pb= param:
 // !2d150.9208817756947!3d-33.922678721851504) — Home7 Real Estate, Suite
 // 1/209 Macquarie Street, Liverpool NSW.
-const HOME7_LOCATION: LatLngLiteral = { lat: -33.922678721851504, lng: 150.9208817756947 };
+const HOME7_LOCATION: LatLngLiteral = OFFICE_GEO;
 
 const DIRECTIONS_URL = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
   `Home7 Real Estate, ${COMPANY.address}`

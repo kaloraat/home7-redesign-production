@@ -3,6 +3,7 @@ import dbConnect from "@/lib/db";
 import Property from "@/models/Property";
 import Agent from "@/models/Agent";
 import Content from "@/models/Content";
+import Redirect from "@/models/Redirect";
 import { SITE_URL } from "@/lib/constants";
 
 const STATIC_PATHS = [
@@ -47,13 +48,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     await dbConnect();
 
-    const [properties, agents, content] = await Promise.all([
+    const [properties, agents, content, redirects] = await Promise.all([
       Property.find({}, "slug updatedAt images").lean(),
       Agent.find({ active: true }, "slug photo").lean(),
       Content.find({ status: "published" }, "slug urlPath updatedAt coverImage").lean(),
+      Redirect.find({}, "fromPath").lean(),
     ]);
+    // A page that has a row in /admin/redirects never renders (proxy.ts
+    // redirects it first), so listing it would send Google to a redirect.
+    // This lets a consolidation be done with a redirect alone, without
+    // also unpublishing the old Content row.
+    const redirected = new Set(redirects.map((r) => r.fromPath));
 
     for (const p of properties) {
+      if (redirected.has(`/property/${p.slug}`)) continue;
       entries.push({
         url: `${SITE_URL}/property/${p.slug}`,
         lastModified: p.updatedAt,
@@ -61,6 +69,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       });
     }
     for (const a of agents) {
+      if (redirected.has(`/agent/${a.slug}`)) continue;
       entries.push({
         url: `${SITE_URL}/agent/${a.slug}`,
         ...(a.photo ? { images: [a.photo] } : {}),
@@ -69,6 +78,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     for (const c of content) {
       const path =
         c.urlPath === "blog" ? `/blog/${c.slug}` : c.urlPath === "suburb" ? `/suburb/${c.slug}` : `/${c.slug}`;
+      if (redirected.has(path)) continue;
       entries.push({
         url: `${SITE_URL}${path}`,
         lastModified: c.updatedAt,

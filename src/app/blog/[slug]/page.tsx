@@ -6,7 +6,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { getContentBySlug } from "@/lib/queries";
 import { normalizeLegacyHtml, stripDuplicateTitle } from "@/lib/legacyContent";
 import { RICH_TEXT_CLASSNAME } from "@/lib/richTextClassName";
-import { SITE_URL, SITE_NAME, BLOG_CONTACT_FORM_HEADING, BLOG_CONTACT_FORM_INTRO } from "@/lib/constants";
+import { SITE_URL, SITE_NAME, ORG_ID, BLOG_CONTACT_FORM_HEADING, BLOG_CONTACT_FORM_INTRO } from "@/lib/constants";
 import ContactForm from "@/components/ContactForm";
 import BlogSidebar from "@/components/blog/BlogSidebar";
 import BlogContactFab from "@/components/blog/BlogContactFab";
@@ -95,12 +95,17 @@ export default async function Page({
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: post.title,
-    description: post.excerpt,
+    description: post.seoDescription || post.excerpt,
     image: post.coverImage || undefined,
     datePublished: post.publishedAt?.toISOString(),
     dateModified: post.updatedAt.toISOString(),
-    author: { "@type": "Organization", name: SITE_NAME },
-    publisher: { "@type": "Organization", name: SITE_NAME },
+    author: { "@type": "Organization", "@id": ORG_ID, name: SITE_NAME, url: SITE_URL },
+    publisher: {
+      "@type": "Organization",
+      "@id": ORG_ID,
+      name: SITE_NAME,
+      logo: { "@type": "ImageObject", url: `${SITE_URL}/images/logo-footer.png` },
+    },
     mainEntityOfPage: `${SITE_URL}/blog/${post.slug}`,
   };
 

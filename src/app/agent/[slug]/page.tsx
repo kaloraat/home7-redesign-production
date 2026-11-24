@@ -3,15 +3,7 @@ import Image from "next/image";
 import { notFound, permanentRedirect } from "next/navigation";
 import { getAgentBySlug, getPropertiesByAgent } from "@/lib/queries";
 import { PhoneIcon, MobileIcon, EmailIcon, FacebookIcon, LinkedInIcon } from "@/components/icons";
-import {
-  SITE_URL,
-  BLOG_CONTACT_FORM_INTRO,
-  COMPANY,
-  MESH_NAVY_BASE,
-  MESH_GLOW_BRIGHT_BLUE,
-  MESH_GLOW_LIGHT_BLUE,
-  MESH_GLOW_DEEP_BLUE,
-} from "@/lib/constants";
+import { SITE_URL, BLOG_CONTACT_FORM_INTRO, COMPANY, MESH_NAVY_BASE, MESH_GLOW_BRIGHT_BLUE, MESH_GLOW_LIGHT_BLUE, MESH_GLOW_DEEP_BLUE, ORG_ID, SITE_NAME } from "@/lib/constants";
 import MeshBackground from "@/components/MeshBackground";
 import PropertyCard from "@/components/PropertyCard";
 import ResponsiveCardGrid from "@/components/ResponsiveCardGrid";
@@ -111,7 +103,7 @@ export default async function Page({
     image: agent.photo || undefined,
     telephone: agent.phone || agent.mobile || undefined,
     email: agent.email || undefined,
-    worksFor: { "@type": "RealEstateAgent", name: "Home7 Real Estate" },
+    worksFor: { "@type": "RealEstateAgent", "@id": ORG_ID, name: SITE_NAME },
     url: `${SITE_URL}/agent/${agent.slug}`,
     sameAs: sameAs.length > 0 ? sameAs : undefined,
   };
