@@ -188,7 +188,7 @@ export type LeadType = (typeof LEAD_TYPES)[number];
 // one source so the copy can't drift between them.
 export const BLOG_CONTACT_FORM_HEADING = "Talk to a Local Property Expert";
 export const BLOG_CONTACT_FORM_INTRO =
-  "Got a question about buying, selling or renting in Liverpool? Leave your details and a local property expert will get back to you personally — no call centres, no pressure.";
+  "Got a question about buying, selling or renting in Liverpool? Leave your details and a local property expert will get back to you personally. No call centres, no pressure.";
 
 /**
  * Brand story copy, kept verbatim from the live site's homepage blockquote
@@ -219,7 +219,7 @@ export const WHY_HOME7 = [
   {
     title: "Local Market Expertise",
     description:
-      "Deep, street-by-street knowledge of Liverpool and South West Sydney — not a generic citywide view.",
+      "Deep, street-by-street knowledge of Liverpool and South West Sydney, not a generic citywide view.",
   },
   {
     title: "Dedicated Communication",
@@ -239,12 +239,12 @@ export const WHY_HOME7 = [
   {
     title: "Genuinely Approachable",
     description:
-      "No corporate scripts or sales pressure — straight-talking advice from people who treat you like a friend, not a file number.",
+      "No corporate scripts or sales pressure. Just straight-talking advice from people who treat you like a friend, not a file number.",
   },
   {
     title: "Small Team, Big Heart",
     description:
-      "Not a big franchise machine — a close-knit local team that treats every sale like it's for our own family.",
+      "Not a big franchise machine. A close-knit local team that treats every sale like it's for our own family.",
   },
 ] as const;
 

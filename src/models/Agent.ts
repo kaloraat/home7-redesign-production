@@ -12,6 +12,7 @@ export interface IAgent extends Document {
   facebook?: string;
   linkedin?: string;
   bio?: string;
+  licence?: string; // NSW Fair Trading licence/certificate number
   order: number;
   active: boolean;
 }
@@ -29,6 +30,7 @@ const AgentSchema = new Schema<IAgent>(
     facebook: String,
     linkedin: String,
     bio: String,
+    licence: String,
     order: { type: Number, default: 0 },
     active: { type: Boolean, default: true },
   },

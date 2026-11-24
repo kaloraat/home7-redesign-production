@@ -18,7 +18,7 @@ export function SuburbShowcase() {
           Local Experts Across South West Sydney
         </h2>
         <p className="mt-3 text-lg text-slate-600 leading-relaxed">
-          From our Liverpool home base out to the growth corridors — we know these
+          From our Liverpool home base out to the growth corridors, we know these
           streets, these buyers, and these markets.
         </p>
       </div>

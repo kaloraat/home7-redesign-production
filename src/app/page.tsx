@@ -6,6 +6,7 @@ import {
   getFeaturedProperties,
   getPublishedContent,
   getAgents,
+  getResultCounts,
 } from "@/lib/queries";
 import HeroSearch from "@/components/HeroSearch";
 import HeroQuickLinks from "@/components/HeroQuickLinks";
@@ -19,6 +20,8 @@ import WhyHome7 from "@/components/WhyHome7";
 import BrandStory from "@/components/BrandStory";
 import TeamGrid from "@/components/TeamGrid";
 import Testimonials from "@/components/Testimonials";
+import HomeIntro from "@/components/HomeIntro";
+import HomeFaq from "@/components/HomeFaq";
 import { COMPANY, SITE_NAME, SITE_URL, TARGET_SUBURBS, GOOGLE_RATING, ORG_ID, GOOGLE_MAPS_URL, OFFICE_GEO } from "@/lib/constants";
 
 // JSON-LD structured data for the homepage — RealEstateAgent (a LocalBusiness
@@ -93,7 +96,7 @@ function buildJsonLd() {
 }
 
 export default async function Home() {
-  const [featured, forSale, forRent, sold, leased, posts, agents] = await Promise.all([
+  const [featured, forSale, forRent, sold, leased, posts, agents, resultCounts] = await Promise.all([
     getFeaturedProperties(6),
     // Topped up with recent sold/leased cards when fewer than 6 are active.
     getActiveListingsWithFill("sale", 6),
@@ -102,6 +105,7 @@ export default async function Home() {
     getPropertiesByType("leased", 6),
     getPublishedContent("blog", 4),
     getAgents(),
+    getResultCounts(),
   ]);
 
   const jsonLd = buildJsonLd();
@@ -272,11 +276,13 @@ export default async function Home() {
         />
       </section>
 
+      <HomeIntro sold={resultCounts.sold} leased={resultCounts.leased} />
       <SuburbShowcase />
       <WhyHome7 />
       <BrandStory />
       <TeamGrid agents={agents} />
       <Testimonials />
+      <HomeFaq />
 
       <section className="mx-auto max-w-6xl 2xl:max-w-384 px-4 py-16 sm:py-20">
         <div className="border-b border-slate-200 pb-4">

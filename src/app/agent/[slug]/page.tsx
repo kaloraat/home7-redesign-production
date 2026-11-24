@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound, permanentRedirect } from "next/navigation";
-import { getAgentBySlug, getPropertiesByAgent } from "@/lib/queries";
+import Link from "next/link";
+import { getAgentBySlug, getAgentTrackRecord, getPropertiesByAgent } from "@/lib/queries";
 import { PhoneIcon, MobileIcon, EmailIcon, FacebookIcon, LinkedInIcon } from "@/components/icons";
-import { SITE_URL, BLOG_CONTACT_FORM_INTRO, COMPANY, MESH_NAVY_BASE, MESH_GLOW_BRIGHT_BLUE, MESH_GLOW_LIGHT_BLUE, MESH_GLOW_DEEP_BLUE, ORG_ID, SITE_NAME } from "@/lib/constants";
+import { SITE_URL, BLOG_CONTACT_FORM_INTRO, COMPANY, MESH_NAVY_BASE, MESH_GLOW_BRIGHT_BLUE, MESH_GLOW_LIGHT_BLUE, MESH_GLOW_DEEP_BLUE, ORG_ID, SITE_NAME, TARGET_SUBURBS, suburbSlug } from "@/lib/constants";
 import MeshBackground from "@/components/MeshBackground";
 import PropertyCard from "@/components/PropertyCard";
 import ResponsiveCardGrid from "@/components/ResponsiveCardGrid";
@@ -21,7 +22,12 @@ export async function generateMetadata({
   if (!agent) return {};
 
   const title = agent.name;
-  const description = `${agent.name} — ${agent.role} at Home7 Real Estate, Liverpool NSW.`;
+  const record = await getAgentTrackRecord(String(agent._id));
+  const results =
+    record.soldCount + record.leasedCount > 0
+      ? ` ${record.soldCount} properties sold and ${record.leasedCount} leased across Liverpool and South West Sydney.`
+      : "";
+  const description = `${agent.name}, ${agent.role} at Home7 Real Estate in Liverpool NSW.${results}`;
   const url = `${SITE_URL}/agent/${agent.slug}`;
 
   return {
@@ -66,7 +72,13 @@ export default async function Page({
   // Internal linking — this page had zero links into any property page
   // before, despite being the natural "who's selling this" companion to
   // the "Listed by {agent}" link property pages now carry back here.
-  const listings = await getPropertiesByAgent(String(agent._id));
+  const [listings, record] = await Promise.all([
+    getPropertiesByAgent(String(agent._id)),
+    getAgentTrackRecord(String(agent._id)),
+  ]);
+  const firstName = agent.name.split(" ")[0];
+  const topSuburbs = record.suburbs.slice(0, 12);
+  const bioParagraphs = (agent.bio || "").split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
 
   // Mohammed-specific per explicit request — everyone else keeps the
   // shared BLOG_CONTACT_FORM_INTRO copy ("a local property expert"),
@@ -106,6 +118,16 @@ export default async function Page({
     worksFor: { "@type": "RealEstateAgent", "@id": ORG_ID, name: SITE_NAME },
     url: `${SITE_URL}/agent/${agent.slug}`,
     sameAs: sameAs.length > 0 ? sameAs : undefined,
+    hasCredential: agent.licence
+      ? {
+          "@type": "EducationalOccupationalCredential",
+          credentialCategory: "license",
+          name: "NSW real estate licence",
+          identifier: agent.licence,
+          recognizedBy: { "@type": "GovernmentOrganization", name: "NSW Fair Trading" },
+        }
+      : undefined,
+    knowsAbout: topSuburbs.length > 0 ? topSuburbs.map((s) => `${s.name} NSW real estate`) : undefined,
   };
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -167,6 +189,9 @@ export default async function Page({
             </p>
             <h1 className="mt-1 font-display text-3xl sm:text-4xl">{agent.name}</h1>
             <p className="mt-1 text-slate-200">{agent.role}</p>
+            {agent.licence && (
+              <p className="mt-1 text-sm text-slate-300">NSW licence no. {agent.licence}</p>
+            )}
 
             {/* Falls back to Home7's own Facebook/LinkedIn (facebookUrl/
                 linkedinUrl above) when this agent has no page of their
@@ -261,12 +286,60 @@ export default async function Page({
             )}
           </div>
 
-          {agent.bio && (
+          {bioParagraphs.length > 0 && (
             <div className="mt-8">
               <h2 className="font-display text-xl text-brand-navy pb-2 border-b-2 border-brand-gold inline-block">
-                Description
+                About {firstName}
               </h2>
-              <p className="mt-4 text-lg text-slate-600 leading-relaxed">{agent.bio}</p>
+              <div className="mt-4 space-y-4">
+                {bioParagraphs.map((p, i) => (
+                  <p key={i} className="text-lg text-slate-600 leading-relaxed">
+                    {p}
+                  </p>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Real results from this agent's own listings in the DB, so the
+              numbers can never drift from what the site actually shows. */}
+          {record.soldCount + record.leasedCount > 0 && (
+            <div className="mt-8">
+              <h2 className="font-display text-xl text-brand-navy pb-2 border-b-2 border-brand-gold inline-block">
+                Track Record
+              </h2>
+              <dl className="mt-4 grid grid-cols-2 gap-4 max-w-md">
+                <div className="rounded-lg border border-slate-200 bg-white p-4">
+                  <dt className="text-sm text-slate-500">Properties sold</dt>
+                  <dd className="font-display text-3xl text-brand-navy">{record.soldCount}</dd>
+                </div>
+                <div className="rounded-lg border border-slate-200 bg-white p-4">
+                  <dt className="text-sm text-slate-500">Properties leased</dt>
+                  <dd className="font-display text-3xl text-brand-navy">{record.leasedCount}</dd>
+                </div>
+              </dl>
+              {topSuburbs.length > 0 && (
+                <>
+                  <h3 className="mt-6 font-semibold text-brand-navy">Suburbs {firstName} has worked in</h3>
+                  <ul className="mt-3 flex flex-wrap gap-2">
+                    {topSuburbs.map((s) => {
+                      const hasPage = (TARGET_SUBURBS as readonly string[]).includes(s.name);
+                      const chip = "rounded-full border border-slate-300 bg-white px-3 py-1 text-sm text-slate-700";
+                      return (
+                        <li key={s.name}>
+                          {hasPage ? (
+                            <Link href={`/suburb/${suburbSlug(s.name)}`} className={`${chip} inline-block hover:border-brand-gold hover:text-brand-gold-dark`}>
+                              {s.name}
+                            </Link>
+                          ) : (
+                            <span className={`${chip} inline-block`}>{s.name}</span>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </>
+              )}
             </div>
           )}
         </div>
@@ -313,6 +386,26 @@ export default async function Page({
           <div className="mt-8">
             <ResponsiveCardGrid
               items={listings}
+              renderItem={(p) => <PropertyCard key={String(p._id)} property={p} />}
+              wide4up
+            />
+          </div>
+        </div>
+      )}
+
+      {record.recent.length > 0 && (
+        <div className="mx-auto max-w-6xl 2xl:max-w-384 px-4 pb-10">
+          <div className="flex items-baseline justify-between border-b border-slate-200 pb-4">
+            <h2 className="font-display text-2xl sm:text-3xl text-brand-navy">
+              Recently Sold &amp; Leased by {firstName}
+            </h2>
+            <Link href="/sold-properties" className="text-brand-navy font-semibold hover:text-brand-gold-dark">
+              All sold
+            </Link>
+          </div>
+          <div className="mt-8">
+            <ResponsiveCardGrid
+              items={record.recent}
               renderItem={(p) => <PropertyCard key={String(p._id)} property={p} />}
               wide4up
             />

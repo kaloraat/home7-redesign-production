@@ -153,6 +153,72 @@ export async function getPropertiesByAgent(agentId: string, limit = 6): Promise<
   }
 }
 
+// Property.suburb is free text from the legacy import and REA, with noise
+// like "avenue lurnea", "street lakemba", "ingleburn nsw", "minto." (the
+// street type bled in from the address). Normalised for display only.
+const STREET_WORDS = new Set([
+  "street", "st", "avenue", "ave", "road", "rd", "place", "pl", "close", "parade",
+  "terrace", "drive", "dr", "crescent", "cres", "lane", "way", "court", "ct",
+]);
+function cleanSuburb(raw: string): string {
+  const words = raw
+    .toLowerCase()
+    .replace(/[^a-z\s]/g, " ")
+    .split(/\s+/)
+    .filter((w) => w && w !== "nsw");
+  while (words.length > 1 && STREET_WORDS.has(words[0])) words.shift();
+  return words.map((w) => w[0].toUpperCase() + w.slice(1)).join(" ");
+}
+
+export type AgentTrackRecord = {
+  soldCount: number;
+  leasedCount: number;
+  recent: IProperty[]; // sold first, then leased, newest first within each
+  suburbs: { name: string; count: number }[]; // most active first
+};
+
+/**
+ * An agent's real results: counts, recent sold/leased cards and the
+ * suburbs they've worked in, all from the listings already in the DB.
+ */
+export async function getAgentTrackRecord(agentId: string, recentLimit = 8): Promise<AgentTrackRecord> {
+  try {
+    await dbConnect();
+    const [soldCount, leasedCount, sold, leased, all] = await Promise.all([
+      Property.countDocuments({ agent: agentId, listingType: "sold" }),
+      Property.countDocuments({ agent: agentId, listingType: "leased" }),
+      Property.find({ agent: agentId, listingType: "sold" }).sort({ createdAt: -1 }).limit(recentLimit).lean<IProperty[]>(),
+      Property.find({ agent: agentId, listingType: "leased" }).sort({ createdAt: -1 }).limit(recentLimit).lean<IProperty[]>(),
+      Property.find({ agent: agentId, listingType: { $in: ["sale", "rent", "sold", "leased"] } }, "suburb").lean<IProperty[]>(),
+    ]);
+    const counts = new Map<string, number>();
+    for (const p of all) {
+      const name = p.suburb ? cleanSuburb(p.suburb) : "";
+      if (name) counts.set(name, (counts.get(name) ?? 0) + 1);
+    }
+    const suburbs = [...counts.entries()]
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+    return { soldCount, leasedCount, recent: [...sold, ...leased].slice(0, recentLimit), suburbs };
+  } catch {
+    return { soldCount: 0, leasedCount: 0, recent: [], suburbs: [] };
+  }
+}
+
+/** Site-wide sold/leased totals for the homepage intro. */
+export async function getResultCounts(): Promise<{ sold: number; leased: number }> {
+  try {
+    await dbConnect();
+    const [sold, leased] = await Promise.all([
+      Property.countDocuments({ listingType: "sold" }),
+      Property.countDocuments({ listingType: "leased" }),
+    ]);
+    return { sold, leased };
+  } catch {
+    return { sold: 0, leased: 0 };
+  }
+}
+
 export async function getAgents(): Promise<IAgent[]> {
   try {
     await dbConnect();

@@ -20,7 +20,19 @@ export function AgentForm({ action, defaultValues, submitLabel }: Props) {
           <input name="name" placeholder="Full name" defaultValue={d.name} required className={inputClass} />
           <input name="role" placeholder="Role, e.g. Sales Consultant" defaultValue={d.role} required className={inputClass} />
         </div>
-        <textarea name="bio" placeholder="Short bio" rows={4} defaultValue={d.bio} className={inputClass} />
+        <input
+          name="licence"
+          placeholder="NSW licence or certificate number (shown on the profile)"
+          defaultValue={d.licence}
+          className={inputClass}
+        />
+        <textarea
+          name="bio"
+          placeholder="Bio (leave a blank line between paragraphs)"
+          rows={8}
+          defaultValue={d.bio}
+          className={inputClass}
+        />
       </fieldset>
 
       <fieldset className="space-y-4">

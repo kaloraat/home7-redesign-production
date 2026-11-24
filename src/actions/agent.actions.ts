@@ -40,6 +40,7 @@ function parseFields(formData: FormData) {
     facebook: String(formData.get("facebook") || "").trim() || undefined,
     linkedin: String(formData.get("linkedin") || "").trim() || undefined,
     bio: String(formData.get("bio") || "").trim() || undefined,
+    licence: String(formData.get("licence") || "").trim() || undefined,
     order: numberOrUndefined(formData.get("order")) ?? 0,
     active: formData.get("active") === "on",
   };
