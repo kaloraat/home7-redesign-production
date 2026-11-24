@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { brandedTitle } from "@/lib/pageMetadata";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
@@ -24,7 +25,7 @@ export async function generateMetadata({
   const url = `${SITE_URL}/blog/${post.slug}`;
 
   return {
-    title,
+    title: brandedTitle(title),
     description,
     alternates: { canonical: url },
     // See property/[slug]/page.tsx's generateMetadata for why this can't

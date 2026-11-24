@@ -31,3 +31,13 @@ export function pageMetadata(title: string, description: string, path: string) {
     },
   };
 }
+
+/**
+ * The root layout's title template appends " | Home7 Real Estate". Many
+ * migrated seoTitles already end in (or contain) the brand, which produced
+ * "... | Home7 Real Estate | Home7 Real Estate" in Google. When the title
+ * already names the brand, use it as-is (absolute) instead of templating.
+ */
+export function brandedTitle(title: string) {
+  return /home\s?7/i.test(title) ? { absolute: title } : title;
+}

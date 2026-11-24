@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/constants";
-import { pageMetadata } from "@/lib/pageMetadata";
+import { brandedTitle, pageMetadata } from "@/lib/pageMetadata";
 import { getAgents } from "@/lib/queries";
 import { PlayIcon } from "@/components/icons";
 import ServiceAreaTabs from "@/components/ServiceAreaTabs";
@@ -15,7 +15,7 @@ const DESCRIPTION =
   "Home7 Real Estate offers top-quality property services in Liverpool, NSW, specializing in buying, selling, and leasing homes with a commitment to client satisfaction";
 
 export const metadata: Metadata = {
-  title: TITLE,
+  title: brandedTitle(TITLE),
   description: DESCRIPTION,
   ...pageMetadata(TITLE, DESCRIPTION, "/about-us"),
 };

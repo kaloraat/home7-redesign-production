@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { brandedTitle } from "@/lib/pageMetadata";
 import Image from "next/image";
 import { notFound, permanentRedirect } from "next/navigation";
 import Link from "next/link";
@@ -114,7 +115,7 @@ export async function generateMetadata({
   const image = property.images?.[0];
 
   return {
-    title,
+    title: brandedTitle(title),
     description,
     alternates: { canonical: url },
     // Without this, every property page shared anywhere (Facebook,

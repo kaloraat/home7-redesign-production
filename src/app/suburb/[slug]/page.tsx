@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { brandedTitle } from "@/lib/pageMetadata";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -33,7 +34,7 @@ export async function generateMetadata({
   const url = `${SITE_URL}/suburb/${page.slug}`;
 
   return {
-    title,
+    title: brandedTitle(title),
     description,
     alternates: { canonical: url },
     openGraph: { type: "website", url, title, description },
