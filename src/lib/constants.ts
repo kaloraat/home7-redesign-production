@@ -265,7 +265,7 @@ export const WHY_HOME7 = [
 // 0xe6b905e70ea37b51, that identifies this exact business), so "Google
 // review" under each card links straight to the real thing rather than
 // asserting authenticity with nothing to back it up.
-export const GOOGLE_RATING = { value: 4.7, count: 46 };
+export const GOOGLE_RATING = { value: 4.7, count: 44 };
 
 // The "#lrd=" fragment opens Google's local-reviews panel directly for this
 // place — same place ID (0xe6b905e70ea37b51) as every testimonial's own

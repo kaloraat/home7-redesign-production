@@ -33,18 +33,18 @@ const inter = Inter({
   variable: "--font-sans",
 });
 
-const DEFAULT_TITLE = "The Best Real Estate in Liverpool, New South Wales";
+// The homepage is the page Google ranks for "real estate agents liverpool"
+// (the agency itself; the Google Business Profile links here too), so the
+// title says what we are. The guide at /blog/real-estate-agent-liverpool
+// supports it rather than competing with it.
+const DEFAULT_TITLE = "Real Estate Agents Liverpool NSW | Home7 Real Estate";
 const DEFAULT_DESCRIPTION =
-  "Find the best real estate in Liverpool, NSW. Explore top properties for sale or rent today.";
+  "Home7 Real Estate is a family-owned real estate agency in Liverpool NSW. Sell, buy, rent or manage property with local agents rated 4.7 on Google.";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: new URL(SITE_URL),
     title: {
-      // Matches the live site's indexed title verbatim ("The Best Real
-      // Estate in Liverpool, New South Wales") rather than a from-scratch
-      // rewrite — preserving ranking equity while the rest of the
-      // homepage is redesigned.
       default: DEFAULT_TITLE,
       template: `%s | ${SITE_NAME}`,
     },

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { WHY_HOME7 } from "@/lib/constants";
 
 export function WhyHome7() {
@@ -12,8 +13,16 @@ export function WhyHome7() {
             A Different Kind of Real Estate Experience
           </h2>
           <p className="mt-3 text-lg text-slate-600 leading-relaxed">
-            We&apos;re not a big established name — working with us feels more like getting
+            We&apos;re not a big established name. Working with us feels more like getting
             things done with a friend who happens to know real estate inside out.
+          </p>
+          <p className="mt-3 text-lg">
+            <Link
+              href="/blog/real-estate-agent-liverpool"
+              className="font-semibold text-brand-navy underline underline-offset-4 hover:text-brand-gold-dark"
+            >
+              How to choose a real estate agent in Liverpool
+            </Link>
           </p>
         </div>
 

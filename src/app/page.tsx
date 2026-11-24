@@ -172,14 +172,14 @@ export default async function Home() {
             close to the full amount instead. */}
         <div className="absolute inset-x-0 bottom-0 h-95 sm:h-105 lg:h-110 mx-auto max-w-6xl px-4 pt-16 md:pt-0 flex flex-col items-center justify-center text-center text-white">
           <p className="text-shadow-hero text-brand-gold text-xs sm:text-sm uppercase tracking-[0.2em] font-medium">
-            Liverpool &amp; South West Sydney
+            Home7 Real Estate
           </p>
           <h1 className="text-shadow-hero mt-3 font-display text-4xl sm:text-5xl lg:text-6xl text-white">
-            <span className="text-brand-gold">Home7</span> Real Estate
+            Real Estate Agents in <span className="text-brand-gold">Liverpool</span>
           </h1>
           <p className="text-shadow-hero mt-3 text-slate-200 max-w-2xl text-lg">
             Your local property experts across {TARGET_SUBURBS.slice(0, 4).join(", ")} and
-            beyond — buying, selling, renting and property management.
+            beyond. Buying, selling, renting and property management.
           </p>
 
           <div className="mt-8 w-full">
