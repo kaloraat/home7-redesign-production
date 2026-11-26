@@ -38,6 +38,7 @@ interface Change {
   urlPath: "blog" | "root";
   slug: string;
   set?: { title?: string; seoTitle?: string }; // always part B
+  rewriteFile?: string; // part B: replaces bodyHtml + title/seoTitle/seoDescription/excerpt
   ops?: Op[];
 }
 
@@ -92,7 +93,7 @@ const CHANGES: Change[] = [
     urlPath: "blog",
     slug: "best-real-estate-agent-warwick-farm-nsw-home7",
     set: { seoTitle: "Real Estate Agent Warwick Farm | Sell Fast with Home7" },
-    ops: [{ kind: "text", find: "achieve record prices —\noften faster than expected", replace: "achieve strong prices, often faster than expected" }],
+    ops: [{ kind: "text", find: "achieve record prices - often faster than expected", replace: "achieve strong prices, often faster than expected" }],
   },
   {
     urlPath: "root",
@@ -110,17 +111,11 @@ const CHANGES: Change[] = [
     slug: "acreage-land-for-sale-austral-nsw-developers-dual-frontage",
     ops: [{ kind: "text", find: "gives them unmatched expertise in guiding", replace: "gives them the local expertise needed for guiding" }],
   },
+  // Full rewrite (part B): body, title and meta from the REWRITE file.
   {
     urlPath: "blog",
     slug: "why-acreage-land-in-austral-nsw-could-make-you-a-future-billionaire",
-    set: { title: "Why Acreage Land in Austral NSW Attracts Long-Term Investors" },
-    ops: [
-      {
-        kind: "text",
-        find: "this isn’t wishful\nthinking—it’s almost guaranteed.",
-        replace: "nothing in property is guaranteed, but the long-term fundamentals are strong.",
-      },
-    ],
+    rewriteFile: "content-archive/REWRITE-blog-austral-acreage-investors-2026-11-27.html",
   },
 ];
 
@@ -155,9 +150,16 @@ function fixEmDashes(html: string) {
     const doc = await Content.findOne({ urlPath: c.urlPath, slug: c.slug }).lean();
     if (!doc) { console.log(`MISSING ${c.slug}`); ok = false; continue; }
     const ops = (c.ops ?? []).filter((o) => PARTS.has(o.part ?? "b"));
-    const set = PARTS.has("b") ? c.set ?? {} : {};
+    const set: Record<string, string> = PARTS.has("b") ? { ...(c.set ?? {}) } : {};
+    let rewriteBody: string | null = null;
+    if (c.rewriteFile && PARTS.has("b")) {
+      const src = fs.readFileSync(c.rewriteFile, "utf8");
+      for (const k of ["title", "seoTitle", "seoDescription", "excerpt"]) set[k] = src.match(new RegExp(`^\\s*${k}:\\s+(.*)$`, "m"))![1].trim();
+      rewriteBody = src.slice(src.indexOf("-->") + 3).trim();
+    }
     if (!ops.length && !Object.keys(set).length) continue;
-    let html = doc.bodyHtml;
+    let html = rewriteBody ?? doc.bodyHtml;
+    if (rewriteBody) console.log(`  BODY REWRITTEN from ${c.rewriteFile} (${strip(rewriteBody).split(" ").length} words)`);
     console.log(`\n=== /${c.urlPath === "root" ? "" : c.urlPath + "/"}${c.slug}`);
     for (const [k, v] of Object.entries(set)) console.log(`  ${k}: "${(doc as unknown as Record<string, unknown>)[k]}"\n   -> "${v}"`);
     for (const op of ops) {
@@ -202,10 +204,12 @@ function fixEmDashes(html: string) {
   if (!ok) { console.log("\nSome changes did not match. Nothing written."); process.exit(1); }
   if (!APPLY) { console.log(`\nDRY RUN: ${docsToWrite.size} docs would change. Nothing written.`); process.exit(0); }
 
-  fs.writeFileSync("content-archive/BACKUP-wording-cleanup-2026-11-27.json", JSON.stringify(backup, null, 2));
+  const backupFile = `content-archive/BACKUP-wording-cleanup-${[...PARTS].join("")}${EMDASH ? "c" : ""}-2026-11-27.json`;
+  if (fs.existsSync(backupFile)) { console.log(`Backup ${backupFile} exists, refusing to overwrite.`); process.exit(1); }
+  fs.writeFileSync(backupFile, JSON.stringify(backup, null, 2));
   for (const { id, set } of docsToWrite.values()) {
     await Content.updateOne({ _id: id }, { $set: set }, { timestamps: false });
   }
-  console.log(`\nAPPLIED to ${docsToWrite.size} docs. Backup: content-archive/BACKUP-wording-cleanup-2026-11-27.json`);
+  console.log(`\nAPPLIED to ${docsToWrite.size} docs. Backup: ${backupFile}`);
   process.exit(0);
 })();
