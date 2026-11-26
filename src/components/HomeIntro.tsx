@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FEES } from "@/lib/fees";
 import {
   COMPANY,
   GOOGLE_RATING,
@@ -72,8 +73,9 @@ export function HomeIntro({ sold, leased }: Props) {
                   Our principal, Mohammed Islam, works directly with clients.
                   You deal with the same people from your first appraisal to
                   settlement or lease signing, you get honest pricing based on
-                  real local sales, and someone picks up the phone. Our fees are
-                  low and negotiable, and every cost is in writing before you
+                  real local sales, and someone picks up the phone. We publish our
+                  fees: {FEES.sale.label} to sell and {FEES.management.label} for
+                  property management, with every cost in writing before you
                   sign.
                 </p>
                 <p>

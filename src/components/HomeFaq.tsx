@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FEES } from "@/lib/fees";
 
 /**
  * Short homepage FAQ. Kept to agency questions (areas, fees, appraisal,
@@ -14,7 +15,7 @@ export const HOME_FAQ = [
   },
   {
     q: "How much do you charge to sell a property?",
-    a: "Our fees are low and negotiable. We agree them with you in writing before you sign anything, and we give you a full breakdown of commission and marketing costs at your free appraisal. There are no hidden costs.",
+    a: `Our sales commission is ${FEES.sale.label} (${FEES.sale.inclLabel}) of the sale price, and property management is ${FEES.management.label} (${FEES.management.inclLabel}) of rent collected. Marketing and letting costs are separate and quoted in writing before you sign. See all our fees and a savings calculator on our fees page.`,
   },
   {
     q: "Is the market appraisal really free?",
@@ -22,7 +23,7 @@ export const HOME_FAQ = [
   },
   {
     q: "Do you manage rental properties?",
-    a: "Yes. Our property management covers tenant screening, leases, rent collection, routine inspections and repairs with trusted local tradespeople, so your investment is looked after.",
+    a: `Yes, for ${FEES.management.label} (${FEES.management.inclLabel}) of rent collected. Our property management covers tenant screening, leases, rent collection, routine inspections and repairs with trusted local tradespeople, and switching from another agent is easy.`,
   },
   {
     q: "Where is your office and when are you open?",
@@ -65,6 +66,10 @@ export function HomeFaq() {
         More questions about choosing an agent? Read our{" "}
         <Link href="/blog/real-estate-agent-liverpool" className="font-semibold text-brand-navy underline underline-offset-4 hover:text-brand-gold-dark">
           guide to real estate agents in Liverpool
+        </Link>
+        , or see{" "}
+        <Link href="/fees" className="font-semibold text-brand-navy underline underline-offset-4 hover:text-brand-gold-dark">
+          our fees and savings calculator
         </Link>
         .
       </p>

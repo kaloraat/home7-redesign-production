@@ -37,9 +37,9 @@ const inter = Inter({
 // (the agency itself; the Google Business Profile links here too), so the
 // title says what we are. The guide at /blog/real-estate-agent-liverpool
 // supports it rather than competing with it.
-const DEFAULT_TITLE = "Real Estate Agents Liverpool NSW | Home7 Real Estate";
+const DEFAULT_TITLE = "Real Estate Agents Liverpool NSW | Sell for 1% + GST | Home7";
 const DEFAULT_DESCRIPTION =
-  "Home7 Real Estate is a family-owned real estate agency in Liverpool NSW. Sell, buy, rent or manage property with local agents rated 4.7 on Google.";
+  "Family-owned real estate agents in Liverpool NSW. Sell for 1% + GST, property management 4% + GST, published upfront. Rated 4.7 on Google.";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -223,10 +223,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   <ul className="space-y-1">
                     <li><Link href="/" className="hover:text-brand-gold">Home</Link></li>
                     <li><Link href="/about-us" className="hover:text-brand-gold">About Home7</Link></li>
+                    <li><Link href="/fees" className="hover:text-brand-gold">Our Fees</Link></li>
+                    <li><Link href="/property-management" className="hover:text-brand-gold">Property Management</Link></li>
                     <li><Link href="/buyers-advisory" className="hover:text-brand-gold">Buyers Advisory</Link></li>
                     <li><Link href="/blog/real-estate-liverpool" className="hover:text-brand-gold">Real Estate Liverpool</Link></li>
                     <li><Link href="/agents" className="hover:text-brand-gold">Our Team</Link></li>
                     <li><Link href="/privacy-policy" className="hover:text-brand-gold">Privacy Policy</Link></li>
+                    <li><Link href="/terms-and-conditions" className="hover:text-brand-gold">Terms and Conditions</Link></li>
                     <li><Link href="/contact" className="hover:text-brand-gold">Contact</Link></li>
                     <li><Link href="/sitemap.xml" className="hover:text-brand-gold">Sitemap</Link></li>
                   </ul>

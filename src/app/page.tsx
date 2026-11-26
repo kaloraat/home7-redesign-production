@@ -1,4 +1,6 @@
 import Image from "next/image";
+import FeesBand from "@/components/FeesBand";
+import { FEES } from "@/lib/fees";
 import Link from "next/link";
 import {
   getPropertiesByType,
@@ -63,6 +65,8 @@ function buildJsonLd() {
         "@type": "PostalAddress",
         ...COMPANY.addressParts,
       },
+      description: `Family-owned real estate agency in Liverpool NSW, founded in 2020 by Mohammed Islam. Sales commission ${FEES.sale.label} (${FEES.sale.inclLabel}); property management ${FEES.management.label} (${FEES.management.inclLabel}).`,
+      priceRange: `Sales commission ${FEES.sale.label}; property management ${FEES.management.label}`,
       areaServed: TARGET_SUBURBS.map((suburb) => ({
         "@type": "City",
         name: suburb,
@@ -224,6 +228,7 @@ export default async function Home() {
       <CTAButtons />
 
       <TrustBar />
+      <FeesBand />
 
       {/* Only rendered when at least one listing is checked "Feature on home
           page" in the admin — this is a hand-picked, admin-curated set

@@ -1,4 +1,5 @@
 import { SITE } from "./site";
+import { FEES } from "@/lib/fees";
 import { REGIONS, type RegionKey } from "./regions";
 import type { LpLeadType } from "./validation";
 
@@ -60,7 +61,7 @@ function pmContent(region: RegionKey, intent: LpIntent): LpCopy {
   const isSwitch = intent === "switch";
   return {
     title: fill("Property Management {region} | Home7 Real Estate", region),
-    description: fill("Family-owned local property managers in {region}. Low, negotiable fees, real support and a free rental appraisal. Talk to a real person today.", region),
+    description: fill(`Family-owned local property managers in {region}. ${FEES.management.label} management fee, real support and a free rental appraisal. Talk to a real person today.`, region),
     eyebrow: fill("{region} property management", region),
     h1: isSwitch
       ? "Unhappy with your property manager? Just say yes. We handle the switch."
@@ -69,7 +70,7 @@ function pmContent(region: RegionKey, intent: LpIntent): LpCopy {
         : fill("{region} property management that actually picks up the phone.", region),
     subheading: isSwitch
       ? "You don't have to deal with your current agent or work out the paperwork. We take care of everything, and your tenant and rent carry on as normal."
-      : "A small, family-owned local team that looks after your investment like it's our own. Low, negotiable fees. Free rental appraisal, no obligation.",
+      : `A small, family-owned local team that looks after your investment like it's our own. ${FEES.management.label} management fee. Free rental appraisal, no obligation.`,
     form: {
       heading: "Find out what your property should rent for",
       chipsLabel: "What do you need?",
@@ -84,11 +85,11 @@ function pmContent(region: RegionKey, intent: LpIntent): LpCopy {
     whyHeading: fill("Why landlords in {label} switch to Home7", region),
     why: [
       { title: "We answer. Every time.", body: "Call, text or email and you'll hear back the same day from the person who actually looks after your property. No call centres, no being passed around." },
-      { title: "Low fees, and they're negotiable.", body: "We keep our fees low because we'd rather grow by looking after owners well than by charging more. Tell us what you pay now and let's talk." },
+      { title: `${FEES.management.label}. Published, not hidden.`, body: `Our management fee is ${FEES.management.label} (${FEES.management.inclLabel}) of rent collected. We keep it low because we'd rather grow by looking after owners well than by charging more.` },
       { title: "Support that doesn't stop after the lease is signed.", body: "Routine inspections with photos, rent arrears followed up fast, repairs handled with your approval, and monthly statements plus an end-of-year summary for your accountant." },
     ],
     included: {
-      heading: "Full management, all included",
+      heading: "What we look after",
       items: [
         "Rental appraisal and marketing",
         "Open inspections and tenant screening",
@@ -104,7 +105,7 @@ function pmContent(region: RegionKey, intent: LpIntent): LpCopy {
     },
     feesHeading: "What it costs",
     fees: {
-      text: "Our fees are low, and they're negotiable. We'd rather earn your trust and keep you for years than squeeze you on price. Tell us what you're paying now and we'll give you a straight answer, in writing, with no pressure to sign.",
+      text: `Management fee: ${FEES.management.label} (${FEES.management.inclLabel}) of rent collected. That is well below the 5% to 8% many Sydney agents charge. Letting and leasing costs are separate and listed in writing before you sign. Tell us what you pay now and we'll show you the difference.`,
       button: "Compare my fees",
     },
     howHeading: "How it works",
@@ -117,7 +118,7 @@ function pmContent(region: RegionKey, intent: LpIntent): LpCopy {
     recentBadge: "Leased",
     faqHeading: "Common questions",
     faq: [
-      { q: "How much do you charge?", a: "Our fees are low and negotiable. Tell us what you pay now and we'll give you a straight answer, in writing." },
+      { q: "How much do you charge?", a: `${FEES.management.label} (${FEES.management.inclLabel}) of rent collected. Letting and leasing costs are separate and set out in writing before you sign.` },
       { q: "How do I switch from my current agent?", a: "Just say yes. We handle the whole switch with your current agent, including the notice, keys, tenant file and bond details, so you don't have to do anything." },
       { q: "How quickly can you find a tenant?", a: "Quickly. Rental demand across Sydney is strong, so we move fast to get your property leased as soon as it's vacant, or on the timing that suits you. We still do our due diligence on every applicant, so you get the best tenant, not just the first one." },
       { q: "What happens if my tenant stops paying?", a: "We follow up arrears quickly and keep you informed at every step, including the NSW Civil and Administrative Tribunal (NCAT) process if it ever comes to that." },
@@ -133,9 +134,9 @@ function pmContent(region: RegionKey, intent: LpIntent): LpCopy {
 function sellContent(region: RegionKey): LpCopy {
   return {
     title: fill("Sell Your Home in {region} | Home7 Real Estate", region),
-    description: fill("Selling in {region}? Honest price advice, low commission and a local agent who keeps you updated. Free, no-obligation market appraisal.", region),
+    description: fill(`Selling in {region}? Honest price advice, ${FEES.sale.label} commission and a local agent who keeps you updated. Free, no-obligation market appraisal.`, region),
     eyebrow: fill("Selling in {region}", region),
-    h1: "Honest price advice, a lower commission, and an agent who picks up the phone.",
+    h1: `Sell for ${FEES.sale.label}. Honest price advice, and an agent who picks up the phone.`,
     subheading: "Family-owned local agency. Get a free, no-obligation market appraisal. We'll tell you what your home is really worth, not just what you want to hear.",
     form: {
       heading: "What's your home worth?",
@@ -151,13 +152,13 @@ function sellContent(region: RegionKey): LpCopy {
     whyHeading: fill("Why owners in {label} sell with Home7", region),
     why: [
       { title: "An honest price, not an inflated one.", body: "We won't overquote to win your listing. You'll get a realistic price range backed by recent local sales." },
-      { title: "Lower commission, and it's negotiable.", body: "Low commission, agreed in writing up front. Got another agent's quote? Show us and let's talk." },
+      { title: `${FEES.sale.label} commission. In writing.`, body: `Our commission is ${FEES.sale.label} (${FEES.sale.inclLabel}). On a $900,000 sale that's $9,900, compared with about $18,000 at a typical 2%.` },
       { title: "You'll always know what's happening.", body: "Regular updates after every open home and every offer, from the same person, from appraisal to settlement." },
     ],
     included: null,
     feesHeading: "What it costs to sell",
     fees: {
-      text: "Our commission is low, and it's negotiable. It's agreed in writing before anything starts, and marketing costs are quoted up front, so you'll know every cost before you decide.",
+      text: `Our commission is ${FEES.sale.label} (${FEES.sale.inclLabel}) of the sale price. Marketing costs are separate and quoted up front, so you'll know every cost before you decide. Got another agent's quote? Compare it with ours.`,
       button: "Compare my quote",
     },
     howHeading: "How it works",
@@ -170,7 +171,7 @@ function sellContent(region: RegionKey): LpCopy {
     recentBadge: "Sold",
     faqHeading: "Common questions",
     faq: [
-      { q: "How much commission do you charge?", a: "Our commission is low and negotiable, and agreed in writing up front. If you have another quote, show us." },
+      { q: "How much commission do you charge?", a: `${FEES.sale.label} (${FEES.sale.inclLabel}) of the sale price, in writing up front. Marketing costs are separate and quoted before your campaign starts.` },
       { q: "Do I have to sign anything at the appraisal?", a: "No. An appraisal is free and there's no obligation at all." },
       { q: "How long will it take to sell?", a: "It depends on your property and the market. We'll give you a realistic timeframe at the appraisal based on recent local sales." },
       { q: "Auction or private treaty?", a: "We'll recommend what suits your property and your timeline, and explain the trade-offs honestly." },
@@ -205,10 +206,10 @@ export function localLeadKind(choice: string): "sell" | "pm" | null {
 function localContent(): LpCopy {
   return {
     title: "Local Real Estate Agent Liverpool & Campbelltown | Home7 Real Estate",
-    description: "Selling or renting out your property in Liverpool or Campbelltown? Family-owned local agents, low, negotiable fees and a free, no-obligation appraisal.",
+    description: `Selling or renting out your property in Liverpool or Campbelltown? Family-owned local agents. Sell for ${FEES.sale.label}, management ${FEES.management.label}. Free appraisal.`,
     eyebrow: "Liverpool & Campbelltown real estate",
     h1: "Selling or renting out your property? Talk to a local agent who picks up the phone.",
-    subheading: "A small, family-owned local team. Low, negotiable fees. Free appraisal, no obligation.",
+    subheading: `A small, family-owned local team. Sell for ${FEES.sale.label}, property management ${FEES.management.label}. Free appraisal, no obligation.`,
     form: {
       heading: "Get your free appraisal",
       chipsLabel: "What do you need?",
@@ -223,13 +224,13 @@ function localContent(): LpCopy {
     whyHeading: "Why owners in Liverpool and Campbelltown choose Home7",
     why: [
       { title: "We answer. Every time.", body: "Call, text or email and you'll hear back the same day from the person who actually looks after your property. No call centres, no being passed around." },
-      { title: "Low fees, and they're negotiable.", body: "We keep our fees low because we'd rather grow by looking after owners well than by charging more. Tell us what you pay now and let's talk." },
+      { title: "Low fees, published upfront.", body: `${FEES.sale.label} to sell and ${FEES.management.label} for property management. We keep our fees low because we'd rather grow by looking after owners well than by charging more.` },
       { title: "An honest price, not an inflated one.", body: "We won't overquote to win your listing. You'll get a realistic price range backed by recent local sales, or an honest rent estimate if you're leasing." },
     ],
     included: null,
     feesHeading: "What it costs",
     fees: {
-      text: "Our fees are low, and they're negotiable. Tell us what you're paying now and we'll give you a straight answer, in writing, with no pressure to sign.",
+      text: `Selling: ${FEES.sale.label} (${FEES.sale.inclLabel}) commission. Property management: ${FEES.management.label} (${FEES.management.inclLabel}) of rent collected. Marketing and letting costs are separate and quoted in writing before you sign.`,
       button: "Compare my fees",
     },
     howHeading: "How it works",
@@ -255,7 +256,7 @@ export const LOCAL_PATHS = [
     cta: "More about selling with Home7",
     points: [
       "Honest price advice, not an inflated one",
-      "Lower commission, agreed in writing up front",
+      `${FEES.sale.label} commission, in writing up front`,
       "Regular updates after every open home and offer",
       "Free, no-obligation market appraisal",
     ],

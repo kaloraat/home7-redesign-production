@@ -1,4 +1,5 @@
 import { GOOGLE_RATING, SITE_URL } from "./constants";
+import { FEES } from "./fees";
 
 /**
  * Extra, hand-written profile content for agents whose page should rank on
@@ -31,21 +32,21 @@ export const AGENT_PROFILES: Record<string, AgentProfile> = {
   [PRINCIPAL_SLUG]: {
     alternateName: "Mohammed Islam",
     seoTitle: "Mohammed Islam | Real Estate Agent Liverpool & Campbelltown",
-    seoDescription: `Mohammed Islam founded Home7 Real Estate in Liverpool after 15 years with Sydney agencies. Family-owned, low upfront fees, ${GOOGLE_RATING.value} stars from ${GOOGLE_RATING.count} Google reviews.`,
+    seoDescription: `Mohammed Islam founded Home7 Real Estate in Liverpool after 15 years with Sydney agencies. Sell for ${FEES.sale.label}, management ${FEES.management.label}. Rated ${GOOGLE_RATING.value} on Google.`,
     tagline: "Real estate agent in Liverpool, Campbelltown and South West Sydney",
     yearsExperience: 15,
     showReviews: true,
     services: [
       {
         title: "Selling your property",
-        text: "An honest price based on real local sales, a clear marketing plan, and low, negotiable commission agreed in writing before you sign.",
+        text: `An honest price based on real local sales, a clear marketing plan, and a ${FEES.sale.label} commission (${FEES.sale.inclLabel}), in writing before you sign.`,
         href: "/free-market-appraisal",
         cta: "Get a free appraisal",
       },
       {
         title: "Leasing and property management",
-        text: "Tenant screening, leases, rent collection, inspections and repairs, with one person you can actually reach when you need an answer.",
-        href: "/contact",
+        text: `Tenant screening, leases, rent collection, inspections and repairs for ${FEES.management.label} of rent, with one person you can actually reach.`,
+        href: "/property-management",
         cta: "Talk about your rental",
       },
       {
@@ -62,7 +63,7 @@ export const AGENT_PROFILES: Record<string, AgentProfile> = {
       },
       {
         q: "Is Home7 Real Estate an affordable agent in Liverpool and Campbelltown?",
-        a: "Yes. Home7 is a small, independent family business, so there are no franchise overheads to pass on and commission stays low and negotiable. Mohammed puts every fee in writing before anything is signed, and Google reviewers regularly mention the low cost and great value.",
+        a: `Yes. Home7 publishes its fees: ${FEES.sale.label} (${FEES.sale.inclLabel}) to sell and ${FEES.management.label} (${FEES.management.inclLabel}) for property management, compared with Liverpool averages of about 2% commission and 5% to 8% for management. As a small, independent family business there are no franchise overheads to pass on, and Google reviewers regularly mention the low cost and great value.`,
       },
       {
         q: "How is working with Mohammed different from a big-name agency?",

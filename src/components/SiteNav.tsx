@@ -34,6 +34,7 @@ const NAV: NavItem[] = [
       { label: "Open For Inspection", href: "/open-for-inspection" },
       { label: "Buyers Advisory", href: "/buyers-advisory" },
       { label: "Buyers Agent Request", href: "/buyers-agent-request" },
+      { label: "Our Fees", href: "/fees" },
       { label: "Free Market Appraisal", href: "/free-market-appraisal" },
       { label: "Our Team", href: "/agents" },
     ],
@@ -43,6 +44,7 @@ const NAV: NavItem[] = [
     href: "/properties-for-rent",
     children: [
       { label: "Properties For Rent", href: "/properties-for-rent" },
+      { label: "Property Management", href: "/property-management" },
       { label: "Leased Properties", href: "/leased-properties" },
       { label: "Tenant Application Form", href: "/property-tenant-application-download" },
       { label: "Free Market Appraisal", href: "/free-market-appraisal?key=renting" },
@@ -54,6 +56,7 @@ const NAV: NavItem[] = [
     href: "/sold-properties",
     children: [
       { label: "All Sold Properties", href: "/sold-properties" },
+      { label: "Our Fees", href: "/fees" },
       { label: "Free Market Appraisal", href: "/free-market-appraisal" },
       { label: "Our Team", href: "/agents" },
     ],
