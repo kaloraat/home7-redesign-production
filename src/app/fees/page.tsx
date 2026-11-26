@@ -50,6 +50,10 @@ const FAQ: FaqItem[] = [
     a: `It is our standard fee, not a "from" price. Sellers across Liverpool, Campbelltown and South West Sydney pay ${FEES.sale.label}. In rare, unusual circumstances a different fee may apply, and if so we explain it and put it in writing before you sign anything.`,
   },
   {
+    q: "How much can I save on commission in Liverpool?",
+    a: `On a ${formatAud(FEE_EXAMPLE_SALE_PRICE)} sale you save ${formatAud(exampleOther - exampleSale)} in commission with Home7 at ${FEES.sale.inclLabel}, compared with a typical Liverpool rate of 2%. On a $1,200,000 sale the saving is ${formatAud(saleFee(1_200_000, FEE_BENCHMARKS.saleAvgPercentInclGst) - saleFee(1_200_000))}. Use the calculator above to work out your own saving.`,
+  },
+  {
     q: "What is not included in the commission?",
     a: `${SALE_SEPARATE_COSTS} Most agents charge marketing separately too, so compare commission with commission.`,
   },
@@ -125,8 +129,8 @@ export default async function Page() {
             note={SALE_SEPARATE_COSTS}
           >
             On a {formatAud(FEE_EXAMPLE_SALE_PRICE)} sale, our commission is <strong>{formatAud(exampleSale)}</strong>. At
-            a typical Liverpool rate of 2% it would be {formatAud(exampleOther)}, so you keep{" "}
-            <strong>{formatAud(exampleOther - exampleSale)}</strong> more.
+            a typical Liverpool rate of 2% it would be {formatAud(exampleOther)}, so you save{" "}
+            <strong>{formatAud(exampleOther - exampleSale)}</strong>.
           </PriceCard>
           <PriceCard
             kicker="Property management"

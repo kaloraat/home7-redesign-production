@@ -151,7 +151,7 @@ export default function FeeCalculator({ initialMode = "sale", showTabs = true }:
           <dd className="font-display text-2xl text-brand-navy">{formatAud(ours)}</dd>
         </div>
         <div className="rounded-lg bg-brand-navy p-4 text-white">
-          <dt className="text-sm text-white/80">{saving >= 0 ? (isSale ? "You keep" : "You keep each year") : "Difference"}</dt>
+          <dt className="text-sm text-white/80">{saving >= 0 ? (isSale ? "You save" : "You save each year") : "Difference"}</dt>
           <dd className="font-display text-2xl text-brand-gold">{formatAud(Math.abs(saving))}</dd>
         </div>
       </dl>
