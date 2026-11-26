@@ -191,14 +191,16 @@ export const BLOG_CONTACT_FORM_INTRO =
   "Got a question about buying, selling or renting in Liverpool? Leave your details and a local property expert will get back to you personally. No call centres, no pressure.";
 
 /**
- * Brand story copy, kept verbatim from the live site's homepage blockquote
- * (indexed, distinctive text — not template boilerplate) rather than
- * rewritten, so the homepage redesign doesn't lose existing ranking equity
- * for this passage. See PROJECT_BRIEF.md "Design" section.
+ * Brand story copy. Originally verbatim from the live site's homepage
+ * blockquote; rewritten 2026-11-27 (client request) to drop unbackable
+ * claims ("Australian Super brand", "leaders within the market", "best
+ * real estate agent") and broken English, and to state the real story:
+ * founded 2020 by Mohammed after 15 years at Sydney agencies. Keeps the
+ * "Real Estate is in our blood" line the pull-quote below repeats.
  */
 export const BRAND_STORY = [
-  `You might say 'Real Estate is in our blood'. As proudly 100% Australian owned family business, we've been at the forefront of real estate in Australia since 2020. We continue today with the same focus, culture and ethics that has helped build our reputation as an Australian Super brand. We are continually evolving to ensure we remain ahead of the pack and leaders within the market.`,
-  `To this day, Home7 brand continues to strengthen, grow and evolve. We are specialist for Sydney Real Estate Market. Property Selling, management, Auction we handle with our highly skilled. Mind it… Our priority is your satisfaction and this will help us to become the best real estate agent in Liverpool NSW.`,
+  `You might say 'Real Estate is in our blood'. Home7 is a proudly 100% Australian-owned family business, founded in 2020 by Mohammed Islam after 15 years working with real estate agencies across Sydney. We still run it the way we started: honest advice, low and transparent fees, and the same person looking after you from start to finish.`,
+  `We sell, lease and manage homes across Liverpool, Campbelltown and South West Sydney. We are a small team, and that is the point. Every client is treated like one of our own close friends, and our Google reviews say it better than we can. Our priority is your result and your peace of mind.`,
 ] as const;
 
 // Pulled out of BRAND_STORY[0] above (it already appears there, in context)

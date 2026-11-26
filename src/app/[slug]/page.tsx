@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { faqJsonLdFromHtml } from "@/lib/faqFromHtml";
 import { brandedTitle } from "@/lib/pageMetadata";
 import Image from "next/image";
 import Link from "next/link";
@@ -74,6 +75,7 @@ export default async function Page({
     // inconsistent-spacing, and undersized-bold-text issues. See
     // lib/legacyContent.ts.
     const cleanedBody = normalizeLegacyHtml(stripDuplicateTitle(page.bodyHtml, page.title));
+    const faqJsonLd = faqJsonLdFromHtml(cleanedBody);
 
     const breadcrumbJsonLd = {
       "@context": "https://schema.org",
@@ -117,6 +119,9 @@ export default async function Page({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
         />
+        {faqJsonLd && (
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+        )}
 
         <div className="mx-auto max-w-7xl px-4 py-10">
           <p className="text-sm text-slate-500">

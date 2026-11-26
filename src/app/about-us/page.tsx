@@ -8,11 +8,12 @@ import { PlayIcon } from "@/components/icons";
 import ServiceAreaTabs from "@/components/ServiceAreaTabs";
 import TeamGrid from "@/components/TeamGrid";
 
-// Matches the live site's indexed title/description verbatim — preserves
-// ranking equity for this page the same way the homepage's metadata does.
-const TITLE = "Home7 Real Estate | Best Real Estate in Liverpool, NSW";
+// Was the old site's "Best Real Estate in Liverpool" title; rewritten
+// 2026-11-27 to describe the business (family-owned, founder, experience)
+// instead of a superlative the page can't back up.
+const TITLE = "About Home7 Real Estate | Family-Owned Agency in Liverpool NSW";
 const DESCRIPTION =
-  "Home7 Real Estate offers top-quality property services in Liverpool, NSW, specializing in buying, selling, and leasing homes with a commitment to client satisfaction";
+  "Family-owned Liverpool agency founded by Mohammed Islam after 15 years in Sydney real estate. Low, upfront fees and honest advice for sellers and landlords.";
 
 export const metadata: Metadata = {
   title: brandedTitle(TITLE),
@@ -35,10 +36,13 @@ const breadcrumbJsonLd = {
 // "vendors expectations", inconsistent "Home 7"/"Home7" spacing — the same
 // treatment given Mohammed's bio on the homepage. Substance and keywords
 // are unchanged.
+// Rewritten 2026-11-27: the old copy claimed "record sales" in suburbs
+// with no listings on the site (Bankstown, Rockdale) and "multi-million
+// dollar homes", and used em dashes. Now matches Mohammed's bio.
 const ABOUT_PARAGRAPHS = [
-  "Home7 Real Estate consistently exceeds vendor expectations, including recent record sales in Sydney, Liverpool, Minto, Campbelltown, Glenfield, Oran Park, Bardia, Denham Court, Willowdale, Prestons, Bankstown, and across South West Sydney and Rockdale.",
-  "As a Sydney resident, we have a great appreciation for the history of the area and share a love of the vibrant lifestyle on offer. A proven high achiever, Home7's proficiency in a broad range of property — stretching from apartments to multi-million dollar homes — ensures that all our clients receive knowledgeable and genuine advice appropriate to current market conditions.",
-  "An outstanding communicator with exceptional local knowledge, Home7 consistently achieves extraordinary results with honesty and tenacity — the building blocks from which we go about our day-to-day business.",
+  "Home7 Real Estate is a family-owned agency on Macquarie Street in the Liverpool CBD. It was founded in 2020 by our principal, Mohammed Islam, after 15 years working with real estate agencies across Sydney. He started Home7 to give clients the experience of a big agency with lower fees and a far more personal service.",
+  "We have sold and leased homes in Liverpool, Warwick Farm, Casula, Prestons, Ingleburn, Leumeah, Minto, Campbelltown, Austral, Oran Park, Parramatta and surrounding suburbs, from one-bedroom units to family homes and acreage. Many of our clients have stayed with us for years, across several sales and investment properties.",
+  "Our approach is simple: price property honestly using real local sales, keep you updated throughout, and put every fee in writing before anything is signed. You deal with the same person from start to finish, and every client is treated like a close friend rather than a listing.",
 ];
 
 // The live page repeats this exact paragraph per suburb with only the name
@@ -67,7 +71,7 @@ const SERVICE_AREAS = [
   {
     name: "Moorebank",
     description:
-      "Home7 Real Estate, your premier real estate agency serving the dynamic community of Moorebank. Our dedicated team covers the entire locale, offering a diverse array of properties from upscale residences to cozy starter homes. With a commitment to excellence, our experienced professionals provide personalized guidance for all your real estate needs.",
+      "Home7 Real Estate, your local real estate agency serving the community of Moorebank. Our dedicated team covers the entire locale, offering a diverse array of properties from upscale residences to cozy starter homes. With a commitment to excellence, our experienced professionals provide personalized guidance for all your real estate needs.",
   },
   {
     name: "Lurnea",
@@ -82,12 +86,12 @@ const SERVICE_AREAS = [
   {
     name: "Bankstown",
     description:
-      "At Home7, we take pride in offering unparalleled service in this dynamic locale, known for its diverse neighborhoods and thriving real estate market. Our dedicated team of experts at Home7 Real Estate brings a wealth of local knowledge to the forefront, ensuring that your property needs are met with precision and insight. Whether you're looking to buy, sell, or invest in Bankstown, we provide personalized guidance to navigate the unique real estate landscape of this bustling suburb.",
+      "At Home7, we take pride in offering reliable, personal service in this dynamic locale, known for its diverse neighborhoods and thriving real estate market. Our dedicated team of experts at Home7 Real Estate brings a wealth of local knowledge to the forefront, ensuring that your property needs are met with precision and insight. Whether you're looking to buy, sell, or invest in Bankstown, we provide personalized guidance to navigate the unique real estate landscape of this bustling suburb.",
   },
   {
     name: "Oran Park",
     description:
-      "Home7 Real Estate, your trusted real estate agency specializing in the dynamic and growing community of Oran Park. As a homeowner or investor in Oran Park, you can rely on Home7 to strategically optimize our online presence with high keyword density. This ensures that our listings and services are easily discoverable, connecting you with the ideal property or buyer seamlessly.",
+      "Home7 Real Estate, your trusted real estate agency specializing in the dynamic and growing community of Oran Park. As a homeowner or investor in Oran Park, you can rely on Home7's local knowledge, honest pricing and regular updates to connect you with the right buyer or tenant.",
   },
   {
     name: "Minto",
@@ -102,7 +106,7 @@ const SERVICE_AREAS = [
   {
     name: "Casula",
     description:
-      "Home7 Real Estate, your premier real estate agency in Casula. Our experienced team provides personalized guidance in this dynamic suburb, known for its diverse neighborhoods and growing real estate market. Trust Home7 to strategically optimize our online presence with high keyword density, ensuring seamless connections for buyers and sellers in Casula.",
+      "Home7 Real Estate, your local real estate agency in Casula, just minutes from our Liverpool office. Our experienced team provides personalized guidance in this established suburb, known for its family homes and steady buyer demand, with honest pricing and low, upfront fees for sellers and landlords in Casula.",
   },
   {
     name: "Green Valley",
@@ -117,7 +121,7 @@ const SERVICE_AREAS = [
   {
     name: "Blacktown",
     description:
-      "Home7 Real Estate, your premier real estate agency serving the dynamic community of Blacktown. Our dedicated team covers the entire locale, offering a diverse array of properties from upscale residences to cozy starter homes. With a commitment to excellence, our experienced professionals provide personalized guidance for all your real estate needs.",
+      "Home7 Real Estate, your local real estate agency serving the community of Blacktown. Our dedicated team covers the entire locale, offering a diverse array of properties from upscale residences to cozy starter homes. With a commitment to excellence, our experienced professionals provide personalized guidance for all your real estate needs.",
   },
   {
     name: "Parramatta",
@@ -132,7 +136,7 @@ const SERVICE_AREAS = [
   {
     name: "Austral",
     description:
-      "At Home7, we take pride in offering unparalleled service in this dynamic locale, known for its diverse neighborhoods and thriving real estate market. Our dedicated team of experts at Home7 Real Estate brings a wealth of local knowledge to the forefront, ensuring that your property needs are met with precision and insight. Whether you're looking to buy, sell, or invest in Austral, we provide personalized guidance to navigate the unique real estate landscape of this growing suburb.",
+      "At Home7, we take pride in offering reliable, personal service in this dynamic locale, known for its diverse neighborhoods and thriving real estate market. Our dedicated team of experts at Home7 Real Estate brings a wealth of local knowledge to the forefront, ensuring that your property needs are met with precision and insight. Whether you're looking to buy, sell, or invest in Austral, we provide personalized guidance to navigate the unique real estate landscape of this growing suburb.",
   },
   {
     name: "Castle Hill",
@@ -152,7 +156,7 @@ const SERVICE_AREAS = [
   {
     name: "Marsden Park",
     description:
-      "Home7 Real Estate, your premier real estate agency in Marsden Park. Our experienced team provides personalized guidance in this fast-growing suburb, known for its new communities and expanding real estate market, ensuring seamless connections for buyers and sellers in Marsden Park.",
+      "Home7 Real Estate, your local real estate agency for Marsden Park. Our experienced team provides personalized guidance in this fast-growing suburb, known for its new communities and expanding real estate market, ensuring seamless connections for buyers and sellers in Marsden Park.",
   },
   {
     name: "Box Hill",

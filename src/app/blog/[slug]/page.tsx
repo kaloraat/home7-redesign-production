@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { faqJsonLdFromHtml } from "@/lib/faqFromHtml";
 import { brandedTitle } from "@/lib/pageMetadata";
 import Image from "next/image";
 import Link from "next/link";
@@ -74,6 +75,7 @@ export default async function Page({
   // text-lg styling. Both are cleaned up server-side before rendering — see
   // lib/legacyContent.ts for exactly what each does and why.
   const cleanedBody = normalizeLegacyHtml(stripDuplicateTitle(post.bodyHtml, post.title));
+  const faqJsonLd = faqJsonLdFromHtml(cleanedBody);
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -123,6 +125,9 @@ export default async function Page({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
       />
+      {faqJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      )}
 
       {/* max-w-7xl, matching the property detail page's overall width
           (was max-w-6xl) — the 128px gained (7xl - 6xl = 1280px - 1152px)
