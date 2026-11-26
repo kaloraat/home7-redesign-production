@@ -4,13 +4,15 @@ import { notFound, permanentRedirect } from "next/navigation";
 import Link from "next/link";
 import { getAgentBySlug, getAgentTrackRecord, getPropertiesByAgent } from "@/lib/queries";
 import { PhoneIcon, MobileIcon, EmailIcon, FacebookIcon, LinkedInIcon } from "@/components/icons";
-import { SITE_URL, BLOG_CONTACT_FORM_INTRO, COMPANY, MESH_NAVY_BASE, MESH_GLOW_BRIGHT_BLUE, MESH_GLOW_LIGHT_BLUE, MESH_GLOW_DEEP_BLUE, ORG_ID, SITE_NAME, TARGET_SUBURBS, suburbSlug } from "@/lib/constants";
+import { SITE_URL, BLOG_CONTACT_FORM_INTRO, COMPANY, GOOGLE_RATING, GOOGLE_REVIEWS_URL, MESH_NAVY_BASE, MESH_GLOW_BRIGHT_BLUE, MESH_GLOW_LIGHT_BLUE, MESH_GLOW_DEEP_BLUE, ORG_ID, SITE_NAME, TARGET_SUBURBS, suburbSlug } from "@/lib/constants";
 import MeshBackground from "@/components/MeshBackground";
 import PropertyCard from "@/components/PropertyCard";
 import ResponsiveCardGrid from "@/components/ResponsiveCardGrid";
 import PhoneLink from "@/components/lp/PhoneLink";
 import { isOfficeNumber } from "@/lib/lp/phone";
 import ContactForm from "@/components/ContactForm";
+import Testimonials from "@/components/Testimonials";
+import { agentPersonId, getAgentProfile } from "@/lib/agentProfiles";
 
 export async function generateMetadata({
   params,
@@ -21,13 +23,19 @@ export async function generateMetadata({
   const agent = await getAgentBySlug(slug);
   if (!agent) return {};
 
-  const title = agent.name;
+  const profile = getAgentProfile(agent.slug);
   const record = await getAgentTrackRecord(String(agent._id));
   const results =
     record.soldCount + record.leasedCount > 0
       ? ` ${record.soldCount} properties sold and ${record.leasedCount} leased across Liverpool and South West Sydney.`
       : "";
-  const description = `${agent.name}, ${agent.role} at Home7 Real Estate in Liverpool NSW.${results}`;
+  const description =
+    profile.seoDescription ?? `${agent.name}, ${agent.role} at Home7 Real Estate in Liverpool NSW.${results}`;
+  // A profile's seoTitle is a complete title (it already names the role and
+  // area), so it skips the " | Home7 Real Estate" template to stay under ~60
+  // characters. Agents without one keep "{name} | Home7 Real Estate".
+  const title = profile.seoTitle ? { absolute: profile.seoTitle } : agent.name;
+  const socialTitle = profile.seoTitle ?? agent.name;
   const url = `${SITE_URL}/agent/${agent.slug}`;
 
   return {
@@ -40,13 +48,13 @@ export async function generateMetadata({
     openGraph: {
       type: "profile",
       url,
-      title,
+      title: socialTitle,
       description,
       images: agent.photo ? [{ url: agent.photo }] : undefined,
     },
     twitter: {
       card: agent.photo ? "summary_large_image" : "summary",
-      title,
+      title: socialTitle,
       description,
       images: agent.photo ? [agent.photo] : undefined,
     },
@@ -79,6 +87,8 @@ export default async function Page({
   const firstName = agent.name.split(" ")[0];
   const topSuburbs = record.suburbs.slice(0, 12);
   const bioParagraphs = (agent.bio || "").split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+  const profile = getAgentProfile(agent.slug);
+  const pageUrl = `${SITE_URL}/agent/${agent.slug}`;
 
   // Mohammed-specific per explicit request — everyone else keeps the
   // shared BLOG_CONTACT_FORM_INTRO copy ("a local property expert"),
@@ -107,16 +117,23 @@ export default async function Page({
   const facebookUrl = agent.facebook || COMPANY.facebook;
   const linkedinUrl = agent.linkedin || COMPANY.linkedin;
   const sameAs = [facebookUrl, linkedinUrl].filter((url): url is string => Boolean(url));
+  // ProfilePage wrapping the Person: Google's documented type for a page
+  // that's about one person. The Person's @id is stable so the homepage's
+  // RealEstateAgent can point at it as `founder`, joining the agency and
+  // its principal into one connected entity (what AI answers lean on when
+  // they name "who runs Home7").
   const personJsonLd = {
-    "@context": "https://schema.org",
     "@type": "Person",
+    "@id": agentPersonId(agent.slug),
     name: agent.name,
+    alternateName: profile.alternateName,
+    description: bioParagraphs[0] || undefined,
     jobTitle: agent.role,
     image: agent.photo || undefined,
     telephone: agent.phone || agent.mobile || undefined,
     email: agent.email || undefined,
     worksFor: { "@type": "RealEstateAgent", "@id": ORG_ID, name: SITE_NAME },
-    url: `${SITE_URL}/agent/${agent.slug}`,
+    url: pageUrl,
     sameAs: sameAs.length > 0 ? sameAs : undefined,
     hasCredential: agent.licence
       ? {
@@ -127,8 +144,30 @@ export default async function Page({
           recognizedBy: { "@type": "GovernmentOrganization", name: "NSW Fair Trading" },
         }
       : undefined,
-    knowsAbout: topSuburbs.length > 0 ? topSuburbs.map((s) => `${s.name} NSW real estate`) : undefined,
+    knowsAbout: [
+      ...(profile.services ?? []).map((s) => s.title),
+      ...topSuburbs.map((s) => `${s.name} NSW real estate`),
+    ],
   };
+  const profilePageJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "@id": pageUrl,
+    url: pageUrl,
+    name: profile.seoTitle ?? agent.name,
+    mainEntity: personJsonLd,
+  };
+  const faqJsonLd = profile.faqs?.length
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: profile.faqs.map(({ q, a }) => ({
+          "@type": "Question",
+          name: q,
+          acceptedAnswer: { "@type": "Answer", text: a },
+        })),
+      }
+    : null;
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -143,8 +182,11 @@ export default async function Page({
     <div>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(profilePageJsonLd) }}
       />
+      {faqJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      )}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
@@ -176,7 +218,7 @@ export default async function Page({
             <div className="h-32 w-32 sm:h-40 sm:w-40 shrink-0 rounded-full overflow-hidden ring-4 ring-brand-gold shadow-lg">
               <Image
                 src={agent.photo}
-                alt={agent.name}
+                alt={`${agent.name}, ${agent.role} at Home7 Real Estate Liverpool`}
                 width={160}
                 height={160}
                 className="h-full w-full object-cover"
@@ -189,6 +231,7 @@ export default async function Page({
             </p>
             <h1 className="mt-1 font-display text-3xl sm:text-4xl">{agent.name}</h1>
             <p className="mt-1 text-slate-200">{agent.role}</p>
+            {profile.tagline && <p className="mt-1 text-slate-300">{profile.tagline}</p>}
             {agent.licence && (
               <p className="mt-1 text-sm text-slate-300">NSW licence no. {agent.licence}</p>
             )}
@@ -303,12 +346,18 @@ export default async function Page({
 
           {/* Real results from this agent's own listings in the DB, so the
               numbers can never drift from what the site actually shows. */}
-          {record.soldCount + record.leasedCount > 0 && (
+          {(record.soldCount + record.leasedCount > 0 || profile.yearsExperience) && (
             <div className="mt-8">
               <h2 className="font-display text-xl text-brand-navy pb-2 border-b-2 border-brand-gold inline-block">
                 Track Record
               </h2>
-              <dl className="mt-4 grid grid-cols-2 gap-4 max-w-md">
+              <dl className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {profile.yearsExperience && (
+                  <div className="rounded-lg border border-slate-200 bg-white p-4">
+                    <dt className="text-sm text-slate-500">Years in Sydney real estate</dt>
+                    <dd className="font-display text-3xl text-brand-navy">{profile.yearsExperience}+</dd>
+                  </div>
+                )}
                 <div className="rounded-lg border border-slate-200 bg-white p-4">
                   <dt className="text-sm text-slate-500">Properties sold</dt>
                   <dd className="font-display text-3xl text-brand-navy">{record.soldCount}</dd>
@@ -317,6 +366,20 @@ export default async function Page({
                   <dt className="text-sm text-slate-500">Properties leased</dt>
                   <dd className="font-display text-3xl text-brand-navy">{record.leasedCount}</dd>
                 </div>
+                {profile.showReviews && (
+                  <div className="rounded-lg border border-slate-200 bg-white p-4">
+                    <dt className="text-sm text-slate-500">Google rating</dt>
+                    <dd className="font-display text-3xl text-brand-navy">{GOOGLE_RATING.value}</dd>
+                    <a
+                      href={GOOGLE_REVIEWS_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-brand-gold-dark hover:underline"
+                    >
+                      {GOOGLE_RATING.count} reviews
+                    </a>
+                  </div>
+                )}
               </dl>
               {topSuburbs.length > 0 && (
                 <>
@@ -342,6 +405,25 @@ export default async function Page({
               )}
             </div>
           )}
+
+          {profile.services?.length ? (
+            <div className="mt-8">
+              <h2 className="font-display text-xl text-brand-navy pb-2 border-b-2 border-brand-gold inline-block">
+                How {firstName} Can Help
+              </h2>
+              <div className="mt-4 grid gap-4 sm:grid-cols-3">
+                {profile.services.map((s) => (
+                  <div key={s.title} className="flex flex-col rounded-lg border border-slate-200 bg-white p-4">
+                    <h3 className="font-semibold text-brand-navy">{s.title}</h3>
+                    <p className="mt-2 flex-1 text-slate-600 leading-relaxed">{s.text}</p>
+                    <Link href={s.href} className="mt-3 font-semibold text-brand-navy hover:text-brand-gold-dark">
+                      {s.cta}
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </div>
 
         {/* Not sticky, deliberately — the form and bio are short enough to
@@ -412,6 +494,38 @@ export default async function Page({
           </div>
         </div>
       )}
+
+      {profile.showReviews && (
+        <Testimonials eyebrow="Google reviews" heading={`What Clients Say About ${firstName}`} />
+      )}
+
+      {profile.faqs?.length ? (
+        <section className="mx-auto max-w-3xl px-4 py-16">
+          <h2 className="text-center font-display text-3xl text-brand-navy">
+            Questions About Working With {firstName}
+          </h2>
+          <div className="mt-8 divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white">
+            {profile.faqs.map(({ q, a }) => (
+              <details key={q} className="group p-5">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-brand-navy text-lg">
+                  {q}
+                  <span aria-hidden="true" className="text-brand-gold-dark transition-transform group-open:rotate-45 text-2xl leading-none">
+                    +
+                  </span>
+                </summary>
+                <p className="mt-3 text-lg text-slate-600 leading-relaxed">{a}</p>
+              </details>
+            ))}
+          </div>
+          <p className="mt-6 text-center text-lg text-slate-600">
+            Choosing between agents? Read our{" "}
+            <Link href="/blog/real-estate-agent-liverpool" className="font-semibold text-brand-navy underline underline-offset-4 hover:text-brand-gold-dark">
+              guide to real estate agents in Liverpool
+            </Link>
+            .
+          </p>
+        </section>
+      ) : null}
     </div>
   );
 }

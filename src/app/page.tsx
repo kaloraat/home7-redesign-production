@@ -22,6 +22,7 @@ import TeamGrid from "@/components/TeamGrid";
 import Testimonials from "@/components/Testimonials";
 import HomeIntro from "@/components/HomeIntro";
 import HomeFaq from "@/components/HomeFaq";
+import { agentPersonId, PRINCIPAL_SLUG } from "@/lib/agentProfiles";
 import { COMPANY, SITE_NAME, SITE_URL, TARGET_SUBURBS, GOOGLE_RATING, ORG_ID, GOOGLE_MAPS_URL, OFFICE_GEO } from "@/lib/constants";
 
 // JSON-LD structured data for the homepage — RealEstateAgent (a LocalBusiness
@@ -72,6 +73,14 @@ function buildJsonLd() {
       // as" the company), and inconsistent with COMPANY.facebook/linkedin
       // below anyway. See constants.ts for how these were confirmed.
       sameAs: [COMPANY.facebook, COMPANY.linkedin, GOOGLE_MAPS_URL],
+      // Same @id as the Person on /agent/mohammed-r-islam, so the agency and
+      // its founder resolve to one connected pair of entities.
+      founder: {
+        "@type": "Person",
+        "@id": agentPersonId(PRINCIPAL_SLUG),
+        name: "Mohammed R Islam",
+        url: `${SITE_URL}/agent/${PRINCIPAL_SLUG}`,
+      },
       // Real, sourced figures (Testimonials.tsx displays the same
       // GOOGLE_RATING to actual visitors on this same page) — not
       // fabricated, which matters: Google's structured-data guidelines

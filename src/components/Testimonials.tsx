@@ -12,16 +12,19 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-export function Testimonials() {
+export function Testimonials({
+  eyebrow = "What our clients say",
+  heading = "Real Reviews From Real Clients",
+}: { eyebrow?: string; heading?: string } = {}) {
   return (
     <section className="bg-slate-50 border-y border-slate-200">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:py-20">
         <div className="text-center max-w-2xl mx-auto">
           <p className="text-xs uppercase tracking-widest text-brand-gold-dark font-semibold">
-            What our clients say
+            {eyebrow}
           </p>
           <h2 className="mt-2 font-display text-3xl sm:text-4xl text-brand-navy">
-            Real Reviews From Real Clients
+            {heading}
           </h2>
           <div className="mt-3 flex items-center justify-center gap-2">
             <div className="flex items-center gap-0.5 text-brand-gold">
