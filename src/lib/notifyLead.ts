@@ -123,7 +123,7 @@ export async function notifyNewLead(lead: LeadFields) {
     // .env.local (see .env.example). Logged once per attempt rather than
     // silently doing nothing, so this gap stays visible in server logs
     // instead of just quietly never sending anything.
-    console.warn("notifyNewLead: RESEND_API_KEY not set — skipping email notification.");
+    console.warn("notifyNewLead: RESEND_API_KEY not set - skipping email notification.");
     return;
   }
 
@@ -154,7 +154,7 @@ export async function notifyNewLead(lead: LeadFields) {
     const { error } = await resend.emails.send({
       from,
       to,
-      subject: `New ${typeLabel} lead — ${lead.name}`,
+      subject: `New ${typeLabel} lead - ${lead.name}`,
       text: textLines.join("\n"),
       html: buildLeadEmailHtml(lead, typeLabel),
     });

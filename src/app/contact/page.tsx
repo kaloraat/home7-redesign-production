@@ -11,7 +11,7 @@ import PhoneLink from "@/components/lp/PhoneLink";
 import { getAgents } from "@/lib/queries";
 
 const TITLE = "Contact Us";
-const DESCRIPTION = "Contact Home7 Real Estate — Liverpool, NSW.";
+const DESCRIPTION = "Contact Home7 Real Estate - Liverpool, NSW.";
 
 export const metadata: Metadata = {
   title: TITLE,

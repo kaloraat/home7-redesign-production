@@ -92,7 +92,7 @@ export async function generateMetadata({
     .join(", ");
   const title =
     property.seoTitle ||
-    [`${property.address}, ${property.suburb} NSW`, actionLabel].filter(Boolean).join(" — ");
+    [`${property.address}, ${property.suburb} NSW`, actionLabel].filter(Boolean).join(" - ");
   // Built as one flowing opening sentence plus trailing fragments —
   // joining "{bedBath} property" and "in {suburb}, NSW" as two SEPARATE
   // ". "-joined array entries (an earlier version of this did) produces

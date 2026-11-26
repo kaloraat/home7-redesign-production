@@ -51,7 +51,7 @@ export default async function TenancyReferencePage({
         ) : (
           <div className="rounded-lg border border-slate-200 bg-white p-8 text-center">
             <p className="font-display text-xl text-brand-navy">This request has already been completed</p>
-            <p className="mt-2 text-slate-500">There&apos;s nothing more to do here — thanks for your help.</p>
+            <p className="mt-2 text-slate-500">There&apos;s nothing more to do here - thanks for your help.</p>
           </div>
         )}
       </div>

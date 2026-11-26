@@ -70,7 +70,7 @@ export default async function Page() {
 
         {properties.length === 0 ? (
           <p className="mt-10 text-slate-500 text-lg">
-            No listings yet — connect MONGODB_URI and add properties from the admin dashboard.
+            No listings yet - connect MONGODB_URI and add properties from the admin dashboard.
           </p>
         ) : (
           // Plain grid, not ResponsiveCardGrid — see sold-properties/page.tsx
@@ -122,7 +122,7 @@ export default async function Page() {
             can find the perfect property that meets your needs and fits your budget.
           </p>
           <p>
-            Don&apos;t wait — start your journey today! <Link href="/contact" className="text-brand-gold-dark hover:underline">Contact us</Link> to
+            Don&apos;t wait - start your journey today! <Link href="/contact" className="text-brand-gold-dark hover:underline">Contact us</Link> to
             discover more about the best properties for sale in Liverpool, NSW.
           </p>
         </div>

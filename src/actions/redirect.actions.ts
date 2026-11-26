@@ -20,7 +20,7 @@ function parseFields(formData: FormData) {
     throw new Error("Both paths are required");
   }
   if (fromPath === toPath) {
-    throw new Error("From and To can't be the same path — that's a redirect loop");
+    throw new Error("From and To can't be the same path - that's a redirect loop");
   }
 
   return {

@@ -26,7 +26,7 @@ export async function requireAdmin() {
 export async function requireOwner() {
   const session = await requireAdmin();
   if (session.user.role !== "owner") {
-    throw new Error("Only an owner can delete this — ask an owner to do it for you.");
+    throw new Error("Only an owner can delete this - ask an owner to do it for you.");
   }
   return session;
 }

@@ -7,7 +7,7 @@ import type { ITenancyApplication } from "@/models/TenancyApplication";
 function getResend(): { resend: Resend; from: string } | null {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    console.warn("notifyTenancyApplication: RESEND_API_KEY not set — skipping email.");
+    console.warn("notifyTenancyApplication: RESEND_API_KEY not set - skipping email.");
     return null;
   }
   const from = process.env.LEAD_NOTIFICATION_FROM || "Home7 <onboarding@resend.dev>";
@@ -29,7 +29,7 @@ export async function notifyNewTenancyApplication(application: ITenancyApplicati
     const { error } = await client.resend.emails.send({
       from: client.from,
       to,
-      subject: `New rental application — ${applicantName} (${application.propertyAddress})`,
+      subject: `New rental application - ${applicantName} (${application.propertyAddress})`,
       text: [
         `A new rental application has been submitted.`,
         "",

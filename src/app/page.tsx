@@ -158,7 +158,7 @@ export default async function Home() {
       <section className="relative overflow-hidden h-109.25 -mt-14.25 min-[430px]:h-102.25 min-[430px]:-mt-7.25 sm:h-113.25 sm:-mt-8.25 lg:h-110 lg:mt-0">
         <Image
           src="/images/hero-banner.webp"
-          alt="Home7 Real Estate — real estate agent in Liverpool, NSW"
+          alt="Home7 Real Estate - real estate agent in Liverpool, NSW"
           fill
           priority
           // The box is height-constrained (short and wide), not
@@ -260,28 +260,28 @@ export default async function Home() {
           properties={forSale}
           viewAllLabel="View All Properties For Sale"
           viewAllHref="/properties-for-sale"
-          emptyMessage="No listings yet — this fills in once the property data migration runs."
+          emptyMessage="No listings yet - this fills in once the property data migration runs."
         />
         <ListingsSection
           title="Properties For Rent"
           properties={forRent}
           viewAllLabel="View All Properties For Rent"
           viewAllHref="/properties-for-rent"
-          emptyMessage="No listings yet — this fills in once the property data migration runs."
+          emptyMessage="No listings yet - this fills in once the property data migration runs."
         />
         <ListingsSection
           title="Sold Properties"
           properties={sold}
           viewAllLabel="View All Sold Properties"
           viewAllHref="/sold-properties"
-          emptyMessage="No sold listings yet — this fills in once the property data migration runs."
+          emptyMessage="No sold listings yet - this fills in once the property data migration runs."
         />
         <ListingsSection
           title="Leased Properties"
           properties={leased}
           viewAllLabel="View All Leased Properties"
           viewAllHref="/leased-properties"
-          emptyMessage="No leased listings yet — this fills in once the property data migration runs."
+          emptyMessage="No leased listings yet - this fills in once the property data migration runs."
         />
       </section>
 
@@ -299,7 +299,7 @@ export default async function Home() {
         </div>
         {posts.length === 0 ? (
           <p className="mt-8 text-slate-500 text-lg">
-            No posts yet — this fills in once the blog content migration runs.
+            No posts yet - this fills in once the blog content migration runs.
           </p>
         ) : (
           <div className="mt-8">

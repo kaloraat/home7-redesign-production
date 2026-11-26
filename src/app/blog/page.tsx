@@ -19,7 +19,7 @@ export async function generateMetadata({
   const { page: pageParam } = await searchParams;
   const page = parsePage(pageParam);
   const canonical = page > 1 ? `${SITE_URL}/blog?page=${page}` : `${SITE_URL}/blog`;
-  const title = page > 1 ? `Blog — Page ${page}` : "Blog";
+  const title = page > 1 ? `Blog - Page ${page}` : "Blog";
   const description = "Local property market insights for Liverpool and Western Sydney.";
   return {
     title,
@@ -96,7 +96,7 @@ export default async function Page({
       <div className="mx-auto max-w-6xl px-4 py-10">
         {total === 0 ? (
           <p className="mt-10 text-lg text-slate-600 leading-relaxed">
-            No posts yet — add them from the admin dashboard.
+            No posts yet - add them from the admin dashboard.
           </p>
         ) : (
           <>

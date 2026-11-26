@@ -135,7 +135,7 @@ export default async function SuburbPage({
           {properties.length === 0 ? (
             <div className="mt-6 rounded-lg border border-slate-200 bg-slate-50 px-6 py-10 text-center">
               <p className="text-slate-600 text-lg">
-                We don&apos;t have a current listing in {suburbName} on the site right now — but
+                We don&apos;t have a current listing in {suburbName} on the site right now - but
                 we&apos;re active in this market and new stock moves fast.
               </p>
               <Link

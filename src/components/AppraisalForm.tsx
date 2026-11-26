@@ -163,7 +163,7 @@ export function AppraisalForm({ defaultTab = "selling" }: { defaultTab?: Tab }) 
   if (status === "success") {
     return (
       <div className="rounded-lg border border-slate-200 bg-white p-8 text-center">
-        <p className="font-display text-xl text-brand-navy">Thanks — request received!</p>
+        <p className="font-display text-xl text-brand-navy">Thanks - request received!</p>
         <p className="mt-2 text-slate-500">
           A local Home7 property expert will be in touch shortly with your appraisal.
         </p>
@@ -227,7 +227,7 @@ export function AppraisalForm({ defaultTab = "selling" }: { defaultTab?: Tab }) 
         )}
 
         {status === "error" && (
-          <p className="text-sm text-red-600">Something went wrong — please try again.</p>
+          <p className="text-sm text-red-600">Something went wrong - please try again.</p>
         )}
 
         <div className="flex items-center justify-between pt-2">

@@ -67,7 +67,7 @@ function buildEmail(lead: LeadInput, leadId: string, phoneE164: string) {
   ];
 
   const text = [
-    `${kind} LEAD — call within 5 minutes`,
+    `${kind} LEAD - call within 5 minutes`,
     `Name: ${lead.name}`,
     `Phone: ${lead.phone} (${phoneE164})`,
     `${isPm ? "Suburb" : "Address/suburb"}: ${lead.suburb}`,

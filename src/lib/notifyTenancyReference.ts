@@ -10,7 +10,7 @@ import type { IPropertyReference } from "@/models/PropertyReference";
 function getResend(): { resend: Resend; from: string } | null {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    console.warn("notifyTenancyReference: RESEND_API_KEY not set — skipping email.");
+    console.warn("notifyTenancyReference: RESEND_API_KEY not set - skipping email.");
     return null;
   }
   const from = process.env.LEAD_NOTIFICATION_FROM || "Home7 <onboarding@resend.dev>";
@@ -133,9 +133,9 @@ export async function notifyReferenceOutcome(
 
   const to = getNotificationRecipients();
   const subjectByOutcome: Record<typeof outcome, string> = {
-    submitted: `Reference check completed — ${reference.tenantName}`,
-    call_me_instead: `Reference check: agent asked to be called — ${reference.tenantName}`,
-    unknown_contact: `Reference check: agent doesn't know this tenant — ${reference.tenantName}`,
+    submitted: `Reference check completed - ${reference.tenantName}`,
+    call_me_instead: `Reference check: agent asked to be called - ${reference.tenantName}`,
+    unknown_contact: `Reference check: agent doesn't know this tenant - ${reference.tenantName}`,
   };
 
   try {

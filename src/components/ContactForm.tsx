@@ -179,7 +179,7 @@ export function ContactForm({
       )}
 
       {status === "error" && (
-        <p className="text-sm text-red-600">Something went wrong — please try again.</p>
+        <p className="text-sm text-red-600">Something went wrong - please try again.</p>
       )}
 
       <button

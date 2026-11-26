@@ -56,7 +56,7 @@ export default async function Page() {
 
       <div className="mx-auto max-w-6xl px-4 py-16 sm:py-20">
         {agents.length === 0 ? (
-          <p className="text-slate-500 text-lg">No agents yet — add them from the admin dashboard.</p>
+          <p className="text-slate-500 text-lg">No agents yet - add them from the admin dashboard.</p>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {agents.map((a) => (

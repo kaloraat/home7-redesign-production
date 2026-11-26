@@ -56,7 +56,7 @@ export default function Page() {
 
       <div className="mx-auto max-w-2xl px-4 py-16 sm:py-20">
         <p className="text-lg text-slate-600 leading-relaxed">
-          Let a Home7 buyers agent do the searching, shortlisting and negotiating for you — tell
+          Let a Home7 buyers agent do the searching, shortlisting and negotiating for you - tell
           us what you&apos;re after and we&apos;ll take it from there.
         </p>
         <div className="mt-8">

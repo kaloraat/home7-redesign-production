@@ -89,7 +89,7 @@ function extractErrorMessage(body: unknown): string {
       if (flat.formErrors?.length) return flat.formErrors[0];
     }
   }
-  return "Submission failed — please check the form and try again.";
+  return "Submission failed - please check the form and try again.";
 }
 
 export function TenancyReferenceForm({
@@ -149,7 +149,7 @@ export function TenancyReferenceForm({
       if (!res.ok) throw new Error();
       setScreen("declined");
     } catch {
-      setErrorMsg("Something went wrong — please try again.");
+      setErrorMsg("Something went wrong - please try again.");
       setStatus("error");
     }
   }
@@ -219,7 +219,7 @@ export function TenancyReferenceForm({
       // in place, not a redirect to a page that means nothing to them.
       setScreen("submitted");
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : "Something went wrong — please try again.");
+      setErrorMsg(err instanceof Error ? err.message : "Something went wrong - please try again.");
       setStatus("error");
     }
   }
@@ -243,7 +243,7 @@ export function TenancyReferenceForm({
         </div>
         <p className="font-display text-xl text-brand-navy">Reference submitted</p>
         <p className="mt-2 text-slate-500">
-          Thank you for your assistance — {tenantName}&apos;s reference has been sent to Home7 Real
+          Thank you for your assistance - {tenantName}&apos;s reference has been sent to Home7 Real
           Estate.
         </p>
       </div>

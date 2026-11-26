@@ -79,7 +79,7 @@ const MAX_FILE_BYTES = 2 * 1024 * 1024; // 2MB, matches the live site's limit
 async function uploadIfPresent(file: File | null, token: string, label: string) {
   if (!file || file.size === 0) return undefined;
   if (!ALLOWED_FILE_TYPES.has(file.type)) {
-    throw new Error(`${label}: unsupported file type — use PDF, JPG, PNG, DOC or DOCX`);
+    throw new Error(`${label}: unsupported file type - use PDF, JPG, PNG, DOC or DOCX`);
   }
   if (file.size > MAX_FILE_BYTES) {
     throw new Error(`${label}: file is too large (max 2MB)`);

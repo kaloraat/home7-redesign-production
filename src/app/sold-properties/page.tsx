@@ -68,7 +68,7 @@ export default async function Page() {
 
         {properties.length === 0 ? (
           <p className="mt-10 text-slate-500 text-lg">
-            No listings yet — connect MONGODB_URI and add properties from the admin dashboard.
+            No listings yet - connect MONGODB_URI and add properties from the admin dashboard.
           </p>
         ) : (
           // Plain grid, not ResponsiveCardGrid — that component deliberately

@@ -129,7 +129,7 @@ export function TenancyCheckPdf({ reference }: { reference: IPropertyReference }
   });
 
   return (
-    <Document title={`Tenancy Reference Check — ${reference.tenantName}`}>
+    <Document title={`Tenancy Reference Check - ${reference.tenantName}`}>
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
           <View>
@@ -159,7 +159,7 @@ export function TenancyCheckPdf({ reference }: { reference: IPropertyReference }
         {reference.status === "pending" && (
           <View style={[styles.noteBox, { backgroundColor: COLOR.amber50 }]} wrap={false}>
             <Text style={[styles.noteText, { color: COLOR.amber800 }]}>
-              Still pending — the previous agent hadn&apos;t responded at the time this PDF was generated.
+              Still pending - the previous agent hadn&apos;t responded at the time this PDF was generated.
             </Text>
           </View>
         )}
@@ -255,7 +255,7 @@ export function TenancyCheckPdf({ reference }: { reference: IPropertyReference }
         )}
 
         <View style={styles.footer} fixed>
-          <Text>Home7 Real Estate — Confidential tenancy reference check</Text>
+          <Text>Home7 Real Estate - Confidential tenancy reference check</Text>
           <Text render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`} />
         </View>
       </Page>

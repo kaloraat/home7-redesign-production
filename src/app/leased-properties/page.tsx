@@ -41,7 +41,7 @@ export default async function Page() {
 
       {properties.length === 0 ? (
         <p className="mt-10 text-slate-500">
-          No listings yet — connect MONGODB_URI and add properties from the admin dashboard.
+          No listings yet - connect MONGODB_URI and add properties from the admin dashboard.
         </p>
       ) : (
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
