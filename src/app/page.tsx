@@ -1,6 +1,7 @@
 import Image from "next/image";
 import FeesBand from "@/components/FeesBand";
 import { FEES } from "@/lib/fees";
+import { orgOffers } from "@/lib/feesSchema";
 import Link from "next/link";
 import {
   getPropertiesByType,
@@ -67,6 +68,8 @@ function buildJsonLd() {
       },
       description: `Family-owned real estate agency in Liverpool NSW, founded in 2020 by Mohammed Islam. Sales commission ${FEES.sale.label} (${FEES.sale.inclLabel}); property management ${FEES.management.label} (${FEES.management.inclLabel}).`,
       priceRange: `Sales commission ${FEES.sale.label}; property management ${FEES.management.label}`,
+      // Same offers /fees and /property-management mark up (lib/feesSchema.ts).
+      makesOffer: orgOffers(),
       areaServed: TARGET_SUBURBS.map((suburb) => ({
         "@type": "City",
         name: suburb,

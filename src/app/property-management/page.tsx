@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { COMPANY, GOOGLE_RATING, ORG_ID, SITE_URL, TARGET_SUBURBS } from "@/lib/constants";
+import { COMPANY, GOOGLE_RATING, SITE_URL } from "@/lib/constants";
+import { managementServiceJsonLd } from "@/lib/feesSchema";
 import { pageMetadata } from "@/lib/pageMetadata";
 import { FEES, FEE_BENCHMARKS, FEE_EXAMPLE_WEEKLY_RENT, MANAGEMENT_SEPARATE_COSTS, formatAud, managementFeeYearly } from "@/lib/fees";
 import { getPropertiesByType, getResultCounts } from "@/lib/queries";
@@ -82,26 +83,7 @@ const breadcrumbJsonLd = {
   ],
 };
 
-const serviceJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Service",
-  name: "Property management",
-  serviceType: "Residential property management",
-  provider: { "@type": "RealEstateAgent", "@id": ORG_ID, name: "Home7 Real Estate" },
-  areaServed: TARGET_SUBURBS.map((s) => ({ "@type": "City", name: s })),
-  url: `${SITE_URL}/property-management`,
-  offers: {
-    "@type": "Offer",
-    description: `Management fee ${FEES.management.label} (${FEES.management.inclLabel}) of rent collected. Letting fees and leasing costs are separate.`,
-    priceSpecification: {
-      "@type": "UnitPriceSpecification",
-      price: FEES.management.percentInclGst,
-      priceCurrency: "AUD",
-      unitText: "percent of rent collected, including GST",
-      valueAddedTaxIncluded: true,
-    },
-  },
-};
+const serviceJsonLd = managementServiceJsonLd();
 
 export default async function Page() {
   const [leased, counts] = await Promise.all([

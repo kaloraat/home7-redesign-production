@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { COMPANY, ORG_ID, SITE_URL, TARGET_SUBURBS } from "@/lib/constants";
+import { COMPANY, SITE_URL } from "@/lib/constants";
+import { managementServiceJsonLd, salesServiceJsonLd } from "@/lib/feesSchema";
 import { pageMetadata } from "@/lib/pageMetadata";
 import {
   FEES,
@@ -70,47 +71,7 @@ const FAQ: FaqItem[] = [
   },
 ];
 
-const serviceJsonLd = [
-  {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    name: "Residential property sales",
-    serviceType: "Real estate sales agent",
-    provider: { "@type": "RealEstateAgent", "@id": ORG_ID, name: "Home7 Real Estate" },
-    areaServed: TARGET_SUBURBS.map((s) => ({ "@type": "City", name: s })),
-    offers: {
-      "@type": "Offer",
-      description: `Sales commission ${FEES.sale.label} (${FEES.sale.inclLabel}) of the sale price. Marketing and advertising are separate.`,
-      priceSpecification: {
-        "@type": "UnitPriceSpecification",
-        price: FEES.sale.percentInclGst,
-        priceCurrency: "AUD",
-        unitText: "percent of sale price, including GST",
-        valueAddedTaxIncluded: true,
-      },
-    },
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    name: "Property management",
-    serviceType: "Residential property management",
-    provider: { "@type": "RealEstateAgent", "@id": ORG_ID, name: "Home7 Real Estate" },
-    areaServed: TARGET_SUBURBS.map((s) => ({ "@type": "City", name: s })),
-    url: `${SITE_URL}/property-management`,
-    offers: {
-      "@type": "Offer",
-      description: `Management fee ${FEES.management.label} (${FEES.management.inclLabel}) of rent collected. Letting fees and leasing costs are separate.`,
-      priceSpecification: {
-        "@type": "UnitPriceSpecification",
-        price: FEES.management.percentInclGst,
-        priceCurrency: "AUD",
-        unitText: "percent of rent collected, including GST",
-        valueAddedTaxIncluded: true,
-      },
-    },
-  },
-];
+const serviceJsonLd = [salesServiceJsonLd(), managementServiceJsonLd()];
 
 const breadcrumbJsonLd = {
   "@context": "https://schema.org",
