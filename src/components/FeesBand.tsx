@@ -22,7 +22,7 @@ export default function FeesBand() {
     <section className="mx-auto max-w-6xl px-4 py-14 sm:py-16">
       <div className="text-center">
         <p className="text-xs uppercase tracking-widest text-brand-gold-dark font-semibold">Our fees, published upfront</p>
-        <h2 className="mt-2 font-display text-3xl sm:text-4xl text-brand-navy">Low, Clear Fees. No Guesswork.</h2>
+        <h2 className="mt-2 font-display text-3xl sm:text-4xl text-brand-navy">Lower Fees. The Same Great Service.</h2>
         <p className="mx-auto mt-3 max-w-2xl text-lg text-slate-600">
           Most agents won&apos;t tell you their fees until they visit. Here are ours.
         </p>
