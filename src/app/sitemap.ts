@@ -34,6 +34,21 @@ const STATIC_PATHS = [
 // removes listings between deploys.
 export const revalidate = 3600;
 
+// Sitemap <image:loc> must be an absolute URL. Agent photos (and some older
+// images) are stored as site paths like "/images/team/x.png", which Search
+// Console rejects as "Invalid URL". Resolve against SITE_URL (also
+// percent-encodes spaces in legacy file names) and drop anything unparseable.
+function absImages(urls: (string | undefined | null)[]): string[] {
+  return urls.flatMap((u) => {
+    if (!u) return [];
+    try {
+      return [new URL(u, SITE_URL).href];
+    } catch {
+      return [];
+    }
+  });
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // The `images` field is what produces the <image:image><image:loc>...
   // entries Google's Image Sitemaps extension reads — the old Laravel
@@ -68,14 +83,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       entries.push({
         url: `${SITE_URL}/property/${p.slug}`,
         lastModified: p.updatedAt,
-        ...(p.images?.length ? { images: p.images } : {}),
+        ...(p.images?.length ? { images: absImages(p.images) } : {}),
       });
     }
     for (const a of agents) {
       if (redirected.has(`/agent/${a.slug}`)) continue;
       entries.push({
         url: `${SITE_URL}/agent/${a.slug}`,
-        ...(a.photo ? { images: [a.photo] } : {}),
+        ...(a.photo ? { images: absImages([a.photo]) } : {}),
       });
     }
     for (const c of content) {
@@ -85,7 +100,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       entries.push({
         url: `${SITE_URL}${path}`,
         lastModified: c.updatedAt,
-        ...(c.coverImage ? { images: [c.coverImage] } : {}),
+        ...(c.coverImage ? { images: absImages([c.coverImage]) } : {}),
       });
     }
   } catch {
