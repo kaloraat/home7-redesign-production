@@ -43,6 +43,7 @@ export async function createRedirect(formData: FormData) {
 
   await Redirect.create(fields);
   revalidatePath("/admin/redirects");
+  revalidatePath("/sitemap.xml"); // list/unlist the page now, not up to an hour later
   nextRedirect("/admin/redirects");
 }
 
@@ -53,6 +54,7 @@ export async function updateRedirect(id: string, formData: FormData) {
   const fields = parseFields(formData);
   await Redirect.findByIdAndUpdate(id, fields);
   revalidatePath("/admin/redirects");
+  revalidatePath("/sitemap.xml"); // list/unlist the page now, not up to an hour later
   nextRedirect("/admin/redirects");
 }
 
@@ -61,4 +63,5 @@ export async function deleteRedirect(id: string) {
   await dbConnect();
   await Redirect.findByIdAndDelete(id);
   revalidatePath("/admin/redirects");
+  revalidatePath("/sitemap.xml"); // list/unlist the page now, not up to an hour later
 }

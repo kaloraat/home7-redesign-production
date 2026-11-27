@@ -130,6 +130,8 @@ export async function createProperty(formData: FormData) {
   await Property.create({ slug, ...fields });
 
   revalidatePath("/admin/properties");
+
+  revalidatePath("/sitemap.xml"); // list/unlist the page now, not up to an hour later
   revalidatePath(listingTypePath(fields.listingType));
   redirect("/admin/properties?created=1");
 }
@@ -173,6 +175,8 @@ export async function updateProperty(id: string, formData: FormData) {
   await Property.findByIdAndUpdate(id, { ...fields, ...reaFields });
 
   revalidatePath("/admin/properties");
+
+  revalidatePath("/sitemap.xml"); // list/unlist the page now, not up to an hour later
   revalidatePath(listingTypePath(fields.listingType));
   revalidatePath(`/property/${existing.slug}`);
   // Repeats on the list page what the toggle said, so it's confirmed after Save.
@@ -186,4 +190,5 @@ export async function deleteProperty(id: string) {
   await dbConnect();
   await Property.findByIdAndDelete(id);
   revalidatePath("/admin/properties");
+  revalidatePath("/sitemap.xml"); // list/unlist the page now, not up to an hour later
 }

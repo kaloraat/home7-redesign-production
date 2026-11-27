@@ -68,6 +68,8 @@ export async function createContent(formData: FormData) {
   });
 
   revalidatePath("/admin/blog");
+
+  revalidatePath("/sitemap.xml"); // list/unlist the page now, not up to an hour later
   revalidatePath("/blog");
   revalidatePath(publicPath(urlPath, slug));
   redirect("/admin/blog?created=1");
@@ -101,6 +103,8 @@ export async function updateContent(id: string, formData: FormData) {
   });
 
   revalidatePath("/admin/blog");
+
+  revalidatePath("/sitemap.xml"); // list/unlist the page now, not up to an hour later
   revalidatePath("/blog");
   revalidatePath(publicPath(existing.urlPath, existing.slug));
   redirect("/admin/blog");
@@ -115,6 +119,8 @@ export async function deleteContent(id: string) {
   await Content.findByIdAndDelete(id);
 
   revalidatePath("/admin/blog");
+
+  revalidatePath("/sitemap.xml"); // list/unlist the page now, not up to an hour later
   revalidatePath("/blog");
   revalidatePath(publicPath(existing.urlPath, existing.slug));
 }
